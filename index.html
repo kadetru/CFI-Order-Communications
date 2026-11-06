@@ -87,6 +87,8 @@ nav.pages .n{font-family:var(--mono);font-size:11px;font-weight:700;background:v
 .big{font-family:var(--cond);font-weight:600;font-size:18px;letter-spacing:.06em;}
 table.ans .pcol{display:none;}table.ans.partial .pcol{display:table-cell;}
 .choices.c3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.choices.c4{grid-template-columns:repeat(4,minmax(0,1fr));}
+@media (max-width:760px){.choices.c4{grid-template-columns:1fr 1fr;}}
 .perf{background:var(--white);border:1px solid var(--line);padding:12px 16px;margin-bottom:16px;}
 .c-act{display:flex;justify-content:flex-end;padding-right:12px;}
 .rq-head{cursor:default;padding-top:0;padding-bottom:7px;font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);}
@@ -517,7 +519,7 @@ function createRequest(f){
   const lines=f.lines&&f.lines.length?f.lines:(o.lines.length?o.lines.map(l=>({ln:l.ln,qty:l.rem})):[{ln:null,qty:null}]);
   const r={id:f.id,osnap:orderSnap(o),createdByName:ME?ME.name:'',so:f.so,type:f.type,dir:f.dir||null,ask:f.ask||null,lines,changes:f.changes||null,reqDate:f.reqDate||null,reason:f.reason,urgency:f.urgency||'Normal',by:S.view,created:T(),createdTs:ts(),turn:T(),status:'submitted',rounds:1,unread:{}};
   S.requests.push(r);
-  ev(r,'request',{rows:f.type==='date'?rowsFrom(lines,r.reqDate):f.type==='cancel'?rowsFrom(lines,null):null,ref:'order',note:f.reason,changes:r.changes,date:r.reqDate,ask:r.ask});
+  ev(r,'request',{rows:f.type==='date'?rowsFrom(lines,r.reqDate):f.type==='cancel'?rowsFrom(lines,null):f.type==='check'?rowsFrom(lines,r.reqDate):null,ref:'order',note:f.reason,changes:r.changes,date:r.reqDate,ask:r.ask});
   return r;
 }
 function acknowledge(r){r.status='acknowledged';ev(r,'ack');}
@@ -537,10 +539,10 @@ function dateDecide(r,outcome,rows,note){
 }
 function dateCounter(r,lines,date,note){r.lines=lines;r.reqDate=date;r.dir=date<BY_SO[r.so].esd||BY_SO[r.so].esd<T()?'earlier':'later';r.rounds++;r.status='acknowledged';setTurn(r);r.decision=null;ev(r,'counter',{rows:rowsFrom(lines,date),ref:'order',note});}
 /* check in */
-function checkAnswer(r,kind,date,note){
+function checkAnswer(r,kind,date,note,partRows){
   firstAnswer(r);setTurn(r);
   if(kind==='cant'){r.status='cannot';ev(r,'cant',{note});return;}
-  const rows=rowsFrom(r.lines,date);ev(r,'chk_ok',{rows,ref:'request',reqLines:r.lines.map(x=>({...x})),note,kind,date});activate(r,rows);
+  const rows=rowsFrom(partRows||r.lines,date);ev(r,'chk_ok',{rows,ref:'request',reqLines:r.lines.map(x=>({...x})),note,kind,date});activate(r,rows);
 }
 /* shared offer answers (date + change) */
 function accept(r){
@@ -609,7 +611,7 @@ function lastText(r){if(!r.lastT)return '';const n=bdBetween(r.lastAt.slice(0,10
 function rowHTML(r,g){
   const o=BY_SO[r.so],st=statusOf(r),open=UI.openId===r.id;
   const act=COMMITTED.includes(r.status)?`<button class="btn-ok" data-complete="${r.id}">Complete</button>`:`<button class="chevbtn" data-toggle="${r.id}" aria-label="${open?'Collapse':'Expand'} ${r.id}">${chevSvg}</button>`;
-  const scope=r.type==='change'?plural(r.changes.length,'item'):r.type==='check'?'Whole order':scopeText(r);
+  const scope=r.type==='change'?plural(r.changes.length,'item'):scopeText(r);
   return `<div class="rq ${open?'open':''}" id="rq-${r.id}"><div class="rq-line">
   <button class="rq-row" data-toggle="${r.id}" aria-expanded="${open}">
     <span class="tick t-${st.c}"></span><span class="c-id">${r.id}</span>
@@ -664,14 +666,14 @@ function threadHTML(r){
     switch(e.t){
       case 'request':
         if(r.type==='date'){label=`${typeLabel(r)} request`;body=rowsBlock(r,e);}
-        else if(r.type==='check'){label=e.ask==='status'?'Status check':'Confirm ESD';body=`<div class="msg-d">${e.ask==='status'?'Where is it?':'Confirm ESD '+fmt(BY_SO[r.so].esd)} <span class="of">Whole order</span></div>`;}
+        else if(r.type==='check'){label=e.ask==='status'?'Status check':'Confirm ESD';body=e.rows&&e.rows.length?rowsBlock(r,e,e.ask==='status'?'Where is it?':'Confirm ESD '+fmt(BY_SO[r.so].esd)):`<div class="msg-d">${e.ask==='status'?'Where is it?':'Confirm ESD '+fmt(BY_SO[r.so].esd)} <span class="of">Whole order</span></div>`;}
         else if(r.type==='cancel'){label='Cancel request';body=rowsBlock(r,e,'Cancel');}
         else{label='Change request';body=`<div class="msg-d">Change <span class="of">${plural(e.changes.length,'item')}</span></div>${changesBlock(r,e.changes)}${e.date?`<div class="msg-d" style="font-size:16px;margin-top:8px">Needed by ${fmt(e.date)}</div>`:''}`;}
         break;
       case 'counter':label='Counter';body=r.type==='change'?`<div class="msg-d">Needed by ${fmt(e.date)}</div>`:rowsBlock(r,e);break;
       case 'offer':label='Counter offer';body=r.type==='change'?`<div class="msg-d">Ready by ${fmt(e.date)} <span class="of">with the requested changes</span></div>`:rowsBlock(r,e);break;
       case 'commit':label='Committed';body=rowsBlock(r,e);break;
-      case 'chk_ok':label=e.kind==='ontrack'?'On track':'New date';body=rowsBlock(r,e);break;
+      case 'chk_ok':label=e.kind==='ontrack'?'On track':e.kind==='part'?'Partial':'New date';body=rowsBlock(r,e);break;
       case 'cant':label=r.type==='check'?'Can’t confirm':'Can’t commit';break;
       case 'decline':label='Declined';break;
       case 'change':label='New date';body=rowsBlock(r,e);break;
@@ -755,9 +757,11 @@ function turnHTML(r){
     if(Sx&&st==='alternative')return offerAnswerCard(r);
   }
   if(r.type==='check'){
-    if(answering){const can=o.esd>=T();
+    if(answering){const can=o.esd>=T(),canPart=r.lines.some(x=>x.ln!=null)&&!(r.lines.length===1&&r.lines[0].qty<=1);
+      const opts=[...(can?[['ontrack','On track',`Ready by ESD ${fmt(o.esd)}`]]:[]),['newdate','New date','Everything on one date'],...(canPart?[['part','Partial','Some items or qty']]:[]),['cant','Can’t confirm','No date yet']];
       return `<div class="turn"><h3>Your answer${ackBtn(r)}</h3>
-      ${choices('ck',[...(can?[['ontrack','On track',`Ready by ESD ${fmt(o.esd)}`]]:[]),['newdate','New date','Give a realistic date'],['cant','Can’t confirm','No date yet']])}
+      ${choices('ck',opts).replace('choices c3','choices '+(opts.length===4?'c4':'c3'))}
+      <div id="ckpick" class="hidden" style="margin-top:12px">${canPart?itemPicker(r,r.lines.map(x=>({ln:x.ln,qty:x.qty,max:x.qty,ref:x.qty,checked:true})),{id:'ck',refLabel:'Asked',qtyLabel:'Can confirm'}):''}</div>
       <div class="row ${can?'hidden':''}" id="ckdate"><div><label class="lbl" for="ckd">Ready by</label><input class="din" type="date" id="ckd"></div></div>
       <label class="lbl" for="cknote" id="cklbl">${can?'Where it stands (optional)':'Where it stands'}</label><textarea class="ta" id="cknote" placeholder="For example: in winding, couplings bonded Thursday"></textarea>
       <div class="err" id="aerr" role="alert"></div><div class="actions"><button class="btn-red" id="cksend">Send to Sales</button></div></div>`;}
@@ -834,12 +838,14 @@ function bindDetail(r){
   }
   /* check answer */
   if($('cksend')){
-    const get=bindChoice('ck',v=>{$('ckdate').classList.toggle('hidden',v!=='newdate');$('cklbl').textContent=v==='ontrack'?'Where it stands (optional)':'Where it stands';});
+    tog('ck');
+    const get=bindChoice('ck',v=>{$('ckdate').classList.toggle('hidden',!(v==='newdate'||v==='part'));$('ckpick').classList.toggle('hidden',v!=='part');$('cklbl').textContent=v==='ontrack'?'Where it stands (optional)':'Where it stands';});
     $('cksend').onclick=()=>{const v=get(),note=$('cknote').value.trim();
       if(v==='ontrack'){checkAnswer(r,'ontrack',BY_SO[r.so].esd,note);return done('Confirmed. Moved to Upcoming');}
       if(!note)return err('Say where the order stands.');
       if(v==='cant'){checkAnswer(r,'cant',null,note);return done('Sent. Moved to Closed');}
       const d=$('ckd').value;if(!d)return err('Pick a ready date.');if(past(d))return err('That date is in the past.');
+      if(v==='part'){const pk=readPicker('ck');if(pk.bad)return err('Check the quantities.');if(!pk.rows.length)return err('Pick at least one item.');checkAnswer(r,'part',d,note,pk.rows);return done(`Confirmed ${fmt(d)}. Moved to Upcoming`);}
       checkAnswer(r,'newdate',d,note);done(`Confirmed ${fmt(d)}. Moved to Upcoming`);};
   }
   /* cancel answer */
@@ -938,7 +944,7 @@ function renderNew(){
   let body='';
   if(ty==='date')body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Remaining</th><th class="r">Request qty</th></tr></thead><tbody>${pickRows}</tbody></table></div>`:''}
     <div class="row"><div><label class="lbl" for="nd">Date needed</label><input class="din" type="date" id="nd"></div><span class="dirlbl" id="dirlbl" style="margin-bottom:14px"></span></div>`;
-  else if(ty==='check')body=`<label class="lbl">Question</label><div class="seg" role="group"><button type="button" data-ask="confirm" aria-pressed="${!late}">Confirm ESD</button><button type="button" data-ask="status" aria-pressed="${!!late}">Status check</button></div>`;
+  else if(ty==='check')body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Remaining</th><th class="r">Ask about qty</th></tr></thead><tbody>${pickRows}</tbody></table></div>`:''}<label class="lbl">Question</label><div class="seg" role="group"><button type="button" data-ask="confirm" aria-pressed="${!late}">Confirm ESD</button><button type="button" data-ask="status" aria-pressed="${!!late}">Status check</button></div>`;
   else if(ty==='cancel')body=o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Remaining</th><th class="r">Cancel qty</th></tr></thead><tbody>${pickRows}</tbody></table></div>`:'';
   else body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Current qty</th><th>New item</th><th class="r">New qty</th></tr></thead><tbody>${chgRows}</tbody></table></div><datalist id="itemlist">${Object.keys(ITEMS).sort().map(k=>`<option value="${esc(k)}">`).join('')}</datalist>`:'<p class="hint up">This order has no item lines to change.</p>'}
     <div class="row"><div><label class="lbl" for="nd">Date needed (optional)</label><input class="din" type="date" id="nd"></div></div>`;
@@ -967,7 +973,7 @@ function renderNew(){
     if(ty==='date'){const p=picked();if(o.lines.length&&!p.length)return e('Pick at least one item.');if(p.some(x=>!(x.qty>0)||x.qty>x.max))return e('Check the quantities.');
       const d=$('nd').value;if(!d)return e('Pick the date needed.');if(d<t)return e('That date is in the past.');const v=dir(d);if(v==='same')return e('That’s the ESD. Use Confirm ESD instead.');
       f={type:'date',dir:v,lines:p.map(x=>({ln:x.ln,qty:x.qty})),reqDate:d};}
-    else if(ty==='check')f={type:'check',ask,reqDate:o.esd};
+    else if(ty==='check'){const p=picked();if(o.lines.length&&!p.length)return e('Pick at least one item.');if(p.some(x=>!(x.qty>0)||x.qty>x.max))return e('Check the quantities.');f={type:'check',ask,reqDate:o.esd,lines:p.map(x=>({ln:x.ln,qty:x.qty}))};}
     else if(ty==='cancel'){const p=picked();if(o.lines.length&&!p.length)return e('Pick at least one item.');if(p.some(x=>!(x.qty>0)||x.qty>x.max))return e('Check the quantities.');f={type:'cancel',lines:p.map(x=>({ln:x.ln,qty:x.qty}))};}
     else{const ch=[];let bad='';
       document.querySelectorAll('.nc').forEach(c=>{if(!c.checked)return;const ln=+c.dataset.ln,l=lineOf(o.so,ln),it=document.querySelector(`.nci[data-ln="${ln}"]`).value.trim().toUpperCase(),qv=document.querySelector(`.ncq[data-ln="${ln}"]`).value;const nq=qv===''?null:+qv;
