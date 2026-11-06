@@ -1001,8 +1001,10 @@ function openModal(){lastFocus=document.activeElement;modal.classList.remove('hi
 function closeModal(){modal.classList.add('hidden');document.getElementById('sheet').innerHTML='';document.body.style.overflow='';if(lastFocus&&lastFocus.focus)lastFocus.focus();}
 function armed(el,fn){if(el.dataset.armed){delete el.dataset.armed;el.textContent=el.dataset.orig;fn();return;}el.dataset.orig=el.textContent;el.dataset.armed='1';el.textContent='Click again to confirm';setTimeout(()=>{if(el.isConnected&&el.dataset.armed){delete el.dataset.armed;el.textContent=el.dataset.orig;}},4000);}
 let tt;function toast(m,undo){const el=document.getElementById('toast');el.innerHTML=`<span>${esc(m)}</span>${undo?'<button type="button" id="undo">Undo</button>':''}`;el.classList.remove('hidden');if(undo)document.getElementById('undo').onclick=()=>{undo();el.classList.add('hidden');};clearTimeout(tt);tt=setTimeout(()=>el.classList.add('hidden'),undo?6000:2800);}
+let DEEP=(location.hash.match(/^#(R-\d+)$/)||[])[1]||null,DEEP_SCROLL=null;
 function render(){
   if(!ME)return;
+  if(DEEP){const dr=R(DEEP);if(dr){UI.openId=dr.id;UI.q='';DEEP_SCROLL=dr.id;history.replaceState(null,'','#'+dr.type+'-'+tabOf(dr));DEEP=null;}else if(READY){DEEP=null;history.replaceState(null,'','#date-answer');}}
   parseHash();
   const g=UI.g,tab=UI.tab;
   DIRTY=false;PENDING=false;watchEvents();
@@ -1016,6 +1018,7 @@ function render(){
   document.getElementById('view').innerHTML=`<div class="page"><nav class="groupbar" aria-label="Communication types">${gb}</nav><nav class="subtabs" aria-label="${esc(G(g).l)}">${st}</nav>${pageHTML()}</div>`;
   if(UI.openId){const r=R(UI.openId);if(r&&document.getElementById('rq-'+r.id)){if(unread(r)&&S.view!=='viewer'){r.unread[S.view]=false;updateDoc(doc(db,'requests',r.id),{['unread.'+S.view]:false}).catch(()=>{});}bindDetail(r);}}
   bindPage();
+  if(DEEP_SCROLL){const el=document.getElementById('rq-'+DEEP_SCROLL);DEEP_SCROLL=null;if(el)setTimeout(()=>el.scrollIntoView({block:'start'}),50);}
 }
 function bindPage(){
   const q=document.getElementById('rq');
@@ -1036,7 +1039,7 @@ document.addEventListener('click',e=>{
   const tgl=tg.closest('[data-toggle]');if(tgl){const id=tgl.dataset.toggle;UI.openId=UI.openId===id?null:id;render();if(UI.openId){const el=document.getElementById('rq-'+id);if(el){const top=el.getBoundingClientRect().top;if(top<0||top>window.innerHeight*.6)el.scrollIntoView({block:'start'});}}return;}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.classList.contains('hidden'))closeModal();});
-window.addEventListener('hashchange',()=>{const keep=UI.openId&&R(UI.openId);parseHash();if(!(keep&&R(UI.openId).type===UI.g&&tabOf(R(UI.openId))===UI.tab))UI.openId=null;UI.q='';render();window.scrollTo(0,0);});
+window.addEventListener('hashchange',()=>{const dm=location.hash.match(/^#(R-\d+)$/);if(dm){DEEP=dm[1];render();return;}const keep=UI.openId&&R(UI.openId);parseHash();if(!(keep&&R(UI.openId).type===UI.g&&tabOf(R(UI.openId))===UI.tab))UI.openId=null;UI.q='';render();window.scrollTo(0,0);});
 
 
 /* ===================== FIREBASE LAYER ===================== */
@@ -1245,16 +1248,17 @@ async function openUsers(){
   <div style="flex:2 1 220px"><label class="lbl" for="ue">Email</label><input class="din" id="ue" type="email" style="width:100%"></div>
   <div style="flex:2 1 180px"><label class="lbl" for="un">Name</label><input class="din" id="un" style="width:100%"></div>
   <div><label class="lbl" for="ur">Role</label><select class="sel" id="ur"><option value="sales">Sales</option><option value="production">Production</option><option value="viewer">Viewer</option></select></div>
-  <div><label class="lbl" for="ua">Admin</label><select class="sel" id="ua"><option value="no">No</option><option value="yes">Yes</option></select></div></div>
+  <div><label class="lbl" for="ua">Admin</label><select class="sel" id="ua"><option value="no">No</option><option value="yes">Yes</option></select></div>
+  <div><label class="lbl" for="um">Emails</label><select class="sel" id="um"><option value="yes">Yes</option><option value="no">No</option></select></div></div>
   <div class="err" id="uerr" role="alert"></div><div class="actions"><button class="btn-red" id="usave">Save user</button></div></div>`;
   openModal();
   const $=id=>document.getElementById(id);
   const load=async()=>{const s=await getDocs(collection(db,'roles'));const rows=s.docs.map(d=>({email:d.id,...d.data()})).sort((a,b)=>(a.role+a.name)<(b.role+b.name)?-1:1);
-    $('ulist').innerHTML=`<div class="scroll"><table class="it"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Admin</th><th></th></tr></thead><tbody>${rows.map(u=>`<tr><td>${esc(u.name||'')}</td><td class="mono">${esc(u.email)}</td><td class="up">${esc(u.role)}</td><td class="up">${u.admin?'Yes':''}</td><td class="r"><button class="btn-link" data-uedit="${esc(u.email)}">Edit</button> <button class="btn-link" data-udel="${esc(u.email)}">Remove</button></td></tr>`).join('')}</tbody></table></div>`;
-    document.querySelectorAll('[data-uedit]').forEach(b=>b.onclick=()=>{const u=rows.find(x=>x.email===b.dataset.uedit);$('ue').value=u.email;$('un').value=u.name||'';$('ur').value=u.role;$('ua').value=u.admin?'yes':'no';$('un').focus();});
+    $('ulist').innerHTML=`<div class="scroll"><table class="it"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Admin</th><th>Emails</th><th></th></tr></thead><tbody>${rows.map(u=>`<tr><td>${esc(u.name||'')}</td><td class="mono">${esc(u.email)}</td><td class="up">${esc(u.role)}</td><td class="up">${u.admin?'Yes':''}</td><td class="up">${u.emails===false?'No':'Yes'}</td><td class="r"><button class="btn-link" data-uedit="${esc(u.email)}">Edit</button> <button class="btn-link" data-udel="${esc(u.email)}">Remove</button></td></tr>`).join('')}</tbody></table></div>`;
+    document.querySelectorAll('[data-uedit]').forEach(b=>b.onclick=()=>{const u=rows.find(x=>x.email===b.dataset.uedit);$('ue').value=u.email;$('un').value=u.name||'';$('ur').value=u.role;$('ua').value=u.admin?'yes':'no';$('um').value=u.emails===false?'no':'yes';$('un').focus();});
     document.querySelectorAll('[data-udel]').forEach(b=>b.onclick=()=>armed(b,async()=>{if(b.dataset.udel===ME.email){$('uerr').textContent='You can’t remove yourself.';return;}await deleteDoc(doc(db,'roles',b.dataset.udel));load();}));};
   $('usave').onclick=async()=>{const em=$('ue').value.trim().toLowerCase(),nm=$('un').value.trim();if(!em||!em.includes('@'))return $('uerr').textContent='Enter a valid email.';if(!nm)return $('uerr').textContent='Enter a name.';
-    try{await setDoc(doc(db,'roles',em),{email:em,name:nm,role:$('ur').value,admin:$('ua').value==='yes'});$('uerr').textContent='';$('ue').value='';$('un').value='';load();toast('User saved');}catch(x){$('uerr').textContent='Couldn’t save. Only admins can change users.';}};
+    try{await setDoc(doc(db,'roles',em),{email:em,name:nm,role:$('ur').value,admin:$('ua').value==='yes',emails:$('um').value==='yes'});$('uerr').textContent='';$('ue').value='';$('un').value='';load();toast('User saved');}catch(x){$('uerr').textContent='Couldn’t save. Only admins can change users.';}};
   load();
 }
 
