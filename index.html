@@ -322,6 +322,13 @@ footer{padding:16px 24px 26px;font-size:11px;letter-spacing:.08em;text-transform
 .msg-wo.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-tint);}
 .woconfirm{display:flex;gap:10px;align-items:center;margin-top:16px;padding:12px 14px;border:1px dashed var(--line-strong);background:var(--field);font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;}
 .woconfirm em{font-style:normal;font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-2);}
+.recip-l{font-size:13.5px;margin:3px 0;display:flex;gap:10px;flex-wrap:wrap;}
+.recip-k{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);min-width:78px;padding-top:2px;}
+.recip-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;margin-top:6px;max-height:220px;overflow:auto;}
+.recip-o{display:flex;gap:10px;align-items:center;padding:6px 8px;border:1px solid var(--line);background:var(--white);cursor:pointer;font-size:14px;}
+.recip-o small{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);}
+.recip-line{display:flex;gap:6px 18px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin:-8px 0 14px;}
+.recip-line b{font-weight:600;color:var(--ink);}
 .c-last{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2);}
 /* group bar (4 communication types) */
 .groupbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--ink);background:var(--white);margin:0 0 0;}
@@ -510,14 +517,14 @@ function listFor(g,tab){
 const groupBadge=g=>listFor(g,'answer').length+S.requests.filter(r=>r.type===g&&unread(r)).length;
 
 /* ===== actions ===== */
-function ev(r,t,o){const e={req:r.id,at:ts(),ms:Date.now()*100+(SEQN++%100),by:S.view,name:S.view==='auto'||!ME?'':(ME.name||ME.email),t,...(o||{})};S.ev.push(e);BUF.push(e);r.lastAt=e.at;r.lastT=t;r.lastBy=S.view;r.lastName=e.name;return e;}
+function ev(r,t,o){const e={req:r.id,at:ts(),ms:Date.now()*100+(SEQN++%100),by:S.view,name:S.view==='auto'||!ME?'':(ME.name||ME.email),t,...(o||{})};S.ev.push(e);BUF.push(e);r.lastAt=e.at;r.lastT=t;r.lastBy=S.view;r.lastName=e.name;if(S.view==='production'&&e.name)r.answeredBy=e.name;return e;}
 function sysEv(r,t,o){const pv=S.view;S.view='auto';ev(r,t,o);S.view=pv;}
 function setTurn(r){r.turn=T();}
 function firstAnswer(r){if(!r.firstAnswerAt)r.firstAnswerAt=ts();}
 function createRequest(f){
   const o=BY_SO[f.so];
   const lines=f.lines&&f.lines.length?f.lines:(o.lines.length?o.lines.map(l=>({ln:l.ln,qty:l.rem})):[{ln:null,qty:null}]);
-  const r={id:f.id,osnap:orderSnap(o),createdByName:ME?ME.name:'',so:f.so,type:f.type,dir:f.dir||null,ask:f.ask||null,lines,changes:f.changes||null,reqDate:f.reqDate||null,reason:f.reason,urgency:f.urgency||'Normal',by:S.view,created:T(),createdTs:ts(),turn:T(),status:'submitted',rounds:1,unread:{}};
+  const r={id:f.id,osnap:orderSnap(o),createdByName:ME?ME.name:'',createdByEmail:ME?ME.email:'',notify:f.notify||[],so:f.so,type:f.type,dir:f.dir||null,ask:f.ask||null,lines,changes:f.changes||null,reqDate:f.reqDate||null,reason:f.reason,urgency:f.urgency||'Normal',by:S.view,created:T(),createdTs:ts(),turn:T(),status:'submitted',rounds:1,unread:{}};
   S.requests.push(r);
   ev(r,'request',{rows:f.type==='date'?rowsFrom(lines,r.reqDate):f.type==='cancel'?rowsFrom(lines,null):f.type==='check'?rowsFrom(lines,r.reqDate):null,ref:'order',note:f.reason,changes:r.changes,date:r.reqDate,ask:r.ask});
   return r;
@@ -616,7 +623,7 @@ function rowHTML(r,g){
   <button class="rq-row" data-toggle="${r.id}" aria-expanded="${open}">
     <span class="tick t-${st.c}"></span><span class="c-id">${r.id}</span>
     <span class="c-main"><span class="c-so">${esc(r.so)}</span><span class="c-cust">${esc(o.c)}</span>${unread(r)?'<span class="newtag">Update</span>':''}<span class="c-last">${esc(lastText(r))}</span></span>
-    <span class="c-type up">${r.type==='cancel'?'<span class="cx">Cancel</span>':typeLabel(r)}${r.urgency==='High'?'<span class="hi">High</span>':''}${r.rounds>1?`<span class="rnd">Round ${r.rounds}</span>`:''}<small>${scope}</small></span>
+    <span class="c-type up">${r.type==='cancel'?'<span class="cx">Cancel</span>':typeLabel(r)}${r.urgency==='High'?'<span class="hi">High</span>':''}${r.rounds>1?`<span class="rnd">Round ${r.rounds}</span>`:''}<small>${scope}${r.createdByName?', '+esc(r.createdByName):''}</small></span>
     <span class="c-date up">${keyDate(r)}</span>
     <span class="c-st"><span class="pill ${st.c}">${st.t}</span></span>
   </button><span class="c-act" data-toggle="${r.id}">${act}</span></div>
@@ -801,7 +808,7 @@ function turnHTML(r){
 function factsHTML(r){
   const o=BY_SO[r.so],t=T(),late=o.esd<t?daysBetween(o.esd,t):0;
   const esdF=fact('ESD',fmt(o.esd)+(late?`<span class="late-l">${plural(late,'day')} late</span>`:''),'up');
-  const tail=fact('Sent',fmt(r.created),'up')+fact('Unbilled',money(o.amt))+fact('Urgency',esc(r.urgency),'up'+(r.urgency==='High'?' red':''));
+  const tail=fact('Sent',fmt(r.created),'up')+fact('Requested by',esc(r.createdByName||'—'))+fact('Answered by',esc(r.answeredBy||'—'))+fact('Unbilled',money(o.amt))+fact('Urgency',esc(r.urgency),'up'+(r.urgency==='High'?' red':''));
   if(r.type==='date'){const dl=daysBetween(r.reqDate,o.esd);return `<div class="facts">${esdF}${fact('Requested',fmt(r.reqDate)+(dl?`<span class="sub-l">${plural(Math.abs(dl),'day')} ${dl>0?'before':'after'} ESD</span>`:''),'up')}${tail}</div>`;}
   if(r.type==='check')return `<div class="facts">${esdF}${fact('Production ESD',fmt(o.pesd),'up')}${tail}</div>`;
   if(r.type==='cancel'){const v=r.lines.reduce((s,x)=>{const l=x.ln!=null?lineOf(r.so,x.ln):null;return s+(l&&l.amt&&l.rem?l.amt*x.qty/l.rem:0);},0);return `<div class="facts">${esdF}${fact('$ To cancel',money(o.lines.length?v:o.amt),'red')}${tail}</div>`;}
@@ -810,7 +817,7 @@ function factsHTML(r){
 function detailHTML(r){
   if(S.view==='viewer')return `${BY_SO[r.so].gone?'<div class="notice">Off the NetSuite backlog (shipped or closed)</div>':''}${factsHTML(r)}${threadHTML(r)}`;
   const canWithdraw=isSales()&&(['submitted','acknowledged','alternative'].includes(r.status)||COMMITTED.includes(r.status));
-  return `${BY_SO[r.so].gone?'<div class="notice">Off the NetSuite backlog (shipped or closed)</div>':''}${factsHTML(r)}${threadHTML(r)}${turnHTML(r)}
+  return `${BY_SO[r.so].gone?'<div class="notice">Off the NetSuite backlog (shipped or closed)</div>':''}${factsHTML(r)}${recipLine(r)}${threadHTML(r)}${turnHTML(r)}
   <div class="notebar"><input class="din" id="cmt" placeholder="Add a note for both teams" aria-label="Add a note"><button class="btn-ghost btn-sm" id="cmtb" style="min-height:42px">Add note</button>${canWithdraw?'<button class="btn-link" id="wd" style="margin-left:auto">Withdraw request</button>':''}</div>`;
 }
 function fmtSize(b){return b<1024?b+' B':b<1048576?Math.round(b/1024)+' KB':(b/1048576).toFixed(1)+' MB';}
@@ -955,6 +962,7 @@ function renderNew(){
   ${body}
   <div class="row"><div><label class="lbl" for="nu">Urgency</label><select class="sel" id="nu"><option>Normal</option><option>High</option></select></div></div>
   <label class="lbl" for="nr">${ty==='check'?'Question or details':'Reason'}</label><textarea class="ta" id="nr"></textarea>
+  ${recipPicker()}
   <div class="err" id="nerr" role="alert"></div>
   <div class="actions"><button class="btn-red" id="nsend">Send to Production</button><button class="btn-ghost" id="nback">Change order</button></div>`;
   const $=id=>document.getElementById(id);
@@ -986,7 +994,8 @@ function renderNew(){
     $('nsend').disabled=true;
     let id;try{id=await nextId();}catch(x){$('nsend').disabled=false;return e('Couldn’t reach the server. Try again.');}
     const before=snapshotReqs();BUF=[];
-    const r=createRequest({id,so:o.so,urgency:urg,reason,...f});
+    const notify=[...document.querySelectorAll('.nw:checked')].map(c=>c.value);
+    const r=createRequest({id,so:o.so,urgency:urg,reason,notify,...f});
     const ok=await persist(r.id,'__new__',before);
     if(!ok){$('nsend').disabled=false;return;}
     closeModal();UI.openId=r.id;UI.q='';
@@ -1014,7 +1023,7 @@ function render(){
   parseHash();
   const g=UI.g,tab=UI.tab;
   DIRTY=false;PENDING=false;watchEvents();
-  document.getElementById('hdr').innerHTML=`${isSales()?'<button class="btn-red" id="newreq">New request</button>':''}<div class="me"><b class="me-n">${esc(ME.name||ME.email)}</b><b class="me-r">${NAMES[S.view]}</b><button class="btn-link" id="signout">Sign out</button></div>`;
+  document.getElementById('hdr').innerHTML=`${isSales()?'<button class="btn-red" id="newreq">New request</button>':''}${ME.admin?`<div class="viewsw" role="group" aria-label="Acting as"><button data-view="production" aria-pressed="${isProd()}">Production</button><button data-view="sales" aria-pressed="${isSales()}">Sales</button></div>`:''}<div class="me"><b class="me-n">${esc(ME.name||ME.email)}</b><b class="me-r">${NAMES[S.view]}</b><button class="btn-link" id="signout">Sign out</button></div>`;
   const ab=document.getElementById('adminbar');
   if(ME.admin){const st=!META||bdBetween(META.asOf.slice(0,10),T())>=1;ab.classList.remove('hidden');ab.innerHTML=`<span class="ab-l">Admin</span><button class="btn-admin" id="admin-import">Import backlog</button><button class="btn-admin" id="admin-users">Users</button><span class="ab-s ${st?'stale':''}">${META?`Backlog as of ${fmt(META.asOf.slice(0,10))}, ${hm12(META.asOf.slice(11,16))}${st?', needs today’s import':''}`:'No backlog imported yet'}</span>`;}else{ab.classList.add('hidden');ab.innerHTML='';}
   const stale=!META||bdBetween(META.asOf.slice(0,10),T())>=1;
@@ -1038,6 +1047,7 @@ document.addEventListener('click',e=>{
   const pick=tg.closest('[data-pick]');if(pick){NR.so=pick.dataset.pick;return renderNew();}
   if(tg.id==='newreq')return openNew();
   if(tg.id==='signout'){UI.openId=null;return signOut(auth);}
+  const vw=tg.closest('[data-view]');if(vw&&ME&&ME.admin){S.view=vw.dataset.view;try{localStorage.setItem('oc-view',S.view);}catch(x){}UI.openId=null;render();return toast(`Acting as ${NAMES[S.view]}`);}
   if(tg.id==='admin-import')return openImport();
   if(tg.id==='admin-users')return openUsers();
   const go=tg.closest('[data-goto]');if(go){const r=R(go.dataset.goto);UI.openId=r.id;UI.q='';const h=`${r.type}-${tabOf(r)}`;if(location.hash!=='#'+h)location.hash=h;else render();setTimeout(()=>{const el=document.getElementById('rq-'+r.id);if(el)el.scrollIntoView({block:'start'});},30);return;}
@@ -1126,6 +1136,24 @@ function hydrateMissing(){
     s.lines.forEach(l=>{GHOST[r.so+'|'+l.ln]=l;});
   });
 }
+let USERS=[];
+async function loadUsers(){try{const s=await getDocs(collection(db,'roles'));USERS=s.docs.map(d=>({email:d.id,...d.data()})).filter(u=>u.role&&u.role!=='none');}catch(x){USERS=[];}}
+const firstName=n=>(n||'').split(' ')[0];
+function recipPicker(){
+  const prod=USERS.filter(u=>u.role==='production'&&u.always),sales=USERS.filter(u=>u.role==='sales'&&u.always&&u.email!==ME.email);
+  const fixed=new Set([...prod,...sales].map(u=>u.email).concat([ME.email]));
+  const others=USERS.filter(u=>!fixed.has(u.email)).sort((a,b)=>(a.name||a.email)<(b.name||b.email)?-1:1);
+  return `<div class="recip"><div class="lbl" style="margin-top:16px">Email updates go to</div>
+  <div class="recip-l"><span class="recip-k">Production</span>${prod.length?prod.map(u=>esc(u.name||u.email)).join(', '):'<span class="hint">No one set as Always emailed</span>'}</div>
+  <div class="recip-l"><span class="recip-k">Sales</span>${[...sales.map(u=>esc(u.name||u.email)),esc(ME.name||ME.email)+' (you)'].join(', ')}</div>
+  ${others.length?`<details class="more" style="margin-top:4px"><summary>Also email others</summary><div class="recip-pick">${others.map(u=>`<label class="recip-o"><input type="checkbox" class="bx nw" value="${esc(u.email)}"><span>${esc(u.name||u.email)}<small>${esc(NAMES[u.role]||u.role)}</small></span></label>`).join('')}</div></details>`:''}</div>`;
+}
+function recipLine(r){
+  const prod=USERS.filter(u=>u.role==='production'&&u.always).map(u=>u.name||u.email);
+  const byEmail=e=>{const u=USERS.find(x=>x.email===e);return u?(u.name||u.email):e;};
+  const sales=[...new Set([...USERS.filter(u=>u.role==='sales'&&u.always).map(u=>u.email),r.createdByEmail,...(r.notify||[])].filter(Boolean))].map(byEmail);
+  return `<div class="recip-line"><span class="recip-k">Emails</span><span><b>Production:</b> ${esc(prod.join(', ')||'—')}</span><span><b>Sales:</b> ${esc(sales.join(', ')||'—')}</span></div>`;
+}
 async function loadBacklog(){
   const m=await getDoc(doc(db,'backlog','meta'));
   if(!m.exists()){META=null;buildBacklog([],[]);return;}
@@ -1161,10 +1189,13 @@ async function startApp(user){
   let rd;try{rd=await getDoc(doc(db,'roles',email));}catch(x){rd=null;}
   if(!rd||!rd.exists()){showMessage('No access yet',`You’re signed in as <b>${esc(email)}</b>, but you haven’t been given access. Ask your administrator to add you.`,true);return;}
   ME={email,uid:user.uid,...rd.data()};
-  S={view:ME.role==='sales'||ME.role==='production'?ME.role:'viewer',requests:[],ev:[]};
+  let v=ME.role==='sales'||ME.role==='production'?ME.role:'viewer';
+  if(ME.admin){let saved=null;try{saved=localStorage.getItem('oc-view');}catch(x){}v=saved==='sales'||saved==='production'?saved:(v==='viewer'?'production':v);}
+  S={view:v,requests:[],ev:[]};
   chrome(true);
   document.getElementById('view').innerHTML='<div class="page"><div class="empty">Loading…</div></div>';
   await loadBacklog();
+  await loadUsers();
   unsubs.push(onSnapshot(doc(db,'backlog','meta'),snap=>{const m=snap.exists()?snap.data():null;if(m&&(!META||m.syncedAt!==META.syncedAt))loadBacklog().then(()=>{if(!DIRTY)render();else PENDING=true;});}));
   unsubs.push(onSnapshot(collection(db,'requests'),snap=>{
     S.requests=snap.docs.map(d=>d.data());hydrateMissing();
@@ -1255,16 +1286,16 @@ async function openUsers(){
   <div style="flex:2 1 180px"><label class="lbl" for="un">Name</label><input class="din" id="un" style="width:100%"></div>
   <div><label class="lbl" for="ur">Role</label><select class="sel" id="ur"><option value="sales">Sales</option><option value="production">Production</option><option value="viewer">Viewer</option></select></div>
   <div><label class="lbl" for="ua">Admin</label><select class="sel" id="ua"><option value="no">No</option><option value="yes">Yes</option></select></div>
-  <div><label class="lbl" for="um">Emails</label><select class="sel" id="um"><option value="yes">Yes</option><option value="no">No</option></select></div></div>
+  <div><label class="lbl" for="um">Always emailed</label><select class="sel" id="um"><option value="no">No</option><option value="yes">Yes</option></select></div></div>
   <div class="err" id="uerr" role="alert"></div><div class="actions"><button class="btn-red" id="usave">Save user</button></div></div>`;
   openModal();
   const $=id=>document.getElementById(id);
   const load=async()=>{const s=await getDocs(collection(db,'roles'));const rows=s.docs.map(d=>({email:d.id,...d.data()})).sort((a,b)=>(a.role+a.name)<(b.role+b.name)?-1:1);
-    $('ulist').innerHTML=`<div class="scroll"><table class="it"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Admin</th><th>Emails</th><th></th></tr></thead><tbody>${rows.map(u=>`<tr><td>${esc(u.name||'')}</td><td class="mono">${esc(u.email)}</td><td class="up">${esc(u.role)}</td><td class="up">${u.admin?'Yes':''}</td><td class="up">${u.emails===false?'No':'Yes'}</td><td class="r"><button class="btn-link" data-uedit="${esc(u.email)}">Edit</button> <button class="btn-link" data-udel="${esc(u.email)}">Remove</button></td></tr>`).join('')}</tbody></table></div>`;
-    document.querySelectorAll('[data-uedit]').forEach(b=>b.onclick=()=>{const u=rows.find(x=>x.email===b.dataset.uedit);$('ue').value=u.email;$('un').value=u.name||'';$('ur').value=u.role;$('ua').value=u.admin?'yes':'no';$('um').value=u.emails===false?'no':'yes';$('un').focus();});
+    $('ulist').innerHTML=`<div class="scroll"><table class="it"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Admin</th><th>Always emailed</th><th></th></tr></thead><tbody>${rows.map(u=>`<tr><td>${esc(u.name||'')}</td><td class="mono">${esc(u.email)}</td><td class="up">${esc(u.role)}</td><td class="up">${u.admin?'Yes':''}</td><td class="up">${u.always?'Yes':''}</td><td class="r"><button class="btn-link" data-uedit="${esc(u.email)}">Edit</button> <button class="btn-link" data-udel="${esc(u.email)}">Remove</button></td></tr>`).join('')}</tbody></table></div>`;
+    document.querySelectorAll('[data-uedit]').forEach(b=>b.onclick=()=>{const u=rows.find(x=>x.email===b.dataset.uedit);$('ue').value=u.email;$('un').value=u.name||'';$('ur').value=u.role;$('ua').value=u.admin?'yes':'no';$('um').value=u.always?'yes':'no';$('un').focus();});
     document.querySelectorAll('[data-udel]').forEach(b=>b.onclick=()=>armed(b,async()=>{if(b.dataset.udel===ME.email){$('uerr').textContent='You can’t remove yourself.';return;}await deleteDoc(doc(db,'roles',b.dataset.udel));load();}));};
   $('usave').onclick=async()=>{const em=$('ue').value.trim().toLowerCase(),nm=$('un').value.trim();if(!em||!em.includes('@'))return $('uerr').textContent='Enter a valid email.';if(!nm)return $('uerr').textContent='Enter a name.';
-    try{await setDoc(doc(db,'roles',em),{email:em,name:nm,role:$('ur').value,admin:$('ua').value==='yes',emails:$('um').value==='yes'});$('uerr').textContent='';$('ue').value='';$('un').value='';load();toast('User saved');}catch(x){$('uerr').textContent='Couldn’t save. Only admins can change users.';}};
+    try{await setDoc(doc(db,'roles',em),{email:em,name:nm,role:$('ur').value,admin:$('ua').value==='yes',always:$('um').value==='yes'});$('uerr').textContent='';$('ue').value='';$('un').value='';load();loadUsers();toast('User saved');}catch(x){$('uerr').textContent='Couldn’t save. Only admins can change users.';}};
   load();
 }
 
