@@ -593,6 +593,387 @@ footer{flex-shrink:0;padding:7px var(--gutter);font-size:var(--t-11);letter-spac
   .notebar .din,.notebar .btn-ghost{min-height:48px;}
 }
 
+/* ---------- 11b. PRODUCTION SCHEDULE ----------
+   Its own area of the app (header switch: Communications | Production schedule).
+   Brand: Champion ink / red / steel, Barlow, square data surfaces. Craft: one focal
+   point per screen, black KPI band with big numerals, live capacity bars, quiet motion. */
+:root{
+  --ps-tray:320px; --ps-col:236px; --ps-row-h:44px; --ps-bender:132px;
+  --ps-ok:#2E7D52; --ps-warn:#B26A00; --ps-warn-tint:#fff3dc;
+  --ps-ease:cubic-bezier(.2,.7,.2,1);
+}
+.protobar{background:var(--amber-tint);color:var(--amber);font-size:var(--t-11);font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:5px var(--gutter);border-bottom:1px solid rgba(138,95,0,.22);flex-shrink:0;}
+
+/* app switch in the white header bar */
+.appsw{display:flex;gap:2px;padding:3px;border:1px solid var(--line-strong);border-radius:var(--r-pill);margin-right:auto;}
+.appsw button{min-height:38px;padding:0 18px;border:0;border-radius:var(--r-pill);background:transparent;color:var(--muted);font-family:var(--cond);font-weight:700;font-size:var(--t-13);letter-spacing:var(--caps);text-transform:uppercase;cursor:pointer;transition:background var(--d-fast) ease,color var(--d-fast) ease,transform var(--d-press) var(--ease-out);}
+.appsw button[aria-pressed="true"]{background:var(--red);color:#fff;}
+.appsw button:active{transform:scale(.97);}
+@media (hover:hover){.appsw button:hover:not([aria-pressed="true"]){color:var(--ink);}}
+
+/* the area */
+.ps{flex:1;min-height:0;display:flex;flex-direction:column;}
+.ps .groupbar a .gbadge{min-width:26px;}
+.ps-body{flex:1;min-height:0;overflow:auto;background:var(--paper);}
+.ps-body.board{overflow:hidden;overflow:clip;display:flex;flex-direction:column;}
+.ps-page{max-width:1440px;margin:0 auto;padding:var(--s5) var(--gutter) var(--s7);}
+.ps-h{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;margin:0 0 var(--s4);}
+.ps-h h1{font-family:var(--cond);font-weight:700;font-size:var(--t-32);letter-spacing:.04em;text-transform:uppercase;line-height:1;margin:0;}
+.ps-h .sub{font-size:var(--t-13);color:var(--muted);margin-top:6px;}
+.sec-h{font-family:var(--cond);font-weight:700;font-size:var(--t-18);letter-spacing:.1em;text-transform:uppercase;margin:var(--s6) 0 var(--s3);display:flex;align-items:center;gap:12px;}
+.sec-h::before{content:"";width:4px;height:18px;background:var(--red);}
+
+/* KPI band: black, big numerals (the website's stat pattern) */
+.kband{position:relative;background:linear-gradient(180deg,#121314 0%,#1d1f20 100%);color:#fff;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;flex-shrink:0;border-bottom:3px solid var(--red);}
+.kpi{padding:16px var(--gutter) 14px;border-right:1px solid rgba(255,255,255,.08);min-width:0;}
+.kpi:last-child{border-right:0;}
+.kpi .n{display:block;font-family:var(--cond);font-weight:700;font-size:var(--t-48);line-height:.95;letter-spacing:.01em;font-variant-numeric:tabular-nums;}
+.kpi .n small{font-size:var(--t-24);margin-left:2px;color:var(--on-ink-2);}
+.kpi .l{display:block;margin-top:6px;font-size:var(--t-11);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--on-ink-2);}
+.kpi.red .n{color:#ff6b70;} .kpi.ok .n{color:#7fd6a4;} .kpi.amb .n{color:#ffc266;}
+.kband.inpage{margin-bottom:var(--s5);}
+
+/* toolbars */
+.ps-tools{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:12px var(--gutter);background:var(--white);border-bottom:1px solid var(--line);flex-shrink:0;}
+.ps-tools .search{max-width:300px;min-height:40px;}
+.ps-tools .sp{flex:1;}
+.seg2{display:inline-flex;border:1px solid var(--ink);}
+.seg2 button{min-height:40px;padding:0 16px;border:0;background:var(--white);font-family:var(--cond);font-weight:700;font-size:var(--t-13);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:background var(--d-fast) ease,color var(--d-fast) ease;}
+.seg2 button+button{border-left:1px solid var(--ink);}
+.seg2 button[aria-pressed="true"]{background:var(--ink);color:#fff;}
+.tbtn{min-height:40px;padding:0 14px;border:1px solid var(--line-strong);background:var(--white);font-family:var(--cond);font-weight:700;font-size:var(--t-13);letter-spacing:.09em;text-transform:uppercase;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color var(--d-fast) ease,background var(--d-fast) ease,transform var(--d-press) var(--ease-out);}
+.tbtn:active{transform:scale(.97);}
+.tbtn:disabled{opacity:.4;cursor:default;}
+@media (hover:hover){.tbtn:hover:not(:disabled){border-color:var(--ink);}}
+.tbtn.ic{width:40px;padding:0;justify-content:center;font-size:var(--t-18);}
+.wklbl{font-family:var(--cond);font-weight:700;font-size:var(--t-18);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+
+/* planner layout: tray | board */
+.pl{flex:1;min-height:0;display:grid;grid-template-columns:var(--ps-tray) minmax(0,1fr);}
+.tray{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:var(--surface);}
+.tray-h{padding:14px 16px 10px;background:var(--surface);border-bottom:1px solid var(--line);}
+.tray-h b{display:flex;align-items:baseline;justify-content:space-between;font-family:var(--cond);font-weight:700;font-size:var(--t-15);letter-spacing:.1em;text-transform:uppercase;}
+.tray-h b span{font-family:var(--mono);font-size:var(--t-13);color:var(--red-text);}
+.tray-h p{margin:4px 0 0;font-size:var(--t-12);color:var(--muted);}
+.tray-l{flex:1;min-height:0;overflow:auto;padding:10px 12px 24px;display:flex;flex-direction:column;gap:8px;}
+.board{min-width:0;min-height:0;overflow:auto;background:var(--paper);position:relative;}
+.grid{display:grid;grid-template-columns:var(--ps-bender) repeat(var(--wks),var(--ps-col));width:max-content;}
+.jc .ka{max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1;min-width:0;}
+.jc .so{flex-shrink:0;}
+.gh{position:sticky;top:0;z-index:4;background:var(--white);border-bottom:1px solid var(--line-strong);padding:10px 12px 8px;min-height:64px;}
+.gh.corner{left:0;z-index:5;display:flex;align-items:flex-end;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.gh .w{font-family:var(--cond);font-weight:700;font-size:var(--t-18);letter-spacing:.06em;text-transform:uppercase;line-height:1.1;}
+.gh .w small{font-family:var(--sans);font-weight:500;font-size:var(--t-12);letter-spacing:0;text-transform:none;color:var(--muted);margin-left:6px;}
+.gh.now{box-shadow:inset 0 3px 0 var(--red);}
+.gh .tl{display:flex;justify-content:space-between;font-size:var(--t-11);font-family:var(--mono);color:var(--muted);margin-top:4px;}
+.rh{position:sticky;left:0;z-index:3;background:var(--ink);color:#fff;padding:12px 12px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:4px;}
+.rh b{font-family:var(--cond);font-weight:700;font-size:var(--t-18);letter-spacing:.08em;text-transform:uppercase;line-height:1;}
+.rh span{font-size:var(--t-11);color:var(--on-ink-2);line-height:1.35;}
+.cell{position:relative;border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line);padding:8px 8px 10px;background:var(--paper);min-height:120px;display:flex;flex-direction:column;gap:6px;transition:background var(--d-fast) ease,box-shadow var(--d-fast) ease;}
+.cell.now{background:#f7f7f8;}
+.cell.past{background:repeating-linear-gradient(135deg,var(--paper) 0 8px,#ececee 8px 9px);}
+.cell.dz-ok{background:var(--steel-tint);box-shadow:inset 0 0 0 2px var(--steel);}
+.cell.dz-bad{background:var(--red-tint);box-shadow:inset 0 0 0 2px var(--red);}
+.cap{display:flex;align-items:center;gap:8px;}
+.cap .cb{flex:1;height:6px;background:rgba(29,31,32,.1);position:relative;overflow:hidden;}
+.cap .cb i{position:absolute;left:0;top:0;bottom:0;background:var(--ps-ok);transition:width var(--d-panel) var(--ps-ease),background var(--d-base) ease;}
+.cap.lv-hi .cb i{background:var(--ps-warn);}
+.cap.lv-over .cb i{background:var(--red);}
+.cap .ct{font-family:var(--mono);font-size:var(--t-11);color:var(--muted);white-space:nowrap;}
+.cap.lv-over .ct{color:var(--red-text);font-weight:700;}
+.cmenu{position:absolute;top:4px;right:4px;width:28px;height:24px;border:0;background:transparent;color:var(--muted);cursor:pointer;font-weight:700;letter-spacing:.1em;opacity:0;transition:opacity var(--d-fast) ease;}
+.cell:hover .cmenu,.cmenu:focus-visible{opacity:1;}
+.cell .more{border:0;background:transparent;font-size:var(--t-12);color:var(--steel);cursor:pointer;text-align:left;padding:2px 0;font-weight:600;}
+
+/* job cards (square, record surfaces) */
+.jc{position:relative;display:block;width:100%;text-align:left;background:var(--white);border:1px solid var(--line);border-left:4px solid var(--steel);padding:7px 9px 7px 9px;box-shadow:var(--e1);cursor:grab;font:inherit;color:inherit;transition:transform var(--d-fast) var(--ps-ease),box-shadow var(--d-fast) var(--ps-ease),opacity var(--d-fast) ease;}
+.jc[draggable="false"]{cursor:pointer;}
+@media (hover:hover){.jc:hover{transform:translateY(-2px);box-shadow:var(--e2);}}
+.jc:active{cursor:grabbing;}
+.jc.dragging{opacity:.35;transform:none;}
+.jc.late{border-left-color:var(--red);}
+.jc.wrn{border-left-color:var(--ps-warn);}
+.jc.rec{border-left-color:var(--muted-2);}
+.jc.pick{box-shadow:0 0 0 2px var(--steel),var(--e2);}
+.jc.dim{opacity:.28;}
+.jc .r1{display:flex;align-items:center;gap:6px;min-width:0;}
+.jc .so{font-family:var(--mono);font-weight:700;font-size:var(--t-12);}
+.jc .q{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:var(--t-13);}
+.jc .c{display:block;font-size:var(--t-12);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.jc .r3{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:var(--t-11);}
+.jc .it{font-family:var(--mono);font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.jc .h{margin-left:auto;font-family:var(--mono);color:var(--muted);white-space:nowrap;}
+.jc .due{display:inline-block;margin-top:4px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+.jc.late .due{color:var(--red-text);}
+.jc .r4{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px;}
+.jc .r4 .due{margin-top:0;}
+/* compact: one card = order, qty, item, hours; the rest is in the tooltip and the drawer */
+.board.dense .grid{--ps-col:186px;}
+.board.dense .cell{min-height:84px;gap:4px;padding:6px 6px 8px;}
+.board.dense .jc{padding:4px 7px;}
+.board.dense .jc .c,.board.dense .jc .due{display:none;}
+.board.dense .jc .r3{margin-top:0;}
+.board.dense .jc .so{font-size:var(--t-11);}
+.board.dense .jc .q{font-size:var(--t-12);}
+.gh .wl{font-size:10px;min-height:0;letter-spacing:.1em;}
+.rh .ru{font-family:var(--mono);font-size:var(--t-11);color:#7fd6a4;}
+.rh .ru.over{color:#ff6b70;}
+.tray-h .fitall{margin-top:10px;width:100%;min-height:34px;}
+.tray-h .fitall[data-armed]{background:var(--red);border-color:var(--red);color:#fff;}
+.tray .jc{cursor:grab;}
+.tray .jc .need{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.mini{min-height:26px;padding:0 9px;border:1px solid var(--ink);background:var(--white);font-family:var(--cond);font-weight:700;font-size:var(--t-11);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background var(--d-fast) ease,color var(--d-fast) ease,transform var(--d-press) var(--ease-out);}
+.mini:active{transform:scale(.96);}
+@media (hover:hover){.mini:hover{background:var(--ink);color:#fff;}}
+.ka{display:inline-block;font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.08em;color:#6b4e00;background:#ffe39a;padding:1px 5px;text-transform:uppercase;line-height:1.3;}
+
+/* drawer: slides in from the right */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);z-index:60;background:var(--white);box-shadow:var(--e3);display:flex;flex-direction:column;transform:translateX(0);transition:transform var(--d-panel) var(--ps-ease);}
+.drawer.hidden{transform:translateX(104%);visibility:hidden;}
+.dw-h{background:var(--ink);color:#fff;padding:18px 20px 16px;border-bottom:3px solid var(--red);position:relative;}
+.dw-h .k{font-size:var(--t-11);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--on-ink-2);}
+.dw-h h2{margin:4px 0 2px;font-family:var(--cond);font-weight:700;font-size:var(--t-24);letter-spacing:.04em;text-transform:uppercase;line-height:1.05;}
+.dw-h h2 .mono{font-size:var(--t-18);}
+.dw-h p{margin:0;font-size:var(--t-13);color:var(--on-ink-2);}
+.dw-x{position:absolute;top:12px;right:12px;width:40px;height:40px;border:1px solid rgba(255,255,255,.3);border-radius:50%;background:transparent;color:#fff;font-size:20px;cursor:pointer;}
+.dw-b{flex:1;overflow:auto;padding:18px 20px 28px;}
+.dw-b .facts{gap:12px 28px;}
+.dw-sec{border-top:1px solid var(--line);padding-top:14px;margin-top:16px;}
+.dw-sec>b{display:block;font-family:var(--cond);font-weight:700;font-size:var(--t-14);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;}
+.dw-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;}
+.dw-row .sel,.dw-row .qin,.dw-row .din{min-height:44px;}
+.dw-row .sel{flex:1;min-width:130px;}
+.dw-row .f{display:flex;flex-direction:column;gap:4px;}
+.dw-row .f span{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.btn-ink{min-height:44px;padding:0 18px;border:0;background:var(--ink);color:#fff;font-family:var(--cond);font-weight:700;font-size:var(--t-14);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background var(--d-fast) ease,transform var(--d-press) var(--ease-out);}
+.btn-ink:active{transform:scale(.97);}
+.btn-ink:disabled{opacity:.4;cursor:default;}
+@media (hover:hover){.btn-ink:hover:not(:disabled){background:#000;}}
+.btn-ink.red{background:var(--red);}
+.dw-list{list-style:none;margin:0;padding:0;}
+.dw-list li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:var(--t-13);}
+.dw-list .mono{font-weight:700;}
+.warn{background:var(--ps-warn-tint);color:var(--ps-warn);padding:10px 12px;font-size:var(--t-13);margin:10px 0;border-left:4px solid var(--ps-warn);}
+.warn.red{background:var(--red-tint);color:var(--red-text);border-left-color:var(--red);}
+.warn .btn-link{color:inherit;font-weight:700;}
+.scrim{position:fixed;inset:0;z-index:59;background:rgba(0,0,0,.18);opacity:1;transition:opacity var(--d-panel) ease;}
+.scrim.hidden{opacity:0;pointer-events:none;}
+
+/* tables on the other pages */
+.tcard{background:var(--white);border:1px solid var(--line);box-shadow:var(--e1);}
+table.it.st td{padding:9px 12px 9px 0;font-size:var(--t-13);}
+table.it.st th{background:var(--white);}
+table.it.st th.r,table.it.st td.r{padding-left:18px;padding-right:12px;}
+table.it.st td:first-child,table.it.st th:first-child{padding-left:16px;}
+table.it.st tbody tr:nth-child(even) td{background:rgba(29,31,32,.018);}
+table.it tr.clk{cursor:pointer;}
+@media (hover:hover){table.it tr.clk:hover td{background:var(--steel-tint);}}
+.stk{display:inline-flex;align-items:center;gap:7px;font-size:var(--t-11);font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
+.stk::before{content:"";width:4px;height:14px;background:currentColor;}
+.stk.red{color:var(--red-text);} .stk.ok{color:var(--ps-ok);} .stk.amber{color:var(--ps-warn);} .stk.steel{color:var(--steel);} .stk.muted{color:var(--muted-2);}
+.fchips{display:flex;flex-wrap:wrap;gap:6px;}
+.fchip{min-height:36px;padding:0 12px;border:1px solid var(--line-strong);background:var(--white);font-family:var(--cond);font-weight:700;font-size:var(--t-13);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:background var(--d-fast) ease,color var(--d-fast) ease;}
+.fchip b{font-family:var(--mono);margin-left:6px;color:var(--ink);}
+.fchip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink);}
+.fchip[aria-pressed="true"] b{color:#fff;}
+.mono{font-family:var(--mono);}
+.rchip{display:inline-block;margin:2px 4px 2px 0;padding:2px 7px;background:var(--field);border:1px solid var(--line-soft);font-size:var(--t-12);white-space:nowrap;font-family:var(--mono);}
+.rchip.late{border-color:var(--red);background:var(--red-tint);}
+.rchip.past{opacity:.55;text-decoration:line-through;}
+
+/* order lookup */
+.ohero{background:var(--white);border:1px solid var(--line);box-shadow:var(--e1);margin-bottom:var(--s4);}
+.ohero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:20px 22px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.ohero-top .so{font-family:var(--mono);font-weight:700;font-size:var(--t-15);color:var(--muted);}
+.ohero-top h2{margin:2px 0 4px;font-family:var(--cond);font-weight:700;font-size:var(--t-32);letter-spacing:.03em;text-transform:uppercase;line-height:1;}
+.ohero-top .meta{font-size:var(--t-13);color:var(--muted);}
+.ostats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));}
+.ostats>div{padding:14px 22px;border-right:1px solid var(--line-soft);}
+.ostats>div:last-child{border-right:0;}
+.ostats .k{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.ostats .v{font-family:var(--cond);font-weight:700;font-size:var(--t-24);letter-spacing:.02em;line-height:1.15;}
+.ostats .v.red{color:var(--red-text);} .ostats .v.ok{color:var(--ps-ok);}
+.obody{padding:16px 22px 20px;}
+.psearch{position:relative;max-width:640px;margin:0 0 var(--s4);}
+.psearch .search{min-height:56px;font-size:var(--t-18);max-width:none;}
+.empty-ps{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:var(--s8) var(--s5);color:var(--muted);}
+.empty-ps svg{color:var(--steel);}
+.empty-ps b{font-family:var(--cond);font-weight:700;font-size:var(--t-32);letter-spacing:.04em;text-transform:uppercase;color:var(--ink);line-height:1;}
+.ed-line{border-top:1px solid var(--line);padding:12px 0;}
+.ed-head{display:flex;gap:6px 12px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px;}
+.ed-run{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0;}
+.ed-run .sel,.ed-run .qin{min-height:40px;font-size:var(--t-14);}
+.ed-run .hrs{font-family:var(--mono);font-size:var(--t-12);color:var(--muted);min-width:76px;}
+
+/* skeleton */
+.psk{display:block;height:14px;background:linear-gradient(90deg,#e6e6e8 0%,#f2f2f3 50%,#e6e6e8 100%);background-size:200% 100%;animation:psk 1.2s linear infinite;}
+@keyframes psk{to{background-position:-200% 0;}}
+
+/* live change flash and entrance */
+@keyframes jcin{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.jc.in{animation:jcin var(--d-panel) var(--ps-ease) both;}
+@keyframes jcflash{0%{box-shadow:0 0 0 3px var(--steel-edge),var(--e2);}100%{box-shadow:var(--e1);}}
+.jc.flash{animation:jcflash 1.2s ease-out;}
+
+/* small screens: tray on top, board scrolls sideways */
+@media (max-width:900px){
+  .ps-body.board{overflow:auto;display:block;}
+  .pl{display:block;}
+  .tray{border-right:0;border-bottom:1px solid var(--line);max-height:34vh;}
+  .board{height:72vh;}
+  .kband{grid-template-columns:repeat(4,1fr);}
+  :root{--ps-col:200px;--ps-bender:96px;}
+  .kpi .n{font-size:var(--t-32);}
+  .ps-tools .search{max-width:none;flex:1 1 100%;}
+}
+@media (max-width:480px){
+  .kband{grid-template-columns:repeat(2,1fr);}
+  .kpi{border-bottom:1px solid rgba(255,255,255,.08);}
+  .appsw button{padding:0 12px;font-size:var(--t-12);}
+  .ps-h h1{font-size:var(--t-24);}
+}
+@media (prefers-reduced-motion:reduce){
+  .jc,.drawer,.scrim,.cap .cb i{transition:none!important;}
+  .jc.in,.jc.flash,.psk{animation:none!important;}
+}
+@media print{
+  .drawer,.scrim,.ps-tools,.tray,.protobar,.appsw{display:none!important;}
+  .ps-body,.board{overflow:visible;}
+}
+
+/* ----- 3-week plan panel (top of the tray) ----- */
+.plan3{background:var(--ink);color:#fff;padding:14px 16px 12px;border-bottom:3px solid var(--red);}
+.p3-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.p3-h b{font-family:var(--cond);font-weight:700;font-size:var(--t-18);letter-spacing:.08em;text-transform:uppercase;}
+.p3-h span{font-size:var(--t-12);color:var(--on-ink-2);}
+.p3-load{display:grid;gap:5px;margin:10px 0 6px;}
+.p3-load>div{display:grid;grid-template-columns:52px 1fr 40px;align-items:center;gap:8px;font-size:var(--t-12);}
+.p3-load span:first-child{color:var(--on-ink-2);font-family:var(--mono);}
+.p3-load .cb{height:6px;background:rgba(255,255,255,.14);position:relative;overflow:hidden;}
+.p3-load .cb i{position:absolute;inset:0 auto 0 0;background:#7fd6a4;transition:width var(--d-panel) var(--ps-ease);}
+.p3-load .over .cb i{background:#ff6b70;}
+.p3-load b{font-family:var(--mono);text-align:right;}
+.p3-steps{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:10px;}
+.p3-steps>li{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;}
+.p3-steps .sn{width:26px;height:26px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.4);font-family:var(--cond);font-weight:700;font-size:var(--t-14);}
+.p3-steps li.done .sn{background:var(--ps-ok);border-color:var(--ps-ok);color:#fff;font-size:0;}
+.p3-steps li.done .sn::after{content:"✓";font-size:var(--t-14);}
+.p3-steps .sb{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.p3-steps .sb>b{font-family:var(--cond);font-weight:700;font-size:var(--t-14);letter-spacing:.1em;text-transform:uppercase;}
+.p3-steps .sb>span{font-size:var(--t-12);color:var(--on-ink-2);line-height:1.35;}
+.p3-steps .p3-next{color:#fff!important;}
+.p3-rec{list-style:none;margin:2px 0;padding:0;display:flex;flex-direction:column;gap:3px;}
+.p3-rec li{display:flex;align-items:center;gap:6px;font-size:var(--t-12);background:rgba(255,255,255,.06);padding:3px 6px;}
+.p3-rec .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--on-ink-2);}
+.p3-rec .x{border:0;background:transparent;color:var(--on-ink-2);cursor:pointer;font-size:16px;line-height:1;padding:0 2px;}
+.p3-rec .x[data-armed]{color:#ff6b70;font-size:var(--t-11);}
+.btn-ink.sm{min-height:36px;padding:0 14px;font-size:var(--t-12);align-self:flex-start;margin-top:2px;}
+.plan3 .btn-ink{background:#fff;color:var(--ink);}
+.plan3 .btn-ink.red{background:var(--red);color:#fff;}
+.plan3 .btn-ink[data-armed]{background:#000;color:#fff;box-shadow:0 0 0 1px #fff inset;}
+.tray-h .search{min-height:40px;margin-top:8px;font-size:var(--t-14);}
+.rtag{display:inline-block;font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--steel);padding:1px 5px;line-height:1.3;white-space:nowrap;}
+td .rtag{margin-top:4px;}
+.jc.done{cursor:default;opacity:.7;border-left-color:var(--ps-ok);box-shadow:none;}
+.jc.done:hover{transform:none;box-shadow:none;}
+.cell-empty{font-size:var(--t-11);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:6px 2px;}
+.gh.plan{background:linear-gradient(180deg,var(--steel-tint),var(--white));}
+.gh .pw{font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);}
+
+/* ----- order completion: rows open in place ----- */
+.chev2{display:inline-block;width:14px;color:var(--muted);}
+table.it tr.open td{background:var(--steel-tint);}
+tr.xrow>td{background:var(--field)!important;padding:12px 16px 16px!important;border-bottom:2px solid var(--steel-edge);}
+tr.xrow .xa{display:flex;gap:8px;margin-top:10px;}
+
+/* ----- plain item names ----- */
+.iname2{font-weight:700;font-size:var(--t-14);line-height:1.25;}
+.icode{font-family:var(--mono);font-weight:700;font-size:var(--t-12);color:var(--muted);}
+.msg-i .n .icode{margin-left:6px;}
+
+/* ----- the schedule on a request ----- */
+.simp{background:var(--white);border:1px solid var(--line);border-left:4px solid var(--steel);margin:0 0 var(--s5);box-shadow:var(--e1);}
+.simp-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line-soft);}
+.simp-h b{font-family:var(--cond);font-weight:700;font-size:var(--t-14);letter-spacing:.12em;text-transform:uppercase;}
+.simp-n{margin:8px 14px 0;font-size:var(--t-13);color:var(--muted);}
+.simp-a{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px 10px;}
+.simp table.it.st td:first-child,.simp table.it.st th:first-child{padding-left:14px;}
+
+/* ----- every Planner tab: search sidebar | content ----- */
+.ps-body{overflow:hidden;}
+.ps-wrap{height:100%;display:grid;grid-template-columns:var(--ps-tray) minmax(0,1fr);}
+.ps-main{min-width:0;min-height:0;overflow:auto;}
+.ps-main.board{overflow:hidden;overflow:clip;display:flex;flex-direction:column;}
+.ps-main.board .board{flex:1;min-height:0;}
+.tray-h{padding:12px;}
+.tray-h .search{margin-top:0;min-height:44px;font-size:var(--t-15);}
+.tray-hint{display:flex;flex-direction:column;gap:6px;padding:28px 10px;text-align:center;color:var(--muted);font-size:var(--t-13);}
+.tray-hint b{font-family:var(--cond);font-weight:700;font-size:var(--t-24);letter-spacing:.05em;text-transform:uppercase;color:var(--ink);}
+.tr-o{display:flex;flex-direction:column;gap:6px;padding-bottom:10px;border-bottom:1px solid var(--line);}
+.tr-oh{display:grid;grid-template-columns:auto auto 1fr;grid-template-areas:"so ka ." "c c c" "d d d";gap:0 6px;align-items:center;text-align:left;border:0;background:transparent;padding:4px 2px;cursor:pointer;font:inherit;color:inherit;}
+.tr-oh .so{grid-area:so;font-family:var(--mono);font-weight:700;font-size:var(--t-14);}
+.tr-oh .ka{grid-area:ka;justify-self:start;}
+.tr-oh .c{grid-area:c;font-weight:600;font-size:var(--t-13);}
+.tr-oh .d{grid-area:d;font-size:var(--t-11);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+@media (hover:hover){.tr-oh:hover .so{color:var(--steel);text-decoration:underline;}}
+.tray .jc .it{font-size:var(--t-13);}
+
+/* week headers: label on its own line, date large beneath */
+.gh .wsub{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);line-height:1.2;}
+.gh.now .wsub{color:var(--red-text);}
+.gh .w{font-size:var(--t-24);line-height:1.05;margin-top:1px;}
+
+/* quick delete on a card */
+.jx{position:absolute;top:3px;right:3px;width:22px;height:22px;display:grid;place-items:center;border:0;background:var(--ink);color:#fff;font-size:14px;line-height:1;cursor:pointer;opacity:0;transition:opacity var(--d-fast) ease,background var(--d-fast) ease;z-index:2;}
+.jc:hover .jx,.jx:focus-visible{opacity:1;}
+@media (hover:hover){.jx:hover{background:var(--red);}}
+@media (hover:none){.jx{opacity:1;}}
+.jc .r1 .q{margin-right:0;}
+.jc:hover .r1 .q{visibility:hidden;}
+@media (hover:none){.jc .r1 .q{visibility:visible;}}
+
+/* commitments from Order Communications */
+.rh.lane{background:var(--steel);}
+.cell.lane{background:#f3f7fb;min-height:0;border-bottom:2px solid var(--steel-edge);}
+.jc.cm{border:1px dashed var(--steel);border-left:4px solid var(--steel);background:var(--steel-tint);box-shadow:none;}
+.jc.cm .due{color:var(--steel);}
+.jc.cm.ok{border-color:var(--ps-ok);border-left-color:var(--ps-ok);background:var(--ok-tint);}
+.jc.cm.ok .due{color:var(--ps-ok);}
+.board.dense .jc.cm .due{display:block;}
+
+@media (max-width:900px){
+  .ps-body{overflow:auto;}
+  .ps-wrap{display:block;height:auto;}
+  .ps-main{overflow:visible;}
+  .ps-main.board{display:block;overflow:visible;}
+  .ps-main.board .board{height:72vh;}
+}
+/* toolbar fits one line beside the sidebar */
+.ps-tools{gap:8px 10px;padding:10px 16px;}
+.ps-tools .seg2 button{padding:0 11px;}
+.ps-tools .tbtn{padding:0 11px;}
+.ps-tools .wklbl{font-size:var(--t-15);}
+:root{--ps-tray:296px;}
+.tbtn.undo{position:relative;}
+.tbtn.undo .ub{position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 3px;background:var(--red);color:#fff;font-family:var(--mono);font-size:10px;line-height:16px;}
+
+/* side panel: SO on top, customer under it, part number large in the body */
+.dw-h h2.mono{font-family:var(--mono);font-size:var(--t-24);letter-spacing:.02em;margin:4px 0 2px;}
+.dw-h .cust{font-family:var(--cond);font-weight:600;font-size:var(--t-18);letter-spacing:.04em;text-transform:uppercase;color:#fff;margin:0;}
+.dw-item{border-left:4px solid var(--red);padding:2px 0 2px 12px;margin:0 0 16px;}
+.dw-item .pn{font-family:var(--mono);font-weight:800;font-size:var(--t-24);line-height:1.15;letter-spacing:.01em;color:var(--ink);word-break:break-all;}
+.dw-item .ds{font-size:var(--t-13);color:var(--muted);margin-top:4px;line-height:1.4;}
+
+/* sidebar sections and the content-only layout on the other tabs */
+.ps-wrap.solo{grid-template-columns:minmax(0,1fr);}
+.tr-sec{display:flex;flex-direction:column;gap:2px;padding:10px 2px 6px;margin-top:4px;border-top:2px solid var(--ink);}
+.tr-sec:first-child{margin-top:0;}
+.tr-sec b{display:flex;justify-content:space-between;font-family:var(--cond);font-weight:700;font-size:var(--t-15);letter-spacing:.1em;text-transform:uppercase;}
+.tr-sec b span{font-family:var(--mono);color:var(--red-text);}
+.tr-sec>span{font-size:var(--t-11);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.tray .jc.cm .c{display:block;}
+
+.bar .hdr-r{flex:1;}
 /* ---------- 12. REDUCED MOTION AND PRINT ---------- */
 /* Reduced motion: keep fades, remove movement */
 @media (prefers-reduced-motion:reduce){
@@ -898,7 +1279,7 @@ const listHTML=(list,empty)=>list.length?`<div class="rqs" data-k="rqs" data-dee
 
 /* ===== thread ===== */
 function fact(k,v,cls){return `<div class="fact"><div class="k">${k}</div><div class="v ${cls||''}">${v}</div></div>`;}
-function itemList(r,rows,reqLines,restTxt){
+function itemList_portal(r,rows,reqLines,restTxt){
   return `<ul class="msg-i">${rows.map(x=>{const l=x.ln!=null?lineOf(r.so,x.ln):null,rq=reqLines?reqLines.find(y=>y.ln===x.ln):null;return `<li><span class="q">${x.qty!=null?num(x.qty):''}</span><span class="n">${l?esc(l.item):'Whole order'}${rq&&rq.qty>x.qty?` <span class="hint">of ${num(rq.qty)}, ${restTxt}</span>`:''}</span></li>`;}).join('')}</ul>`;
 }
 function rowsBlock(r,e,head){
@@ -909,9 +1290,9 @@ function rowsBlock(r,e,head){
     const covers=e.ref==='order'?isWhole(r.so,g):(e.reqLines&&e.reqLines.every(x=>g.some(y=>y.ln===x.ln&&y.qty>=x.qty)));
     const label=e.ref==='order'?(covers?'Whole order':plural(g.length,'item')):(covers?'All requested items':plural(g.length,'item'));
     const h=head||('Ready by '+fmt(d));
-    return `<div class="msg-d">${h} <span class="of">${label}</span></div>${covers?'':itemList(r,g,e.ref==='order'?null:e.reqLines,rest)}`;}).join('');
+    return `<div class="msg-d">${h} <span class="of">${label}</span></div>${itemList(r,g,e.ref==='order'?null:e.reqLines,rest)}`;}).join('');
 }
-function changesBlock(r,changes){
+function changesBlock_portal(r,changes){
   return `<ul class="msg-i">${changes.map(c=>{const l=lineOf(r.so,c.ln);const parts=[];
     if(c.newItem)parts.push(`<span class="n">${esc(l.item)}</span><span class="chg-arrow">→</span><span class="n"><b>${esc(c.newItem)}</b></span>`);else parts.push(`<span class="n">${esc(l.item)}</span>`);
     const q=c.newQty!=null?`<span class="q" style="min-width:0">${num(l.rem)}</span><span class="chg-arrow">→</span><span class="q" style="min-width:0">${num(c.newQty)}</span>`:`<span class="hint">qty ${num(l.rem)} unchanged</span>`;
@@ -1078,7 +1459,7 @@ function turnHTML(r){
 function factsHTML(r){
   const o=BY_SO[r.so],t=T(),late=o.esd<t?daysBetween(o.esd,t):0;
   const esdF=fact('ESD',fmt(o.esd)+(late?`<span class="late-l">${plural(late,'day')} late</span>`:''),'up');
-  const tail=fact('Sent',fmt(r.created),'up')+fact('Requested by',esc(r.createdByName||'—'))+fact('Answered by',esc(r.answeredBy||'—'))+fact('Unbilled',money(o.amt))+fact('Urgency',esc(r.urgency),'up'+(r.urgency==='High'?' red':''));
+  const tail=fact('Sent',fmt(r.created),'up')+fact('Requested by',esc(r.createdByName||'—'))+fact('Answered by',esc(r.answeredBy||'—'))+fact('Unbilled',money(o.amt))+fact('Urgency',esc(r.urgency),'up'+(r.urgency==='High'?' red':''))+schedFact(r.so);
   if(r.type==='date'){const dl=daysBetween(r.reqDate,o.esd);return `<div class="facts">${esdF}${fact('Requested',fmt(r.reqDate)+(dl?`<span class="sub-l">${plural(Math.abs(dl),'day')} ${dl>0?'before':'after'} ESD</span>`:''),'up')}${tail}</div>`;}
   if(r.type==='check')return `<div class="facts">${esdF}${fact('Production ESD',fmt(o.pesd),'up')}${tail}</div>`;
   if(r.type==='cancel'){const v=r.lines.reduce((s,x)=>{const l=x.ln!=null?lineOf(r.so,x.ln):null;return s+(l&&l.amt&&l.rem?l.amt*x.qty/l.rem:0);},0);return `<div class="facts">${esdF}${fact('$ To cancel',money(o.lines.length?v:o.amt),'red')}${tail}</div>`;}
@@ -1114,8 +1495,8 @@ function detailHTML(r){
   const canWithdraw=isSales()&&(['submitted','acknowledged','alternative'].includes(r.status)||COMMITTED.includes(r.status));
   /* data-fresh = always redraw (keeps answer forms behaving exactly as before) */
   return `${recordHeaderHTML(r)}
-  <div class="tp-scroll" id="tps" data-k="tps" data-deep tabindex="-1"><div class="tp-col" data-k="col" data-deep>${gone}${viewer?'':`<div data-k="recip">${recipLine(r)}</div>`}${threadHTML(r)}${viewer?'':`<div data-k="turn" data-fresh>${turnHTML(r)}</div>`}</div></div>
-  ${viewer?'':`<div class="composer" data-k="comp" data-fresh><div class="notebar"><input class="din" id="cmt" placeholder="Add a note for both teams" aria-label="Add a note" autocomplete="off"><button class="btn-ghost" id="cmtb">Add note</button>${canWithdraw?'<button class="btn-link" id="wd" style="margin-left:auto">Withdraw request</button>':''}</div></div>`}`;
+  <div class="tp-scroll" id="tps" data-k="tps" data-deep tabindex="-1"><div class="tp-col" data-k="col" data-deep>${gone}${viewer?'':`<div data-k="recip">${recipLine(r)}</div>`}${schedImpactHTML(r)}${threadHTML(r)}${viewer?'':`<div data-k="turn" data-fresh>${turnHTML(r)}</div>`}</div></div>
+  ${viewer?'':`<div class="composer" data-k="comp" data-fresh><div class="notebar"><input class="din" id="cmt" placeholder="Add a note for both teams" aria-label="Add a note" autocomplete="off"><button class="btn-ghost" id="cmtb">Add note</button>${canEditReq(r)?'<button class="btn-link" id="edreq" style="margin-left:auto">Edit request</button>':''}${canWithdraw?`<button class="btn-link" id="wd" style="margin-left:${canEditReq(r)?'18px':'auto'}">Withdraw request</button>`:''}</div></div>`}`;
 }
 /* Shown in the thread pane when no request is open */
 function paneEmptyHTML(){
@@ -1201,7 +1582,9 @@ function bindDetail(r){
 
 /* ===== pages ===== */
 const UI={g:'date',tab:'answer',q:'',openId:null,cal:null};
-function parseHash(){const h=location.hash.slice(1).split('-');const g=G(h[0])?h[0]:'date';const tab=G(g).tabs.includes(h[1])?h[1]:'answer';UI.g=g;UI.tab=tab;}
+function parseHash(){const sm=location.hash.match(/^#(SO\d+)$/i);if(sm){UI.so=sm[1].toUpperCase();UI.sq='';history.replaceState(null,'','#ps-lookup');}
+  if(/^#ps(-|$)/.test(location.hash)){const t=location.hash.slice(4);UI.g='ps';UI.tab=PS_TABS.includes(t)?t:'planner';return;}
+  const h=location.hash.slice(1).split('-');const g=G(h[0])?h[0]:'date';const tab=G(g).tabs.includes(h[1])?h[1]:'answer';UI.g=g;UI.tab=tab;}
 const EMPTY={answer:'All caught up',waiting:'Nothing waiting',upcoming:'Nothing coming up',complete:'Nothing complete yet',done:'Nothing done yet',closed:'Nothing closed'};
 function onTime(g){const Q=S.requests.filter(r=>r.type===g),m=Q.filter(r=>r.status==='met').length,n=Q.filter(r=>['met','late','missed'].includes(r.status)).length;return n?Math.round(m/n*100)+'%':'—';}
 function avgAnswer(g){const xs=S.requests.filter(r=>r.type===g&&r.firstAnswerAt).map(r=>(new Date(r.firstAnswerAt)-new Date(r.createdTs))/36e5);if(!xs.length)return '—';const h=xs.reduce((a,b)=>a+b,0)/xs.length;return h<24?Math.max(1,Math.round(h))+' hrs':(h/24).toFixed(1)+' days';}
@@ -1265,7 +1648,7 @@ function renderNew(){
   else body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Current qty</th><th>New item</th><th class="r">New qty</th></tr></thead><tbody>${chgRows}</tbody></table></div><datalist id="itemlist">${Object.keys(ITEMS).sort().map(k=>`<option value="${esc(k)}">`).join('')}</datalist>`:'<p class="hint up">This order has no item lines to change.</p>'}
     <div class="row"><div><label class="lbl" for="nd">Date needed (optional)</label><input class="din" type="date" id="nd"></div></div>`;
   sh.innerHTML=`<div class="sheet-head"><div><div class="t" id="mt">New request</div><div class="s"><span class="mono"><b>${esc(o.so)}</b></span> ${esc(o.c)}</div></div><button class="xbtn" data-close aria-label="Close">×</button></div>
-  <div class="ordfacts">${fact('ESD',fmt(o.esd)+(late?`<span class="late-l">${plural(late,'day')} late</span>`:''),'up')}${fact('Production ESD',fmt(o.pesd),'up')}${fact('Unbilled',money(o.amt))}${fact('Ship to',esc((o.state||'')+' '+(o.zip||'')))}</div>
+  <div class="ordfacts">${fact('ESD',fmt(o.esd)+(late?`<span class="late-l">${plural(late,'day')} late</span>`:''),'up')}${fact('Production ESD',fmt(o.pesd),'up')}${fact('Unbilled',money(o.amt))}${fact('Ship to',esc((o.state||'')+' '+(o.zip||'')))}${schedOrderStrip(o.so)}</div>
   <label class="lbl">Type</label>
   <div class="seg" role="group" aria-label="Request type">${NRTYPES.map(([k,l])=>`<button type="button" data-nt="${k}" aria-pressed="${ty===k}">${l}</button>`).join('')}</div>
   ${body}
@@ -1326,7 +1709,7 @@ function openModal(){lastFocus=document.activeElement;modal.classList.remove('hi
   setTimeout(()=>{const f=modal.querySelector('.sheet input:not([type="file"]):not([type="checkbox"]),.sheet textarea');if(f&&!modal.classList.contains('hidden'))f.focus({preventScroll:true});},30);}
 function closeModal(){modal.classList.add('hidden');document.getElementById('sheet').innerHTML='';document.body.style.overflow='';if(lastFocus&&lastFocus.focus)lastFocus.focus();}
 function armed(el,fn){if(el.dataset.armed){delete el.dataset.armed;el.textContent=el.dataset.orig;fn();return;}el.dataset.orig=el.textContent;el.dataset.armed='1';el.textContent='Click again to confirm';setTimeout(()=>{if(el.isConnected&&el.dataset.armed){delete el.dataset.armed;el.textContent=el.dataset.orig;}},4000);}
-let tt;function toast(m,undo){const el=document.getElementById('toast');el.innerHTML=`<span>${esc(m)}</span>${undo?'<button type="button" id="undo">Undo</button>':''}`;el.classList.remove('hidden');if(undo)document.getElementById('undo').onclick=()=>{undo();el.classList.add('hidden');};clearTimeout(tt);tt=setTimeout(()=>el.classList.add('hidden'),undo?6000:2800);}
+let tt;function toast(m,undo){const el=document.getElementById('toast');el.innerHTML=`<span>${esc(m)}</span>${undo?'<button type="button" id="undo">Undo</button>':''}`;el.classList.remove('hidden');if(undo)document.getElementById('undo').onclick=()=>{undo();el.classList.add('hidden');};clearTimeout(tt);tt=setTimeout(()=>el.classList.add('hidden'),undo?12000:2800);}
 /* ===================== SCREEN UPDATES (display only) =====================
    The page used to be rebuilt from scratch on every change. Now the new HTML is
    compared with what is on screen and only the parts that differ are swapped.
@@ -1428,12 +1811,14 @@ function render(){
   /* Header: audience switch (admins), who is signed in, then the primary action fused to the bar's right end.
      Redrawn only when its content changes, so a live update never interrupts a click.
      EXTENSION POINT: the audience switch is a list of buttons; more departments are more buttons. */
-  const hdrHTML=`${ME.admin?`<div class="viewsw" role="group" aria-label="Acting as"><button data-view="production" aria-pressed="${isProd()}">Production</button><button data-view="sales" aria-pressed="${isSales()}">Sales</button></div>`:''}<div class="me"><b class="me-n">${esc(ME.name||ME.email)}</b><b class="me-r">${NAMES[S.view]}</b><button class="btn-link" id="signout">Sign out</button></div>${isSales()?'<button class="btn-red" id="newreq">New request</button>':''}`;
+  const hdrHTML=`${appSwitchHTML()}${ME.admin?`<div class="viewsw" role="group" aria-label="Acting as"><button data-view="production" aria-pressed="${isProd()}">Production</button><button data-view="sales" aria-pressed="${isSales()}">Sales</button></div>`:''}<div class="me"><b class="me-n">${esc(ME.name||ME.email)}</b><b class="me-r">${NAMES[S.view]}</b><button class="btn-link" id="signout">Sign out</button></div>${isSales()&&UI.g!=='ps'?'<button class="btn-red" id="newreq">New request</button>':''}`;
   const hdrEl=document.getElementById('hdr');if(hdrEl.dataset.h!==hdrHTML||!hdrEl.firstChild){hdrEl.innerHTML=hdrHTML;hdrEl.dataset.h=hdrHTML;}
   const ab=document.getElementById('adminbar');
   if(ME.admin){const st=!META||bdBetween(META.asOf.slice(0,10),T())>=1;ab.classList.remove('hidden');ab.innerHTML=`<span class="ab-l">Admin</span><button class="btn-admin" id="admin-import">Import backlog</button><button class="btn-admin" id="admin-users">Users</button><span class="ab-s ${st?'stale':''}">${META?`Backlog as of ${fmt(META.asOf.slice(0,10))}, ${hm12(META.asOf.slice(11,16))}${st?', needs today’s import':''}`:'No backlog imported yet'}</span>`;}else{ab.classList.add('hidden');ab.innerHTML='';}
   const stale=!META||bdBetween(META.asOf.slice(0,10),T())>=1;
   document.getElementById('asof').innerHTML=META?`Backlog from NetSuite as of ${fmt(META.asOf.slice(0,10))}, ${hm12(META.asOf.slice(11,16))}${stale?' <span style="color:var(--red-text)">Needs today’s import</span>':''}`:'<span style="color:var(--red-text)">No backlog imported yet</span>';
+  if(UI.g==='ps'){schedRender();return;}
+  renderDrawer();
   const gb=GROUPS.map(x=>{const n=groupBadge(x.k);return `<a href="#${x.k}-answer" data-k="g-${x.k}" data-deep ${g===x.k?'aria-current="page"':''} aria-label="${esc(x.l)}, ${n} need${n===1?'s':''} you"><span class="gl">${x.l}</span><span class="gbadge ${n?'':'zero'}">${n}</span></a>`;}).join('');
   const st=G(g).tabs.map(k=>{const n=k==='calendar'?'':listFor(g,k).length,un=k==='done'||k==='closed'?listFor(g,k).filter(unread).length:0;const hot=(k==='answer'&&n)||un;return `<a href="#${g}-${k}" data-k="t-${k}" data-deep ${tab===k?'aria-current="page"':''}><span>${TABL()[k]}</span>${n!==''?`<span class="cnt ${hot?'hot':''}">${n}</span>`:''}</a>`;}).join('');
   /* Two-pane desk. The open request shows in the thread pane only while its row is in the list (same rule as before). */
@@ -1488,6 +1873,804 @@ const netbar=document.getElementById('netbar'),netSync=()=>netbar.classList.togg
 window.addEventListener('online',netSync);window.addEventListener('offline',netSync);netSync();
 window.addEventListener('hashchange',()=>{const dm=location.hash.match(/^#(R-\d+)$/);if(dm){DEEP=dm[1];render();return;}const keep=UI.openId&&R(UI.openId);parseHash();if(!(keep&&R(UI.openId).type===UI.g&&tabOf(R(UI.openId))===UI.tab))UI.openId=null;UI.q='';render();window.scrollTo(0,0);});
 
+
+/* ===================== PRODUCTION SCHEDULE =====================
+   Its own area of the app (the Planner), reached with the Communications | Planner switch.
+   Pages: Planner (drag-and-drop board), Order lookup, Ships this week, Order completion.
+   Elbows are planned 3 weeks ahead: recurring lines first, then the remaining bender capacity is
+   filled with the most past-due orders. Conduit and fittings are scheduled by hand.
+   Reads the live backlog (ORDERS / BY_SO) and requests (S.requests). Schedule edits save to
+   proto_sched/{SO} (runs, recur = {line: qty per week}, rev so two people can't overwrite each
+   other) plus an append-only log subcollection. Every change can be undone. */
+const SCOL='schedule',SMCOL='schedule_meta';
+let SCHED={},SMETA=null,SCHED_READY=false,SCHED_ERR=null;
+const PS_TABS=['planner','lookup','week','completion'];
+const PS_L={planner:'Schedule',lookup:'Order Lookup',week:'Ships This Week',completion:'Order Completion'};
+const PLAN_WEEKS=3;
+const LOGS={},COUNTS={};let UNDO=[],DRAG=null,LASTCOMMS='date-answer';
+Object.assign(UI,{so:null,sq:'',cf:'all',cq:'',cx:{},sw:null,draft:null,pw:null,pk:'elbow',pq:'',dw:null,dv:{},expand:{},dense:true,nw:PLAN_WEEKS});
+try{const d=localStorage.getItem('ps-dense');if(d!==null)UI.dense=d==='1';}catch(x){}
+
+/* ----- helpers ----- */
+const monOf=s=>{const d=pd(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return fd(d);};
+const THISMON=()=>monOf(T());
+/* the first week still worth loading: this week until Wednesday, next week from Thursday on */
+const FIRSTWK=()=>{const g=pd(T()).getDay();return g>=4||g===0?addDays(THISMON(),7):THISMON();};
+const canSched=()=>isProd();
+/* What a line is. NetSuite's product class is wrong on dozens of items (custom elbows filed as
+   conduit, adhesive cartridges filed as conduit or fittings), so the description decides first:
+   acc      adhesives and accessories (CM-/FM- mix, guns, tips, tape, catalogs, samples, apparel): never scheduled
+   elbow    "Elbow", or an angle x radius ("22-1/2 Degree x 72in Radius")
+   conduit  "Conduit, 20 ft" or a conduit product class
+   fitting  everything else (couplings, adapters, strut, hangers) */
+function kindOf(l){
+  if(!l||typeof l==='string'){const c=(l||'').toLowerCase();return c.includes('elbow')?'elbow':c.includes('fitting')?'fitting':c.includes('conduit')&&!c.includes('misc')?'conduit':'fitting';}
+  const it=String(l.item||'').toUpperCase(),d=String(l.desc||'').replace(/\s+/g,' '),c=String(l.cls||'').toLowerCase().replace('unclassified','');
+  if(/^(CM|FM)[-\d]/.test(it)||/adhesive|cartridge|mixer tip|catalog|duffel|sample|repair tape|sanding|trucker|snapback/i.test(d)||c.includes('misc')||(!c&&!/^\s*[\d\-\/]+\s*(in\b|")/i.test(d)))return 'acc';
+  if(/\belbow\b/i.test(d)||/\d\s*Degree\s*x\s/i.test(d))return 'elbow';
+  if(/conduit,\s*[\d.]+\s*f/i.test(d)||(c.includes('conduit')&&!c.includes('fitting')))return 'conduit';
+  return 'fitting';
+}
+const KINDL={elbow:'Elbow',conduit:'Conduit',fitting:'Fitting',acc:'Accessory'};
+const schedulable=l=>kindOf(l)!=='acc';
+const sizeOf=l=>{const m=/^\s*([\d\-\/]+)\s*in\b/i.exec((l&&l.desc)||'');return m?m[1]+'"':null;};
+const rateFor=(item,size)=>{const m=SMETA||{};return (m.rateByItem||{})[item]??(m.rateBySize||{})[size]??0.2;};
+const BENDERS=()=>(SMETA&&SMETA.benders)||[];
+const runsSize=size=>BENDERS().filter(b=>size&&(b.sizes||[]).includes(size));
+const bendersFor=size=>{const b=runsSize(size);return b.length?b:BENDERS();};
+const runsOf=so=>(SCHED[so]&&SCHED[so].runs)||[];
+const keyAcct=so=>SMETA&&SMETA.keyAccounts?SMETA.keyAccounts[so]:null;
+const kaTag=so=>keyAcct(so)?`<span class="ka">${esc(keyAcct(so))}</span>`:'';
+const r2=n=>Math.round(n*100)/100;
+const newRunId=()=>'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const hrsOf=x=>x.kind==='elbow'?r2((+x.qty||0)*rateFor(x.item,x.size)):0;
+const capTotal=()=>BENDERS().reduce((s,b)=>s+(+b.hrs||0),0);
+const wkLabel=w=>`${MON[pd(w).getMonth()]} ${pd(w).getDate()}`;
+
+/* The promise an order is held to: an open portal commitment first, then the tracker / email
+   promise seeded from Excel, else none. perLine holds committed dates by line. */
+function promiseOf(so){
+  const reqs=S.requests.filter(r=>r.so===so&&r.commit&&[...COMMITTED,...DONEC].includes(r.status));
+  if(reqs.length){
+    const open=reqs.filter(r=>COMMITTED.includes(r.status)),rows=open.flatMap(r=>r.commit.rows.filter(x=>!x.readyAt));
+    const last=[...reqs].sort((a,b)=>(a.lastAt||'')<(b.lastAt||'')?-1:1).pop();
+    const perLine={};rows.forEach(x=>{if(x.ln!=null&&(!perLine[x.ln]||x.date>perLine[x.ln]))perLine[x.ln]=x.date;});
+    const missed=open.some(r=>r.status==='missed');
+    return {portal:true,complete:!rows.length,perLine,reqs:reqs.map(r=>r.id),
+      date:(rows.length?rows:reqs.flatMap(r=>r.commit.rows)).map(x=>x.date).sort().pop(),
+      type:!rows.length?'Complete (Portal)':missed?'Missed (Portal)':'Portal Commitment',
+      what:rows.map(x=>{const l=x.ln!=null?lineOf(so,x.ln):null;return `${l?num(x.qty)+' '+l.item:'Whole order'} by ${fmt(x.date)}`;}).join('; ')||'Everything Committed Is Ready',
+      by:last.answeredBy||'',on:(last.lastAt||'').slice(0,10),src:'Order Communications '+reqs.map(r=>r.id).join(', ')};
+  }
+  const p=SCHED[so]&&SCHED[so].promise;
+  return p&&(p.date||p.type)?{...p,portal:false,complete:false,perLine:{},reqs:[]}:null;
+}
+const linePromise=(p,ln)=>p?(p.perLine[ln]||p.date||null):null;
+const isWeekly=p=>!!(p&&/weekly/i.test(p.type||''));
+
+/* Where an order stands against its promise (same rules as the Excel Order Completion tab,
+   with this week's Monday as the start of the schedule). */
+function orderPlan(o){
+  const tm=THISMON(),runs=runsOf(o.so),p=promiseOf(o.so);
+  const toBuild=o.lines.reduce((s,l)=>s+(l.rem>0&&schedulable(l)?l.rem:0),0);
+  const fut=runs.filter(x=>x.wk>=tm),sched=fut.reduce((s,x)=>s+(+x.qty||0),0);
+  const wks=fut.map(x=>x.wk).sort(),first=wks[0]||null,finish=wks[wks.length-1]||null;
+  const pw=p&&p.date?monOf(p.date):null,recurring=isWeekly(p);
+  const late=pw&&finish?Math.max(0,Math.round(daysBetween(pw,finish)/7)):null;
+  let st;
+  if(!sched)st={t:'Not Scheduled',c:'red',k:'none'};
+  else if(recurring)st={t:'Recurring, Ends Week '+fmt(finish),c:'steel',k:'rec'};
+  else if(sched<toBuild)st={t:'Not Fully Scheduled',c:'amber',k:'part'};
+  else if(!pw||p.complete)st={t:'No Promise',c:'muted',k:'nop'};
+  else if(pw<tm)st={t:'Past Due, Done Week '+fmt(finish),c:'amber',k:'past'};
+  else if(!late)st={t:'On Time',c:'ok',k:'ok'};
+  else st={t:`Will Miss By ${plural(late,'Week')}`,c:'red',k:'miss'};
+  return {o,p,runs,toBuild,sched,first,finish,pw,late,st,recurring};
+}
+const openOrders=()=>ORDERS.filter(o=>o.st!=='Stock'&&o.lines.some(l=>l.rem>0&&schedulable(l)));
+function runFlag(o,x,p,lineSched){
+  const tm=THISMON();
+  if(x.wk<tm)return 'Past Week';
+  if(!o||o.gone)return 'Order Off The Backlog';
+  const l=x.ln!=null?o.lines.find(y=>y.ln===x.ln):null;
+  if(x.ln!=null&&!l)return 'Line Shipped Or Closed';
+  if(l&&lineSched>l.rem)return `Over By ${num(lineSched-l.rem)}`;
+  const lp=linePromise(p,x.ln);
+  if(lp&&!isWeekly(p)&&monOf(lp)>=tm&&x.wk>monOf(lp))return 'After Promise';
+  return '';
+}
+function loadMap(){const m={};Object.values(SCHED).forEach(d=>(d.runs||[]).forEach(x=>{if(x.kind!=='elbow'||!x.bender)return;(m[x.wk]=m[x.wk]||{})[x.bender]=(m[x.wk][x.bender]||0)+(+x.hrs||0);}));return m;}
+function lineSums(){const m={},tm=THISMON();Object.values(SCHED).forEach(d=>(d.runs||[]).forEach(x=>{if(x.wk>=tm){const k=d.so+'|'+x.ln;m[k]=(m[k]||0)+(+x.qty||0);}}));return m;}
+function bestBender(size,wk,L){const bs=bendersFor(size);if(!bs.length)return null;return bs.map(b=>({n:b.n,free:b.hrs-((L[wk]||{})[b.n]||0)})).sort((a,c)=>c.free-a.free)[0].n;}
+function weekOpts(sel){const tm=THISMON();let w=sel&&sel<tm?sel:tm;const out=[];for(;w<=addDays(tm,7*40);w=addDays(w,7))out.push(`<option value="${w}" ${w===sel?'selected':''}>Week of ${fmt(w)}</option>`);return out.join('');}
+function benderOpts(size,sel){const bs=bendersFor(size);return bs.map(b=>`<option value="${b.n}" ${+sel===b.n?'selected':''}>Bender ${b.n}</option>`).join('')+(sel&&!bs.some(b=>b.n===+sel)?`<option value="${sel}" selected>Bender ${sel}</option>`:'');}
+/* runs that land on the same line, week and bender become one */
+function mergeRuns(runs){const out=[];runs.forEach(x=>{if(!(+x.qty>0))return;const m=out.find(y=>y.ln===x.ln&&y.wk===x.wk&&(y.bender||null)===(x.bender||null)&&y.kind===x.kind);if(m){m.qty=r2(m.qty+(+x.qty));m.hrs=hrsOf(m);}else out.push({...x,qty:+x.qty,hrs:hrsOf(x)});});return out;}
+/* the earliest week with room on a bender that runs this size (finite-capacity placement) */
+function fitTarget(o,l,qty,L){
+  const kind=kindOf(l),size=sizeOf(l),start=FIRSTWK();
+  if(kind!=='elbow'){const lp=linePromise(promiseOf(o.so),l.ln);let wk=lp?monOf(lp):start;if(wk<start)wk=start;return {wk,bender:null,fits:true};}
+  const need=qty*rateFor(l.item,size);L=L||loadMap();
+  for(let i=0;i<52;i++){const wk=addDays(start,7*i);const c=bendersFor(size).map(b=>({n:b.n,free:b.hrs-((L[wk]||{})[b.n]||0)})).filter(x=>x.free>=need-.01).sort((a,b)=>b.free-a.free);if(c.length)return {wk,bender:c[0].n,fits:true};}
+  return {wk:start,bender:bestBender(size,start,L),fits:false};
+}
+
+/* ----- saving: optimistic, one transaction per order, undoable ----- */
+function runsText(runs){return runs.slice().sort((a,b)=>a.wk<b.wk?-1:1).map(x=>`${num(x.qty)} Week ${fmt(x.wk)}${x.bender?' B'+x.bender:''}`).join(' + ');}
+function diffText(so,before,after){
+  const lns=[...new Set([...before,...after].map(x=>x.ln))],out=[];
+  lns.forEach(ln=>{const a=runsText(before.filter(x=>x.ln===ln)),b=runsText(after.filter(x=>x.ln===ln));if(a!==b){const l=lineOf(so,ln);out.push(`Line ${ln??'—'}${l?' '+l.item:''}: ${a||'nothing'} → ${b||'nothing'}`);}});
+  return out.join('; ');
+}
+async function saveSched(so,runs,note,before){
+  before=before||runsOf(so);
+  const ref=doc(db,SCOL,so),base=SCHED[so]?SCHED[so].rev||0:0,text=diffText(so,before,runs);
+  if(!text)return true;
+  try{
+    await runTransaction(db,async tx=>{
+      const s=await tx.get(ref),cur=s.exists()?s.data():null;
+      if((cur?cur.rev||0:0)!==base)throw new Error('STALE');
+      tx.set(ref,{...(cur||{promise:null,notes:null,note:''}),so,runs:clean(runs),rev:base+1,updatedAt:nowTs(),updatedBy:ME.name||ME.email});
+      tx.set(doc(collection(db,SCOL,so,'log')),{at:nowTs(),ms:Date.now(),by:ME.email,name:ME.name||ME.email,text,note:note||''});
+    });
+    if(SCHED[so]&&(SCHED[so].rev||0)<base+1)SCHED[so].rev=base+1;
+    delete LOGS[so];return true;
+  }catch(e){
+    console.error(e);
+    toast(e.message==='STALE'?`Someone else just changed ${so}. Showing theirs; make your change again.`:e.code==='permission-denied'?'You don’t have permission to edit the schedule.':'Couldn’t save. Check your connection and try again.');
+    return false;
+  }
+}
+/* changes: [{so,after}]. Applied on screen at once, then saved; reverted if a save fails. */
+async function commitRuns(changes,label,quiet){
+  const undo=[];
+  changes.forEach(c=>{undo.push({so:c.so,before:runsOf(c.so).map(x=>({...x}))});SCHED[c.so]={...(SCHED[c.so]||{so:c.so,promise:null,notes:null,note:'',rev:0}),runs:c.after};});
+  render();
+  let ok=true;
+  for(const c of changes){const u=undo.find(x=>x.so===c.so);if(!await saveSched(c.so,c.after,label,u.before)){ok=false;SCHED[c.so]={...SCHED[c.so],runs:u.before};}}
+  if(ok){UNDO.push({label,items:undo});if(UNDO.length>40)UNDO.shift();if(!quiet)toast(label,()=>undoLast());}
+  render();return ok;
+}
+async function undoLast(){
+  const u=UNDO.pop();if(!u){toast('Nothing to undo');return;}
+  for(const it of u.items){const cur=runsOf(it.so).map(x=>({...x}));SCHED[it.so]={...SCHED[it.so],runs:it.before};render();if(!await saveSched(it.so,it.before,'Undo: '+u.label,cur))SCHED[it.so]={...SCHED[it.so],runs:cur};}
+  render();toast('Undone: '+u.label);
+}
+const runById=(so,id)=>runsOf(so).find(x=>x.id===id);
+function moveRun(so,id,wk,bender){const x=runById(so,id);if(!x)return;
+  const after=mergeRuns(runsOf(so).map(y=>y.id===id?{...y,wk,bender:bender??y.bender}:y));
+  return commitRuns([{so,after}],`${so} ${x.item} moved to Week ${fmt(wk)}${(bender??x.bender)?' · Bender '+(bender??x.bender):''}`);}
+function setQty(so,id,qty){const x=runById(so,id);if(!x)return;return commitRuns([{so,after:mergeRuns(runsOf(so).map(y=>y.id===id?{...y,qty}:y))}],`${so} ${x.item} set to ${num(qty)}`);}
+function splitRun(so,id,qty,wk,bender){const x=runById(so,id);if(!x||!(qty>0)||qty>=x.qty)return toast('Split needs a quantity smaller than the run.');
+  const after=mergeRuns([...runsOf(so).map(y=>y.id===id?{...y,qty:r2(y.qty-qty)}:y),{...x,id:newRunId(),qty,wk,bender:x.kind==='elbow'?(bender||x.bender):null,why:'Split in planner'}]);
+  return commitRuns([{so,after}],`${so} ${x.item} split: ${num(qty)} to Week ${fmt(wk)}`);}
+function removeRun(so,id){const x=runById(so,id);if(!x)return;UI.dw=null;return commitRuns([{so,after:runsOf(so).filter(y=>y.id!==id)}],`${so} ${x.item} removed from Week ${fmt(x.wk)}`);}
+function addLine(so,ln,wk,bender,qty){const o=BY_SO[so],l=o&&o.lines.find(y=>y.ln===ln);if(!l||!(qty>0))return;
+  const kind=kindOf(l),size=sizeOf(l),x={id:newRunId(),ln,item:l.item,size,wk,qty,bender:kind==='elbow'?(bender||bestBender(size,wk,loadMap())):null,kind,why:'Scheduled in planner'};x.hrs=hrsOf(x);
+  return commitRuns([{so,after:mergeRuns([...runsOf(so).map(y=>({...y})),x])}],`${so} ${l.item}: ${num(qty)} added to Week ${fmt(wk)}${x.bender?' · Bender '+x.bender:''}`);}
+function needOf(so,ln){const o=BY_SO[so],l=o&&o.lines.find(y=>y.ln===ln);if(!l)return 0;const tm=THISMON();return Math.max(0,l.rem-runsOf(so).filter(x=>x.ln===ln&&x.wk>=tm).reduce((s,x)=>s+(+x.qty||0),0));}
+function autoFit(so,ln){const o=BY_SO[so],l=o&&o.lines.find(y=>y.ln===ln),q=needOf(so,ln);if(!l||!q)return;const t=fitTarget(o,l,q);
+  if(!t.fits)toast(`Too big for one bender-week. Placed on the least-loaded bender in Week ${fmt(t.wk)}; split it.`);
+  return addLine(so,ln,t.wk,t.bender,q);}
+/* ----- elbow planning, 3 weeks ahead -----
+   Recurring lines (a qty every 1, 2 or 3 weeks, set on the line) are placed first; the open
+   bender capacity left is then filled with the most past-due orders (earliest NetSuite ESD first),
+   splitting a line across benders and weeks when it doesn't fit in one. */
+const planWeeks=()=>[...Array(PLAN_WEEKS)].map((_,i)=>addDays(FIRSTWK(),7*i));
+const EVERYL={1:'Every Week',2:'Every 2 Weeks',3:'Every 3 Weeks'};
+/* recur[line] = {qty, every: 1|2|3, from: the Monday the cycle starts} (a bare number = every week) */
+const normRec=v=>v==null?null:typeof v==='number'?{qty:v,every:1,from:FIRSTWK()}:{qty:+v.qty||0,every:[1,2,3].includes(+v.every)?+v.every:1,from:v.from||FIRSTWK()};
+const recurOf=so=>{const r=(SCHED[so]&&SCHED[so].recur)||{},out={};Object.keys(r).forEach(k=>{const n=normRec(r[k]);if(n&&n.qty>0)out[k]=n;});return out;};
+const recText=r=>`${num(r.qty)} ${EVERYL[r.every]}`;
+function recurList(){const out=[];Object.keys(SCHED).forEach(so=>Object.entries(recurOf(so)).forEach(([ln,rec])=>{const o=BY_SO[so],l=o&&o.lines.find(y=>String(y.ln)===String(ln));out.push({so,ln:l?l.ln:+ln,rec,o,l});}));return out.sort((a,b)=>a.so<b.so?-1:1);}
+const recWeeks=(rec,weeks)=>weeks.filter(w=>{const n=Math.round(daysBetween(rec.from,w)/7);return ((n%rec.every)+rec.every)%rec.every===0;});
+/* runs for recurring lines in the planning weeks. reset: take that line's future recurring runs off first */
+function recurRuns(items,reset){
+  const weeks=planWeeks(),L=JSON.parse(JSON.stringify(loadMap())),after={},tm=THISMON();let n=0,pcs=0;
+  items.forEach(({so,ln,rec,l})=>{
+    if(!l)return;
+    let runs=after[so]||runsOf(so).map(x=>({...x}));
+    if(reset){runs.filter(x=>x.ln===ln&&x.why==='Recurring'&&x.wk>=tm).forEach(x=>{if(x.bender&&L[x.wk])L[x.wk][x.bender]=(L[x.wk][x.bender]||0)-(+x.hrs||0);});runs=runs.filter(x=>!(x.ln===ln&&x.why==='Recurring'&&x.wk>=tm));}
+    if(rec){const size=sizeOf(l),kind=kindOf(l);
+      recWeeks(rec,weeks).forEach(wk=>{
+        const have=runs.filter(x=>x.ln===ln&&x.wk===wk).reduce((s,x)=>s+(+x.qty||0),0),left=Math.max(0,l.rem-runs.filter(x=>x.ln===ln&&x.wk>=tm).reduce((s,x)=>s+(+x.qty||0),0));
+        const q=Math.min(rec.qty-have,left);if(q<=0)return;
+        const b=kind==='elbow'?bestBender(size,wk,L):null,x={id:newRunId(),ln,item:l.item,size,wk,qty:q,bender:b,kind,why:'Recurring'};x.hrs=hrsOf(x);
+        if(b)(L[wk]=L[wk]||{})[b]=((L[wk]||{})[b]||0)+x.hrs;runs.push(x);n++;pcs+=q;});}
+    after[so]=runs;});
+  return {changes:Object.keys(after).filter(so=>diffText(so,runsOf(so),after[so])).map(so=>({so,after:mergeRuns(after[so])})),n,pcs};
+}
+function placeRecurring(){
+  const r=recurRuns(recurList(),false);
+  if(!r.changes.length)return toast(recurList().length?`Recurring orders are already placed through the week of ${fmt(planWeeks()[PLAN_WEEKS-1])}.`:'No recurring orders yet. Click a line on the board or in the search and set it to recur.');
+  return commitRuns(r.changes,`Recurring placed: ${plural(r.n,'run')}, ${num(r.pcs)} pcs`);
+}
+async function saveRecur(so,ln,rec){
+  const ref=doc(db,SCOL,so),l=lineOf(so,ln),all={...((SCHED[so]&&SCHED[so].recur)||{})};
+  if(rec)all[ln]={qty:rec.qty,every:rec.every,from:rec.from};else delete all[ln];
+  const text=`Line ${ln}${l?' '+l.item:''}: `+(rec?`recurring ${recText(rec)}`:'no longer recurring');
+  SCHED[so]={...(SCHED[so]||{so,runs:[],promise:null,notes:null,note:'',rev:0}),recur:all};render();
+  try{
+    let nr=0;
+    await runTransaction(db,async tx=>{const s=await tx.get(ref),cur=s.exists()?s.data():{so,runs:[],promise:null,notes:null,note:'',rev:0};nr=(cur.rev||0)+1;
+      tx.set(ref,{...cur,so,recur:all,rev:nr,updatedAt:nowTs(),updatedBy:ME.name||ME.email});
+      tx.set(doc(collection(db,SCOL,so,'log')),{at:nowTs(),ms:Date.now(),by:ME.email,name:ME.name||ME.email,text,note:''});});
+    if(SCHED[so]&&(SCHED[so].rev||0)<nr)SCHED[so].rev=nr;delete LOGS[so];
+  }catch(e){console.error(e);toast('Couldn’t save. Check your connection and try again.');return false;}
+  /* put it on the board right away (or take its recurring runs off) */
+  const o=BY_SO[so],line=o&&o.lines.find(y=>y.ln===ln),r=recurRuns([{so,ln,rec,l:line}],true);
+  if(r.changes.length)await commitRuns(r.changes,`${so} ${l?l.item:''}: ${rec?'recurring '+recText(rec)+', '+plural(r.n,'run')+' placed':'recurring runs removed'}`);
+  else toast(`${so} ${text}`);
+  return true;
+}
+function fillCandidates(){
+  const LS=lineSums(),rec=new Set(recurList().map(x=>x.so+'|'+x.ln)),out=[];
+  openOrders().forEach(o=>o.lines.forEach(l=>{if(l.rem<=0||kindOf(l)!=='elbow'||rec.has(o.so+'|'+l.ln))return;const need=l.rem-(LS[o.so+'|'+l.ln]||0);if(need>0)out.push({o,l,need});}));
+  return out.sort((a,b)=>(a.o.esd||'9')<(b.o.esd||'9')?-1:(a.o.esd||'9')>(b.o.esd||'9')?1:((a.o.od||'')<(b.o.od||'')?-1:1));
+}
+function planFill(){
+  const weeks=planWeeks(),L=JSON.parse(JSON.stringify(loadMap())),after={},placed=new Set();let pcs=0,hrs=0;
+  const fullNow=()=>weeks.every(wk=>BENDERS().every(b=>b.hrs-((L[wk]||{})[b.n]||0)<.5));
+  for(const c of fillCandidates()){
+    if(fullNow())break;
+    let need=c.need;const size=sizeOf(c.l),rate=Math.max(.001,rateFor(c.l.item,size)),bs=bendersFor(size);
+    for(const wk of weeks){
+      if(need<=0)break;
+      const cand=bs.map(b=>({n:b.n,free:b.hrs-((L[wk]||{})[b.n]||0)})).filter(x=>x.free>=rate).sort((a,b)=>b.free-a.free);
+      for(const b of cand){
+        if(need<=0)break;const q=Math.min(need,Math.floor(b.free/rate+1e-9));if(q<1)continue;
+        const runs=after[c.o.so]||(after[c.o.so]=runsOf(c.o.so).map(x=>({...x})));
+        const x={id:newRunId(),ln:c.l.ln,item:c.l.item,size,wk,qty:q,bender:b.n,kind:'elbow',why:'Filled, most past due first'};x.hrs=hrsOf(x);
+        runs.push(x);(L[wk]=L[wk]||{})[b.n]=((L[wk]||{})[b.n]||0)+x.hrs;need-=q;pcs+=q;hrs+=x.hrs;placed.add(c.o.so+'|'+c.l.ln);
+      }
+    }
+  }
+  return {after,lines:placed.size,orders:Object.keys(after).length,pcs,hrs};
+}
+function fillOldest(){
+  const p=planFill();if(!p.lines)return toast(`No open capacity left in the next ${PLAN_WEEKS} weeks, or nothing left to place.`);
+  return commitRuns(Object.keys(p.after).map(so=>({so,after:mergeRuns(p.after[so])})),`Filled ${plural(p.lines,'line')} from ${plural(p.orders,'order')}: ${num(p.pcs)} pcs, ${num(Math.round(p.hrs))} h`);
+}
+/* lines committed or confirmed in Order Communications and not yet ready, with their committed week */
+function commitments(){
+  const out=[],tm=THISMON();
+  S.requests.forEach(r=>{if(!r.commit||!COMMITTED.includes(r.status))return;const o=BY_SO[r.so];if(!o||o.gone)return;
+    r.commit.rows.forEach(x=>{if(x.readyAt||!x.date)return;
+      const ls=x.ln!=null?[o.lines.find(y=>y.ln===x.ln)].filter(Boolean):o.lines.filter(l=>l.rem>0);
+      ls.filter(schedulable).forEach(l=>{const q=x.ln!=null?x.qty:l.rem,wk=monOf(x.date),by=runsOf(r.so).filter(y=>y.ln===l.ln&&y.wk>=tm&&y.wk<=wk).reduce((s,y)=>s+(+y.qty||0),0);
+        out.push({so:r.so,o,l,ln:l.ln,qty:q,date:x.date,wk,req:r.id,missed:r.status==='missed',by,kind:kindOf(l)});});});});
+  return out;
+}
+const removeOrder=so=>{UI.dw=null;return commitRuns([{so,after:runsOf(so).filter(x=>x.wk<THISMON())}],`${so} taken off the schedule`);};
+/* every run in one bender-week (or conduit / fittings week) slides a week */
+function cellRuns(wk,row){const out=[];Object.values(SCHED).forEach(d=>(d.runs||[]).forEach(x=>{if(x.wk!==wk)return;if(row==='conduit'||row==='fitting'?x.kind===row:(x.kind==='elbow'&&String(x.bender)===row))out.push({...x,so:d.so});}));return out;}
+function shiftCell(wk,row,delta){const xs=cellRuns(wk,row);if(!xs.length)return;const ids=new Set(xs.map(x=>x.so+'|'+x.id)),to=addDays(wk,7*delta);
+  const sos=[...new Set(xs.map(x=>x.so))];
+  return commitRuns(sos.map(so=>({so,after:mergeRuns(runsOf(so).map(y=>ids.has(so+'|'+y.id)?{...y,wk:to}:y))})),`${plural(xs.length,'run')} moved from Week ${fmt(wk)} to Week ${fmt(to)}`);}
+function lateIfShift(xs,delta){return xs.filter(x=>{const lp=linePromise(promiseOf(x.so),x.ln);if(!lp||isWeekly(promiseOf(x.so)))return false;const pw=monOf(lp),to=addDays(x.wk,7*delta);return x.wk<=pw&&to>pw;}).length;}
+function loadLog(so){getDocs(query(collection(db,SCOL,so,'log'),orderBy('ms','desc'))).then(s=>{LOGS[so]=s.docs.map(d=>d.data());if(!DIRTY)render();}).catch(()=>{LOGS[so]=[];});}
+
+/* ----- shared pieces ----- */
+const ICON_BOARD='<svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="10" width="44" height="36"/><path d="M6 20h44M20 10v36M35 10v36"/><rect x="23" y="24" width="9" height="6" fill="currentColor" stroke="none"/><rect x="38" y="33" width="9" height="6" fill="currentColor" stroke="none"/></svg>';
+const kpi=(k,v,label,cls,suf)=>`<div class="kpi ${cls||''}"><span class="n" data-ck="${k}" data-v="${v}">${(+v).toLocaleString('en-US')}${suf?`<small>${suf}</small>`:''}</span><span class="l">${label}</span></div>`;
+const tick=(c,t)=>`<span class="stk ${c}">${esc(t)}</span>`;
+function countUp(){
+  document.querySelectorAll('[data-ck]').forEach(el=>{
+    const k=el.dataset.ck,v=+el.dataset.v,from=COUNTS[k];COUNTS[k]=v;
+    if(from===v||REDUCED.matches||!el.firstChild)return;
+    const f=from==null?0:from,t0=performance.now(),dur=from==null?800:450;
+    const step=t=>{const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);if(el.firstChild)el.firstChild.nodeValue=Math.round(f+(v-f)*e).toLocaleString('en-US');if(p<1)requestAnimationFrame(step);};
+    requestAnimationFrame(step);
+  });
+}
+function psPlans(){return openOrders().map(orderPlan);}
+
+/* ===== SIDEBAR (Schedule tab) =====
+   Without a search: what Order Communications has committed and isn't scheduled yet, then every
+   order with lines still needing a week, most past-due ESD first. With a search: the matching
+   orders. Lines show by part number and drag onto the board. Elbows or conduit & fittings follow
+   the toggle above the board. */
+function searchTrayHTML(){
+  const q=UI.pq.trim().toLowerCase(),elbow=UI.pk==='elbow',LS=lineSums(),mine=l=>schedulable(l)&&elbow===(kindOf(l)==='elbow');
+  const lineCard=(o,l,s,need)=>{const k=kindOf(l),drag=canSched()&&need>0,sel=UI.dw&&UI.dw.t==='line'&&UI.dw.so===o.so&&UI.dw.ln===l.ln,rec=recurOf(o.so)[l.ln];
+    return `<div class="jc ${need?'':'done'} ${sel?'pick':''}" role="button" tabindex="0" data-k="t-${o.so}-${l.ln}" data-tl="${o.so}|${l.ln}" draggable="${drag}" title="${esc(l.item+'\n'+(l.desc||''))}">
+    <span class="r1"><span class="it">${esc(l.item)}</span>${rec?'<span class="rtag">R</span>':''}<span class="q">${num(need||l.rem)}</span></span>
+    <span class="r4"><span class="due">${KINDL[k]} · ${need?(s?`${num(s)} Scheduled, ${num(need)} To Go`:'Not Scheduled'):'All Scheduled'}</span>${drag&&k==='elbow'?`<button class="mini" data-autofit="${o.so}|${l.ln}" title="Place in the earliest week with room">Auto-Fit</button>`:''}</span></div>`;};
+  const orderBlock=(o,all)=>{
+    const ls=o.lines.filter(l=>l.rem>0&&mine(l)).map(l=>{const s=LS[o.so+'|'+l.ln]||0;return {l,s,need:Math.max(0,l.rem-s)};}).filter(x=>all||x.need>0);
+    if(!ls.length&&!all)return '';
+    return `<div class="tr-o" data-k="tro-${o.so}"><button class="tr-oh" data-sopen="${o.so}" title="Open ${o.so} in Order Lookup"><span class="so">${o.so}</span>${kaTag(o.so)}<span class="c">${esc(o.c)}</span><span class="d">ESD ${fmt(o.esd)}${o.esd<THISMON()?' · Past Due':''}</span></button>
+    ${ls.map(x=>lineCard(o,x.l,x.s,x.need)).join('')||`<p class="hint" style="margin:2px 0 0">No open ${elbow?'elbow':'conduit or fitting'} lines.</p>`}</div>`;};
+  let body;
+  if(q.length>=2){
+    const os=Object.values(BY_SO).filter(o=>!o.gone&&(o.so+' '+o.c+' '+(o.po||'')).toLowerCase().includes(q)).sort((a,b)=>a.so<b.so?-1:1).slice(0,15);
+    body=os.map(o=>orderBlock(o,true)).join('')||`<div class="tray-hint"><b>No Matches</b><span>Try the order number, customer name or PO.</span></div>`;
+  }else{
+    const cm=commitments().filter(c=>mine(c.l)&&c.by<c.qty).sort((a,b)=>a.date<b.date?-1:1);
+    const cmH=cm.map(c=>{const need=c.qty-c.by,sel=UI.dw&&UI.dw.t==='line'&&UI.dw.so===c.so&&UI.dw.ln===c.ln;
+      return `<div class="jc cm ${sel?'pick':''}" role="button" tabindex="0" data-k="cm-${c.req}-${c.ln}" data-tl="${c.so}|${c.ln}" draggable="${canSched()}" title="${esc(c.l.item+'\n'+(c.l.desc||''))}">
+      <span class="r1"><span class="so">${c.so}</span><span class="q">${num(need)}</span></span><span class="c">${esc(c.o.c)}</span>
+      <span class="r3"><span class="it">${esc(c.l.item)}</span></span>
+      <span class="r4"><span class="due">${c.req} · ${c.missed?'Missed, ':''}Due ${fmt(c.date)}${c.by?` · ${num(c.by)} Scheduled`:''}</span>${canSched()&&kindOf(c.l)==='elbow'?`<button class="mini" data-autofit="${c.so}|${c.ln}">Auto-Fit</button>`:''}</span></div>`;}).join('');
+    const os=openOrders().filter(o=>o.lines.some(l=>l.rem>0&&mine(l)&&(LS[o.so+'|'+l.ln]||0)<l.rem)).sort((a,b)=>(a.esd||'9')<(b.esd||'9')?-1:(a.esd||'9')>(b.esd||'9')?1:((a.od||'')<(b.od||'')?-1:1));
+    const MAXO=40;
+    body=`<div class="tr-sec"><b>Committed <span>${cm.length}</span></b><span>In Order Communications, not on the schedule yet</span></div>${cmH||'<p class="hint" style="margin:0 2px 8px">Everything committed is scheduled.</p>'}
+    <div class="tr-sec"><b>Needs Scheduling <span>${os.length}</span></b><span>Most past-due ESD first</span></div>${os.slice(0,MAXO).map(o=>orderBlock(o,false)).join('')||'<p class="hint" style="margin:0 2px">Every open line has a week.</p>'}${os.length>MAXO?`<p class="hint" style="padding:6px 2px">Showing ${MAXO} of ${os.length}. Search to find others.</p>`:''}`;
+  }
+  return `<aside class="tray" data-k="tray" aria-label="Orders to schedule"><div class="tray-h" data-k="tray-h"><input class="search" type="search" id="pq" placeholder="Search Orders" value="${esc(UI.pq)}" autocomplete="off" aria-label="Search orders, customers or POs"></div><div class="tray-l" data-k="tray-l-${UI.pk}-${q.length>=2?'s':'l'}" data-deep>${body}</div></aside>`;
+}
+
+/* ===== SCHEDULE (the board) ===== */
+function plannerHTML(){
+  const tm=THISMON(),first=FIRSTWK();if(!UI.pw)UI.pw=first;
+  const NW=UI.nw||PLAN_WEEKS,weeks=[...Array(NW)].map((_,i)=>addDays(UI.pw,7*i)),pw3=planWeeks(),inPlan=new Set(pw3);
+  const L=loadMap(),LS=lineSums(),PC={},pOf=so=>so in PC?PC[so]:(PC[so]=promiseOf(so));
+  const q=UI.pq.trim().toLowerCase(),elbow=UI.pk==='elbow';
+  const hit=so=>{if(q.length<2)return true;const o=BY_SO[so];return (so+' '+(o?o.c+' '+(o.po||''):'')).toLowerCase().includes(q);};
+  const rows=elbow?BENDERS().map(b=>({key:String(b.n),label:'Bender '+b.n,sub:(b.sizes||[]).join(' · '),cap:+b.hrs})):[{key:'conduit',label:'Conduit',sub:'Pipe And Straights'},{key:'fitting',label:'Fittings',sub:'Fittings, Strut, Misc.'}];
+  const cells={};
+  Object.values(SCHED).forEach(d=>(d.runs||[]).forEach(x=>{if(elbow!==(x.kind==='elbow'))return;const rk=elbow?String(x.bender||''):x.kind,k=x.wk+'|'+rk;(cells[k]=cells[k]||[]).push({...x,so:d.so});}));
+  const capT=capTotal(),wkLoad=pw3.map(w=>{const h=Object.values(L[w]||{}).reduce((s,x)=>s+x,0);return {w,h,u:capT?h/capT:0};});
+  const openH=wkLoad.reduce((s,x)=>s+Math.max(0,capT-x.h),0),recs=recurList(),cm=commitments().filter(c=>elbow===(c.kind==='elbow'));
+  const plans=psPlans(),risk=plans.filter(x=>x.st.k==='miss').length,cmShort=cm.filter(c=>c.by<c.qty).length;
+  const band=`<div class="kband" data-k="kband">${wkLoad.map((x,i)=>kpi('pl-w'+i,Math.round(x.u*100),'Load, Week of '+fmt(x.w),x.u>1.005?'red':x.u>.95?'ok':'','%')).join('')}${kpi('pl-open',Math.round(openH),`Open Hours, ${PLAN_WEEKS} Weeks`,openH>=1?'amb':'')}${kpi('pl-cm',cmShort,'Commitments Not Scheduled',cmShort?'red':'')}${kpi('pl-risk',risk,'Will Miss Promise',risk?'red':'')}</div>`;
+  const tools=`<div class="ps-tools" data-k="tools"><div class="seg2" role="group" aria-label="Product"><button data-pk="elbow" aria-pressed="${elbow}">Elbows</button><button data-pk="cf" aria-pressed="${!elbow}">Conduit &amp; Fittings</button></div>
+  <button class="tbtn ic" data-pw="${addDays(UI.pw,-7)}" aria-label="Earlier week">‹</button><span class="wklbl">${wkLabel(weeks[0])} – ${wkLabel(addDays(weeks[NW-1],4))}</span><button class="tbtn ic" data-pw="${addDays(UI.pw,7)}" aria-label="Later week">›</button>${UI.pw!==first?`<button class="btn-link" data-pw="${first}">Back To Now</button>`:''}
+  <div class="seg2" role="group" aria-label="Weeks shown"><button data-nw="3" aria-pressed="${NW===3}">3 Weeks</button><button data-nw="6" aria-pressed="${NW===6}">6 Weeks</button></div>
+  <div class="seg2" role="group" aria-label="Card size"><button data-dense="0" aria-pressed="${!UI.dense}">Detail</button><button data-dense="1" aria-pressed="${UI.dense}">Compact</button></div>
+  <span class="sp"></span>${canSched()?`${recs.length?'<button class="tbtn" data-placerec title="Place recurring orders through the next 3 weeks">Place Recurring</button>':''}${elbow?`<button class="tbtn" data-fill title="Fill the open bender hours in the next ${PLAN_WEEKS} weeks with the most past-due orders">Fill Open Capacity</button>`:''}<button class="tbtn ic undo" data-undo ${UNDO.length?'':'disabled'} title="${UNDO.length?esc('Undo: '+UNDO[UNDO.length-1].label+' (Ctrl+Z)'):'Nothing to undo'}" aria-label="Undo">↶${UNDO.length?`<span class="ub">${UNDO.length}</span>`:''}</button>`:'<span class="hint">View Only. Production Schedules.</span>'}</div>`;
+  const card=(x)=>{const o=BY_SO[x.so],p=pOf(x.so),lp=linePromise(p,x.ln),f=runFlag(o,x,p,LS[x.so+'|'+x.ln]||0),late=f==='After Promise',rec=x.why==='Recurring';
+    const cls=late?'late':f?'wrn':rec?'rec':'',sel=UI.dw&&UI.dw.t==='run'&&UI.dw.so===x.so&&UI.dw.id===x.id;
+    const tip=[x.so,o?o.c:'',x.item,num(x.qty)+(x.kind==='elbow'?' · '+num(x.hrs)+' h':''),lp?(late?'LATE, due ':'Due ')+fmt(lp):'',rec?'Recurring':'',f&&!late?f:''].filter(Boolean).join('\n');
+    return `<div class="jc ${cls} ${sel?'pick':''} ${hit(x.so)?'':'dim'}" role="button" tabindex="0" title="${esc(tip)}" data-k="j-${x.so}-${x.id}" data-sig="${x.qty}|${x.wk}|${x.bender}" data-jc="${x.so}|${x.id}" draggable="${canSched()}" aria-label="${esc(tip.replace(/\n/g,', '))}">
+    ${canSched()?`<button class="jx" data-delrun="${x.so}|${x.id}" aria-label="Remove ${esc(x.so+' '+x.item)} from this week" title="Remove">×</button>`:''}
+    <span class="r1"><span class="so">${x.so}</span>${kaTag(x.so)}${rec?'<span class="rtag">R</span>':''}<span class="q">${num(x.qty)}</span></span><span class="c">${esc(o?o.c:'Off The Backlog')}</span>
+    <span class="r3"><span class="it">${esc(x.item||'')}</span>${x.kind==='elbow'?`<span class="h">${num(Math.round(x.hrs*10)/10)} h</span>`:''}</span>
+    ${f&&!late?`<span class="due" style="color:var(--ps-warn)">${esc(f)}</span>`:lp?`<span class="due">${late?'Late · ':''}Due ${fmt(lp)}</span>`:''}</div>`;};
+  const head=`<div class="gh corner" data-k="gh-c">${elbow?'Bender':'Line'}</div>`+weeks.map(w=>{const h=Object.values(L[w]||{}).reduce((s,x)=>s+x,0),n=rows.reduce((s,r)=>s+(cells[w+'|'+r.key]||[]).length,0);
+    return `<div class="gh ${w===tm?'now':''} ${inPlan.has(w)?'plan':''}" data-k="gh-${w}"><div class="wsub">${w===tm?'This Week':w===addDays(tm,7)?'Next Week':'Week Of'}</div><div class="w">${wkLabel(w)}</div><div class="tl"><span>${elbow?(capT?Math.round(h/capT*100):0)+'% · '+num(Math.round(h))+' h':plural(n,'run')}</span>${inPlan.has(w)?'<span class="pw">Planning</span>':''}</div></div>`;}).join('');
+  const rowUse=r=>{if(!elbow||!r.cap)return '';const h=weeks.reduce((s,w)=>s+((L[w]||{})[r.key]||0),0),u=Math.round(h/(r.cap*NW)*100);return `<span class="ru ${u>100?'over':''}">${u}% Over ${NW} Weeks</span>`;};
+  const body=rows.map(r=>`<div class="rh" data-k="rh-${r.key}"><b>${r.label}</b><span>${elbow?num(r.cap)+' h / Week':''}</span>${rowUse(r)}<span>${esc(r.sub)}</span></div>`+weeks.map(w=>{
+    const k=w+'|'+r.key,list=(cells[k]||[]).sort((a,b)=>((a.why==='Recurring'?'0':'1')+(a.size||'')+a.so)<((b.why==='Recurring'?'0':'1')+(b.size||'')+b.so)?-1:1),open=UI.expand[k],MAX=UI.dense?12:7;
+    const shown=open?list:list.slice(0,MAX);
+    let cap;
+    if(elbow){const h=(L[w]||{})[r.key]||0,u=r.cap?h/r.cap:0;cap=`<div class="cap ${u>1.005?'lv-over':u>.95?'lv-hi':''}"><span class="cb"><i style="width:${Math.min(100,u*100)}%"></i></span><span class="ct">${num(Math.round(h))}/${num(r.cap)} h</span></div>`;}
+    else cap=`<div class="cap"><span class="ct">${list.length?num(list.reduce((s,x)=>s+(+x.qty||0),0))+' Total':'—'}</span></div>`;
+    return `<div class="cell ${w===tm?'now':''} ${w<tm?'past':''}" data-k="cl-${k}" data-deep data-cell="${k}">${cap}${canSched()&&list.length?`<button class="cmenu" data-cellmenu="${k}" aria-label="Actions for ${esc(r.label)}, week of ${fmt(w)}">•••</button>`:''}${shown.map(card).join('')}${!list.length&&inPlan.has(w)?'<span class="cell-empty">Open</span>':''}${list.length>MAX?`<button class="more" data-more="${k}">${open?'Show Fewer':'+ '+(list.length-MAX)+' More'}</button>`:''}</div>`;}).join('')).join('');
+  return `${band}${tools}<div class="board ${UI.dense?'dense':''}" data-k="board-${UI.pk}" data-deep><div class="grid" data-k="grid" data-deep style="--wks:${NW}">${head}${body}</div></div>`;
+}
+
+/* ===== DRAWER (right side) ===== */
+function ensureDrawer(){if(!document.getElementById('psdrawer'))document.body.insertAdjacentHTML('beforeend','<div class="scrim hidden" id="psscrim" data-dwclose></div><aside class="drawer hidden" id="psdrawer" role="dialog" aria-modal="false" aria-labelledby="dwt"></aside>');}
+function openDrawer(dw){UI.dw=dw;UI.dv={};render();setTimeout(()=>{const f=document.querySelector('#psdrawer .dw-x');if(f)f.focus({preventScroll:true});},40);}
+function closeDrawer(){UI.dw=null;UI.dv={};render();}
+const dvGet=(k,d)=>UI.dv[k]!==undefined?UI.dv[k]:d;
+const recSec=(so,ln)=>{if(!canSched())return '';const r=recurOf(so)[ln];
+  return `<div class="dw-sec"><b>Recurring</b><p class="hint" style="margin:0 0 8px">${r?`Recurring ${esc(recText(r))}, starting the week of ${fmt(r.from)}.`:'Make this line recur: it is placed on the schedule for the next 3 weeks.'}</p><div class="dw-row"><label class="f"><span>Qty</span><input class="qin" type="number" min="1" step="any" data-dv="rq" value="${dvGet('rq',r?r.qty:'')}" aria-label="Recurring quantity"></label><label class="f" style="flex:1"><span>How Often</span><select class="sel" data-dv="re">${[1,2,3].map(n=>`<option value="${n}" ${+dvGet('re',r?r.every:1)===n?'selected':''}>${EVERYL[n]}</option>`).join('')}</select></label></div><div class="dw-row" style="margin-top:8px"><button class="btn-ink" data-drec>${r?'Update Recurring':'Make Recurring'}</button>${r?'<button class="btn-link" data-drecoff>Stop Recurring</button>':''}</div></div>`;};
+function drawerHTML(){
+  const D=UI.dw,tm=THISMON();
+  if(D.t==='run'){
+    const x=runById(D.so,D.id);if(!x)return null;
+    const o=BY_SO[D.so],p=promiseOf(D.so),lp=linePromise(p,x.ln),l=o&&o.lines.find(y=>y.ln===x.ln),LS=lineSums(),f=runFlag(o,x,p,LS[D.so+'|'+x.ln]||0),elbow=x.kind==='elbow';
+    const half=Math.max(1,Math.floor(x.qty/2));
+    return `<div class="dw-h"><div class="k">${KINDL[x.kind]} run · Week of ${fmt(x.wk)}${x.bender?' · Bender '+x.bender:''}</div><h2 id="dwt" class="mono">${D.so}</h2><p class="cust">${esc(o?o.c:'')}</p><button class="dw-x" data-dwclose aria-label="Close">×</button></div>
+    <div class="dw-b"><div class="dw-item"><div class="pn">${esc(x.item)}</div>${l?`<div class="ds">${esc(l.desc)}</div>`:''}</div>
+    <div class="facts">${fact('Qty',num(x.qty),'big')}${elbow?fact('Hours',num(x.hrs),'big'):''}${fact('Line remaining',l?num(l.rem):'—','big')}${fact('Promised',lp?fmt(lp):'—','big'+(f==='After Promise'?' red':''))}</div>
+    ${f?`<div class="warn ${f==='After Promise'?'red':''}">${f==='After Promise'?`This run is after the promised week (${fmt(lp)}).${p&&p.portal?` To move the promise, open ${p.reqs.map(id=>`<button class="btn-link" data-goto="${id}">${id}</button>`).join(' ')} and use Change date. That emails Sales.`:' Pull it earlier, or tell Sales.'}`:esc(f)}</div>`:''}
+    ${canSched()?`<div class="dw-sec"><b>Move</b><div class="dw-row"><button class="btn-ink" data-dshift="-1">‹ Pull 1 week</button><button class="btn-ink" data-dshift="1">Push 1 week ›</button></div><p class="hint" style="margin:6px 0 0">Shortcut: Alt + ← or → moves it a week. Ctrl + Z undoes.</p>
+      <div class="dw-row" style="margin-top:10px"><label class="f" style="flex:1"><span>Week</span><select class="sel" data-dv="wk">${weekOpts(dvGet('wk',x.wk))}</select></label>${elbow?`<label class="f" style="flex:1"><span>Bender</span><select class="sel" data-dv="bender">${benderOpts(x.size,dvGet('bender',x.bender))}</select></label>`:''}<button class="btn-ink red" data-dmove>Move</button></div></div>
+    <div class="dw-sec"><b>Quantity</b><div class="dw-row"><input class="qin" type="number" min="1" step="any" data-dv="qty" value="${dvGet('qty',x.qty)}" aria-label="Quantity"><button class="btn-ink" data-dqty>Update</button></div></div>
+    <div class="dw-sec"><b>Split</b><div class="dw-row"><label class="f"><span>Qty to split off</span><input class="qin" type="number" min="1" step="any" data-dv="sq" value="${dvGet('sq',half)}"></label><label class="f" style="flex:1"><span>To week</span><select class="sel" data-dv="swk">${weekOpts(dvGet('swk',addDays(x.wk,7)))}</select></label>${elbow?`<label class="f" style="flex:1"><span>Bender</span><select class="sel" data-dv="sb">${benderOpts(x.size,dvGet('sb',x.bender))}</select></label>`:''}</div><div class="dw-row" style="margin-top:8px"><button class="btn-ink" data-dsplit>Split run</button></div></div>
+    ${recSec(D.so,x.ln)}<div class="dw-sec"><b>Remove</b><div class="dw-row"><button class="btn-ink red" data-dremove>Remove This Run</button><button class="btn-ghost btn-sm" data-dremoveall>Remove Whole Order</button></div><p class="hint" style="margin:6px 0 0">Undo puts it back.</p></div>`:''}
+    <div class="dw-sec"><button class="btn-ghost btn-sm" data-sopen="${D.so}">Open order ${D.so}</button></div></div>`;
+  }
+  if(D.t==='line'){
+    const o=BY_SO[D.so],l=o&&o.lines.find(y=>y.ln===D.ln);if(!l)return null;
+    const need=needOf(D.so,D.ln);
+    const p=promiseOf(D.so),lp=linePromise(p,D.ln),kind=kindOf(l),size=sizeOf(l),t=fitTarget(o,l,need);
+    return `<div class="dw-h"><div class="k">${need?'Needs Scheduling':'Fully Scheduled'} · ${KINDL[kind]}${size?' · '+esc(size):''}</div><h2 id="dwt" class="mono">${D.so}</h2><p class="cust">${esc(o.c)}</p><button class="dw-x" data-dwclose aria-label="Close">×</button></div>
+    <div class="dw-b"><div class="dw-item"><div class="pn">${esc(l.item)}</div><div class="ds">${esc(l.desc)}</div></div>
+    <div class="facts">${fact('To Schedule',num(need),'big')}${fact('Remaining',num(l.rem),'big')}${fact('Promised',lp?fmt(lp):'—','big')}${kind==='elbow'&&need?fact('Hours',num(Math.round(need*rateFor(l.item,size)*10)/10),'big'):''}</div>
+    ${canSched()?`${need?`${kind==='elbow'?`<div class="dw-sec"><b>Auto-Fit</b><p class="hint" style="margin:0 0 8px">Earliest week with room: <b>Week of ${fmt(t.wk)}${t.bender?' · Bender '+t.bender:''}</b>${t.fits?'':' (too big for one bender-week; split after placing)'}${lp&&t.wk>monOf(lp)?' · <span class="flag">after the promise</span>':''}</p><button class="btn-ink red" data-dfit>Auto-Fit ${num(need)}</button></div>`:''}
+    <div class="dw-sec"><b>Place By Hand</b><div class="dw-row"><label class="f"><span>Qty</span><input class="qin" type="number" min="1" step="any" data-dv="qty" value="${dvGet('qty',need)}"></label><label class="f" style="flex:1"><span>Week</span><select class="sel" data-dv="wk">${weekOpts(dvGet('wk',t.wk))}</select></label>${kind==='elbow'?`<label class="f" style="flex:1"><span>Bender</span><select class="sel" data-dv="bender">${benderOpts(size,dvGet('bender',t.bender))}</select></label>`:''}</div><div class="dw-row" style="margin-top:8px"><button class="btn-ink" data-dadd>Add To Schedule</button></div></div>`:'<div class="dw-sec"><p class="hint" style="margin:0">Every piece of this line is on the schedule.</p></div>'}${recSec(D.so,D.ln)}${runsOf(D.so).some(x=>x.wk>=THISMON())?'<div class="dw-sec"><button class="btn-ghost btn-sm" data-dremoveall>Remove Whole Order From Schedule</button></div>':''}`:''}
+    <div class="dw-sec"><button class="btn-ghost btn-sm" data-sopen="${D.so}">Open order ${D.so}</button></div></div>`;
+  }
+  if(D.t==='cell'){
+    const [wk,row]=D.k.split('|'),xs=cellRuns(wk,row);if(!xs.length)return null;
+    const label=row==='conduit'?'Conduit':row==='fitting'?'Fittings':'Bender '+row,b=BENDERS().find(z=>String(z.n)===row),h=xs.reduce((s,x)=>s+(+x.hrs||0),0);
+    const lp1=lateIfShift(xs,1);
+    return `<div class="dw-h"><div class="k">Week of ${fmt(wk)}</div><h2 id="dwt">${label}</h2><p>${plural(xs.length,'run')}${b?` · ${num(Math.round(h))} of ${num(b.hrs)} hours`:''}</p><button class="dw-x" data-dwclose aria-label="Close">×</button></div>
+    <div class="dw-b">${canSched()?`<div class="dw-sec" style="border:0;margin:0;padding:0"><b>Move the whole week</b><div class="dw-row"><button class="btn-ink" data-dcell="-1" ${wk<=THISMON()?'disabled':''}>‹ Pull all 1 week</button><button class="btn-ink" data-dcell="1">Push all 1 week ›</button></div>${lp1?`<div class="warn red">Pushing makes ${plural(lp1,'run')} land after the promised week.</div>`:''}</div>`:''}
+    <div class="dw-sec"><b>Runs</b><ul class="dw-list">${xs.map(x=>`<li><button class="btn-link" data-jc="${x.so}|${x.id}" style="text-transform:none;letter-spacing:0;font-size:var(--t-13);color:var(--ink)"><span class="mono">${x.so}</span> ${esc(x.item)}</button><span class="mono">${num(x.qty)}${x.kind==='elbow'?` · ${num(Math.round(x.hrs))} h`:''}</span></li>`).join('')}</ul></div></div>`;
+  }
+  return null;
+}
+function renderDrawer(){
+  ensureDrawer();
+  const el=document.getElementById('psdrawer'),sc=document.getElementById('psscrim');
+  const html=UI.g==='ps'&&UI.dw?drawerHTML():null;
+  if(!html){if(UI.dw&&UI.g==='ps')UI.dw=null;el.classList.add('hidden');sc.classList.add('hidden');return;}
+  const af=document.activeElement,afK=af&&el.contains(af)?af.getAttribute('data-dv')||af.getAttribute('data-dshift')||(af.classList.contains('dw-x')?'x':null):null;
+  if(el.dataset.h!==html){el.innerHTML=html;el.dataset.h=html;
+    if(afK){const n=afK==='x'?el.querySelector('.dw-x'):el.querySelector(`[data-dv="${afK}"],[data-dshift="${afK}"]`);if(n)n.focus({preventScroll:true});}}
+  el.classList.remove('hidden');sc.classList.toggle('hidden',window.innerWidth>900);
+}
+
+/* ===== ORDER LOOKUP ===== */
+/* every line of an order: what's left, its runs, its promise, and where it stands */
+function lineTableHTML(o,pl){
+  const tm=THISMON(),p=pl.p,ls={};pl.runs.filter(x=>x.wk>=tm).forEach(x=>{ls[x.ln]=(ls[x.ln]||0)+(+x.qty||0);});
+  const rows=o.lines.map(l=>{
+    const runs=pl.runs.filter(x=>x.ln===l.ln).sort((a,b)=>a.wk<b.wk?-1:1),sc=ls[l.ln]||0,lp=linePromise(p,l.ln),lpw=lp?monOf(lp):null,fin=runs.filter(x=>x.wk>=tm).map(x=>x.wk).sort().pop(),rq=recurOf(o.so)[l.ln];
+    let s;
+    if(!schedulable(l))s=tick('muted','Not Scheduled (Accessory)');else if(l.rem<=0)s=tick('muted','Shipped / Billed');else if(!sc)s=tick('red','Not Scheduled');else if(sc<l.rem)s=tick('amber',`${num(sc)} of ${num(l.rem)}`);else if(lpw&&lpw>=tm&&fin>lpw)s=tick('red',`Late ${plural(Math.round(daysBetween(lpw,fin)/7),'Week')}`);else s=tick('ok','Scheduled');
+    return `<tr><td class="mono">${l.ln??''}</td><td>${itemCell(l)}${rq?`<span class="rtag">Recurring ${esc(recText(rq))}</span>`:''}</td><td>${KINDL[kindOf(l)]}</td><td class="r">${num(l.qty)}</td><td class="r">${num(l.billed)}</td><td class="r"><b>${num(l.rem)}</b></td><td>${runs.map(x=>`<span class="rchip ${x.wk<tm?'past':''} ${lpw&&lpw>=tm&&x.wk>lpw?'late':''}">${num(x.qty)} · ${fmt(x.wk)}${x.bender?' · B'+x.bender:''}</span>`).join('')||'<span class="isub">—</span>'}</td><td>${lp?fmt(lp):'—'}</td><td>${s}</td></tr>`;
+  }).join('');
+  return `<div class="scroll" style="max-height:none;border-top:0"><table class="it st"><thead><tr><th>Ln</th><th>Item</th><th>Type</th><th class="r">Ordered</th><th class="r">Shipped</th><th class="r">Remaining</th><th>Runs (qty · week · bender)</th><th>Promised</th><th>Status</th></tr></thead><tbody>${rows||'<tr><td colspan="9">No item lines</td></tr>'}</tbody></table></div>`;
+}
+function lookupHTML(){
+  const q=(UI.sq||'').trim().toLowerCase();let body;
+  if(q.length>=2){
+    const list=Object.values(BY_SO).filter(o=>(o.so+' '+o.c+' '+(o.po||'')).toLowerCase().includes(q)).sort((a,b)=>a.so<b.so?-1:1).slice(0,40);
+    body=`<div class="tcard"><div class="results" style="max-height:none;border-top:0">${list.length?`<div class="res res-h"><span>Order</span><span>Customer</span><span>Plan</span></div>`+list.map(o=>{const pl=o.gone?null:orderPlan(o);return `<button class="res" data-sopen="${o.so}"><span class="mono"><b>${o.so}</b><small>${esc(o.po||'')}</small></span><span>${esc(o.c)} ${kaTag(o.so)}<small>${plural(o.lines.length,'item')}, ${money(o.amt)}</small></span><span>${pl?tick(pl.st.c,pl.st.t):tick('muted','Off backlog')}</span></button>`;}).join(''):emptyHTML('No matches','Try the order number, customer name or PO.')}</div></div>`;
+  }else if(UI.so)body=orderCardHTML(UI.so);
+  else body=`<div class="empty-ps">${ICON_BOARD}<b>Look up an order</b><span>Every part, the week each one runs, and what was promised.</span></div>`;
+  return `<div class="ps-page"><div class="ps-h"><div><h1>Order lookup</h1><div class="sub">Search by order number, customer or PO.</div></div></div><div class="psearch"><input class="search" type="search" id="slq" placeholder="SO138113, customer or PO" value="${esc(UI.sq||'')}" autocomplete="off" aria-label="Search orders"></div>${body}</div>`;
+}
+function orderCardHTML(so){
+  const o=BY_SO[so];if(!o)return `<div class="empty-ps"><b>Not on the backlog</b><span>${esc(so)} may have shipped or closed.</span></div>`;
+  const tm=THISMON(),pl=orderPlan(o),p=pl.p,nt=(SCHED[so]&&SCHED[so].notes)||{},editing=UI.draft&&UI.draft.so===so;
+  const reqs=S.requests.filter(r=>r.so===so).sort((a,b)=>a.id<b.id?1:-1);
+  const ls={};pl.runs.filter(x=>x.wk>=tm).forEach(x=>{ls[x.ln]=(ls[x.ln]||0)+(+x.qty||0);});
+  const lateRuns=pl.runs.filter(x=>runFlag(o,x,p,ls[x.ln]||0)==='After Promise');
+  let conflict='';
+  if(!o.gone&&(pl.st.k==='miss'||lateRuns.length)){
+    const live=p&&p.portal?p.reqs.map(R).filter(r=>r&&COMMITTED.includes(r.status)):[];
+    conflict=`<div class="warn red" data-k="conf"><b>The schedule finishes after the promise.</b> Last run week of ${fmt(pl.finish)}${p&&p.date?`, promised ${fmt(p.date)}`:''}. ${live.length?`To move the committed date, open ${live.map(r=>`<button class="btn-link" data-goto="${r.id}">${r.id}</button>`).join(' ')} and use Change date there. That emails Sales.`:'This promise wasn’t made in the portal, so tell Sales directly or ask them to start a check-in.'}</div>`;
+  }
+  const st=(k,v,c)=>`<div><div class="k">${k}</div><div class="v ${c||''}">${v}</div></div>`;
+  const prom=p?`<div class="reason prod"><span class="k">${p.portal?'Promise from Order Communications':'Promise ('+esc(p.src||'tracker / email')+')'}</span>${esc(p.type||'')}${p.what?' · '+esc(p.what):''}${p.by||p.on?`<span class="isub" style="display:block">${p.on?'Communicated '+fmt(p.on):''}${p.by?' by '+esc(p.by):''}</span>`:''}</div>`:`<div class="reason"><span class="k">Promise</span>No promise on record. Backlog ESD ${fmt(o.esd)}.</div>`;
+  const reqH=reqs.length?`<div class="bar-row">${reqs.map(r=>{const s=statusOf(r);return `<button class="pill ${s.c}" data-goto="${r.id}" style="cursor:pointer">${r.id} · ${esc(typeLabel(r))} · ${esc(s.t)}</button>`;}).join('')}</div>`:'';
+  const notes=[['Special instructions',nt.special],['Shipping instructions',nt.shipping],['Rules applied',nt.rules],['Schedule note',nt.sched],['Memo',o.memo]].filter(x=>x[1]);
+  if(!LOGS[so]){LOGS[so]='loading';loadLog(so);}
+  const log=Array.isArray(LOGS[so])?LOGS[so]:[];
+  return `<div class="ohero" data-k="oc-${so}">
+  <div class="ohero-top"><div><div class="so">${esc(so)} ${kaTag(so)}</div><h2>${esc(o.c)}</h2><div class="meta">${[o.po?'PO '+esc(o.po):'',esc(o.agency||o.rep||''),esc(o.sm||''),'NetSuite: '+esc(o.st||'—')].filter(Boolean).join(' · ')}</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${tick(pl.st.c,pl.st.t)}${!o.gone?`<button class="btn-ghost btn-sm" data-planso="${so}">Plan On The Schedule</button>`:''}${canSched()&&!editing&&!o.gone?`<button class="btn-ghost btn-sm" data-sedit="${so}">Edit schedule</button>`:''}<button class="tbtn ic" data-sclose aria-label="Close this order" title="Close order">×</button></div></div>
+  ${o.gone?'<div class="notice" style="margin:12px 22px 0">Off the NetSuite backlog (shipped or closed)</div>':''}
+  <div class="ostats">${st('Promised',p&&p.date?fmt(p.date):'—')}${st('Finishes',pl.finish?'Week '+fmt(pl.finish):'—',pl.st.k==='miss'?'red':pl.st.k==='ok'?'ok':'')}${st('Scheduled',pl.sched?`${num(pl.sched)} / ${num(pl.toBuild)}`:'None')}${st('Backlog ESD',fmt(o.esd))}${st('Production ESD',fmt(o.pesd))}${st('Unbilled',money(o.amt))}</div>
+  <div class="obody">${conflict}${prom}${reqH}
+  ${editing?editorHTML(o,pl):lineTableHTML(o,pl)}
+  ${notes.length?`<details class="more" style="margin-top:14px"><summary>Instructions and notes</summary>${notes.map(([k,v])=>`<div class="reason"><span class="k">${k}</span>${esc(v).replace(/\n/g,'<br>')}</div>`).join('')}</details>`:''}
+  <details class="more"><summary>Schedule change history</summary><ul class="hist">${log.map(e=>`<li><time>${fmtTs(e.at)} · ${esc(e.name)}</time>${esc(e.text)}${e.note&&e.note!==e.text?`<div class="isub">${esc(e.note)}</div>`:''}</li>`).join('')}${log.length?'':'<li class="auto">No schedule changes yet</li>'}</ul></details>
+  </div></div>`;
+}
+function editorHTML(o,pl){
+  const D=UI.draft,tm=THISMON(),L=loadMap(),mine={},after={};
+  runsOf(o.so).forEach(x=>{if(x.kind==='elbow'&&x.bender){const k=x.wk+'|'+x.bender;mine[k]=(mine[k]||0)+(+x.hrs||0);}});
+  D.runs.forEach(x=>{if(x.kind==='elbow'&&x.bender){const k=x.wk+'|'+x.bender;after[k]=(after[k]||0)+(+x.hrs||0);}});
+  const warns=[],errs=[];
+  Object.keys(after).forEach(k=>{const [wk,b]=k.split('|'),cap=(BENDERS().find(z=>String(z.n)===b)||{}).hrs||0,tot=((L[wk]||{})[b]||0)-(mine[k]||0)+after[k];
+    if(cap&&tot>cap+.5&&Math.abs(after[k]-(mine[k]||0))>.01)warns.push(`Bender ${b}, Week ${fmt(wk)}: ${num(Math.round(tot))} of ${num(cap)} hrs`);});
+  const lns=[...new Set([...o.lines.filter(l=>l.rem>0).map(l=>l.ln),...D.runs.map(x=>x.ln)])];
+  const blocks=lns.map(ln=>{
+    const l=o.lines.find(y=>y.ln===ln),runs=D.runs.filter(x=>x.ln===ln),fut=runs.filter(x=>x.wk>=tm).reduce((s,x)=>s+(+x.qty||0),0);
+    if(l&&fut>l.rem)errs.push(`${l.item}: ${num(fut)} scheduled but only ${num(l.rem)} remaining`);
+    const kind=l?kindOf(l):(runs[0]||{}).kind||'fitting',size=l?sizeOf(l):(runs[0]||{}).size,lp=linePromise(pl.p,ln);
+    return `<div class="ed-line"><div class="ed-head"><span class="iname">${esc(l?l.item:(runs[0]||{}).item||'Line '+ln)}</span><span class="isub">${l?esc(l.desc):'No longer on the backlog'}</span>${tick('muted',KINDL[kind])}<span class="isub">Remaining <b>${l?num(l.rem):0}</b> · Scheduled <b>${num(fut)}</b>${lp?` · Promised <b>${fmt(lp)}</b>`:''}</span></div>
+    ${runs.map(x=>`<div class="ed-run"><select class="sel" data-ed="wk" data-id="${x.id}" aria-label="Week">${weekOpts(x.wk)}</select><input class="qin" type="number" min="0" step="any" value="${x.qty}" data-ed="qty" data-id="${x.id}" aria-label="Quantity">${kind==='elbow'?`<select class="sel" data-ed="bender" data-id="${x.id}" aria-label="Bender">${benderOpts(size,x.bender)}</select><span class="hrs">${num(x.hrs)} h</span>`:''}${x.wk<tm?'<span class="flag amb">Past week</span>':''}${lp&&monOf(lp)>=tm&&x.wk>monOf(lp)?'<span class="flag">After promise</span>':''}<button class="btn-link" data-ed-del="${x.id}">Remove</button></div>`).join('')}
+    ${l?`<button class="mini" data-ed-add="${ln}">+ Add a week</button>`:''}</div>`;
+  }).join('');
+  return `<div class="tcard" data-k="editor" style="padding:16px 18px;background:var(--field)"><div class="cardhead"><h3>Edit schedule</h3><span class="isub">Weeks start Monday. Elbow hours = qty × the item's run rate.</span></div>
+  ${errs.map(e=>`<div class="warn red">${esc(e)}</div>`).join('')}${warns.map(e=>`<div class="warn">Over capacity: ${esc(e)}</div>`).join('')}
+  ${blocks||'<p class="hint">No open lines on this order.</p>'}
+  <label class="lbl" for="ednote">Note for the change history (optional)</label><input class="din" id="ednote" style="width:100%" value="${esc(D.note||'')}" autocomplete="off">
+  <div class="actions"><button class="btn-red" data-ssave ${errs.length?'disabled':''}>Save schedule</button><button class="btn-ghost" data-scancel>Cancel</button></div></div>`;
+}
+
+/* ===== SHIPS THIS WEEK ===== */
+function shipsHTML(){
+  const tm=THISMON(),te=addDays(tm,6),inWk=d=>!!d&&d>=tm&&d<=te,rows=[],past=[];
+  Object.values(BY_SO).forEach(o=>{
+    const p=promiseOf(o.so);if(!p||!p.date)return;
+    const done=o.gone?'Shipped':p.complete?'Ready (Portal)':o.ac&&o.ac>=addDays(tm,-7)?'Built '+fmt(o.ac):'';
+    if(inWk(p.date)||Object.values(p.perLine).some(inWk))rows.push({o,p,done});
+    else if(p.date<tm&&!done&&!isWeekly(p))past.push({o,p,done:''});
+  });
+  const wkQty=so=>runsOf(so).filter(x=>x.wk===tm).reduce((s,x)=>s+(+x.qty||0),0);
+  const tr=({o,p,done})=>`<tr class="clk ${UI.cx[o.so]?'open':''}" data-cx="${o.so}" aria-expanded="${!!UI.cx[o.so]}"><td class="mono"><span class="chev2">${UI.cx[o.so]?'▾':'▸'}</span><b>${o.so}</b> ${kaTag(o.so)}</td><td>${esc(o.c)}</td><td class="up"><b>${fmtW(p.date)}</b></td><td>${esc(p.type||'')}${p.portal?'':`<div class="isub">${esc(p.src||'')}</div>`}</td><td style="max-width:440px">${esc(p.what||'')}</td><td>${p.on?fmt(p.on):''}${p.by?`<div class="isub">${esc(p.by)}</div>`:''}</td><td class="r mono">${wkQty(o.so)?num(wkQty(o.so)):'—'}</td><td>${done?tick('ok',done):tick('red','Open')}</td></tr>${UI.cx[o.so]&&!o.gone?`<tr class="xrow"><td colspan="8">${lineTableHTML(o,orderPlan(o))}<div class="xa"><button class="btn-ghost btn-sm" data-planso="${o.so}">Plan On The Schedule</button><button class="btn-ghost btn-sm" data-sopen="${o.so}">Open Full Order</button></div></td></tr>`:''}`;
+  const head='<thead><tr><th>Order</th><th>Customer</th><th>Promised</th><th>Type</th><th>What will ship</th><th>Communicated</th><th class="r">On run list</th><th>Status</th></tr></thead>';
+  rows.sort((a,b)=>a.p.date<b.p.date?-1:1);past.sort((a,b)=>a.p.date<b.p.date?-1:1);
+  const open=rows.filter(x=>!x.done).length;
+  return `<div class="kband inpage" data-k="kband">${kpi('sw-n',rows.length,'Promised this week')}${kpi('sw-d',rows.length-open,'Ready or shipped','ok')}${kpi('sw-o',open,'Still open',open?'red':'')}${kpi('sw-p',past.length,'Past due, still open',past.length?'amb':'')}</div>
+  <div class="ps-page" style="padding-top:0"><div class="ps-h"><div><h1>Ships this week</h1><div class="sub">${fmtW(tm)} – ${fmtW(te)}. Promises made in Order Communications.</div></div></div>
+  <div class="tcard"><div class="scroll" style="max-height:none;border-top:0"><table class="it st">${head}<tbody>${rows.map(tr).join('')||'<tr><td colspan="8">Nothing promised to ship this week</td></tr>'}</tbody></table></div></div>
+  ${past.length?`<div class="sec-h">Promised earlier, still open <span class="mono" style="font-size:var(--t-15);color:var(--red-text)">${past.length}</span></div><div class="tcard"><div class="scroll" style="max-height:none;border-top:0"><table class="it st">${head}<tbody>${past.map(tr).join('')}</tbody></table></div></div>`:''}</div>`;
+}
+
+/* ===== ORDER COMPLETION ===== */
+const CF=[['all','All'],['miss','Will miss'],['past','Past due'],['none','Not Scheduled'],['part','Not Fully Scheduled'],['ok','On Time'],['rec','Recurring'],['nop','No Promise']];
+function completionHTML(){
+  const all=psPlans(),cnt={all:all.length};all.forEach(x=>{cnt[x.st.k]=(cnt[x.st.k]||0)+1;});
+  const f=UI.cf||'all',q=(UI.cq||'').trim().toLowerCase(),ord={miss:0,past:1,none:2,part:3,ok:4,rec:5,nop:6};
+  let list=all.filter(x=>f==='all'||x.st.k===f);
+  if(q)list=list.filter(x=>(x.o.so+' '+x.o.c+' '+(x.o.po||'')).toLowerCase().includes(q));
+  list.sort((a,b)=>(ord[a.st.k]-ord[b.st.k])||(((a.p&&a.p.date)||'9')<((b.p&&b.p.date)||'9')?-1:1));
+  const plan=x=>x.recurring?'Recurring':x.pw?'Promised':'Backlog';
+  return `<div class="kband inpage" data-k="kband">${kpi('oc-all',cnt.all,'Open orders')}${kpi('oc-ok',cnt.ok||0,'On Time','ok')}${kpi('oc-miss',cnt.miss||0,'Will miss',cnt.miss?'red':'')}${kpi('oc-past',cnt.past||0,'Past due',cnt.past?'amb':'')}${kpi('oc-none',cnt.none||0,'Not Scheduled',cnt.none?'red':'')}${kpi('oc-nop',cnt.nop||0,'No Promise')}</div>
+  <div class="ps-page" style="padding-top:0"><div class="ps-h"><div><h1>Order completion</h1><div class="sub">When each open order finishes on the schedule, against what was promised.</div></div><input class="search" type="search" id="scq" placeholder="Search order, customer, PO" value="${esc(UI.cq||'')}" autocomplete="off" aria-label="Search orders" style="max-width:320px"></div>
+  <div class="fchips" role="group" aria-label="Filter by status" style="margin-bottom:var(--s4)">${CF.map(([k,l])=>`<button class="fchip" data-cf="${k}" aria-pressed="${f===k}">${l}<b>${cnt[k]||0}</b></button>`).join('')}</div>
+  <div class="tcard"><div class="scroll" style="max-height:none;border-top:0"><table class="it st"><thead><tr><th>Order</th><th>Customer</th><th>Plan</th><th>Promised</th><th class="r">To build</th><th class="r">Scheduled</th><th>First Week</th><th>Finish Week</th><th>Status</th><th>Promise source</th></tr></thead><tbody>
+  ${list.map(x=>`<tr class="clk ${UI.cx[x.o.so]?'open':''}" data-cx="${x.o.so}" aria-expanded="${!!UI.cx[x.o.so]}"><td class="mono"><span class="chev2">${UI.cx[x.o.so]?'▾':'▸'}</span><b>${x.o.so}</b> ${kaTag(x.o.so)}</td><td>${esc(x.o.c)}</td><td>${plan(x)}</td><td>${x.p&&x.p.date?fmt(x.p.date):'—'}</td><td class="r mono">${num(x.toBuild)}</td><td class="r mono">${num(x.sched)}</td><td>${x.first?fmt(x.first):'—'}</td><td>${x.finish?fmt(x.finish):'—'}</td><td>${tick(x.st.c,x.st.t)}</td><td class="isub">${esc(x.p?(x.p.portal?'Order Communications':x.p.src||''):'')}</td></tr>${UI.cx[x.o.so]?`<tr class="xrow"><td colspan="10">${lineTableHTML(x.o,x)}<div class="xa"><button class="btn-ghost btn-sm" data-planso="${x.o.so}">Plan On The Schedule</button><button class="btn-ghost btn-sm" data-sopen="${x.o.so}">Open Full Order</button></div></td></tr>`:''}`).join('')||'<tr><td colspan="10">No orders match</td></tr>'}
+  </tbody></table></div></div></div>`;
+}
+
+/* ===== shell ===== */
+function schedPageHTML(){
+  if(SCHED_ERR)return `<div class="ps-page"><div class="warn red">The schedule can’t be read (${esc(SCHED_ERR)}). Check the Firestore rules, then reload.</div></div>`;
+  if(!SCHED_READY)return `<div class="ps-page">${[1,2,3,4,5].map(()=>'<span class="psk" style="margin:14px 0;height:44px"></span>').join('')}</div>`;
+  if(!SMETA)return `<div class="ps-page"><div class="warn">No schedule set up yet. Run <span class="mono">py seed_schedule.py --write</span> to load the starting schedule.</div></div>`;
+  return {planner:plannerHTML,lookup:lookupHTML,week:shipsHTML,completion:completionHTML}[UI.tab]();
+}
+function appSwitchHTML(){const ps=UI.g==='ps';return `<div class="appsw" role="group" aria-label="Area"><button data-app="comms" aria-pressed="${!ps}">Communications</button><button data-app="ps" aria-pressed="${ps}">Planner</button></div>`;}
+function schedRender(){
+  let badge={};
+  if(SCHED_READY&&SMETA&&!SCHED_ERR){const plans=psPlans();badge.completion=plans.filter(x=>x.st.k==='miss').length;}
+  const gb=PS_TABS.map(k=>`<a href="#ps-${k}" data-k="pg-${k}" data-deep ${UI.tab===k?'aria-current="page"':''}><span class="gl">${PS_L[k]}</span>${badge[k]!=null?`<span class="gbadge ${badge[k]?'':'zero'}">${badge[k]}</span>`:''}</a>`).join('');
+  const board=UI.tab==='planner'&&SCHED_READY&&SMETA&&!SCHED_ERR;
+  const ready=SCHED_READY&&SMETA&&!SCHED_ERR;
+  if(UI.lastTab!==UI.tab){UI.dw=null;UI.dv={};UI.lastTab=UI.tab;}
+  /* the search sidebar stays on every Planner tab */
+  const html=`<div class="desk ps" data-k="ps" data-deep><nav class="groupbar" data-k="psgb" data-deep aria-label="Planner">${gb}</nav><div class="ps-body" data-k="psb" data-deep><div class="ps-wrap ${board?'':'solo'}" data-k="psw" data-deep>${ready&&board?searchTrayHTML():''}<div class="ps-main ${board?'board':''}" data-k="psm-${UI.tab}" data-deep>${schedPageHTML()}</div></div></div></div>`;
+  paint(html,'ps-'+UI.tab);
+  renderDrawer();countUp();
+  DIRTY=!!UI.draft||!!DRAG;
+}
+/* request screens: when the schedule finishes this order */
+function schedFact(so){
+  const o=BY_SO[so];if(!o||o.gone||!SCHED_READY||SCHED_ERR)return '';
+  const pl=orderPlan(o);
+  return fact('Schedule',`<button class="btn-link" data-sopen="${so}" style="font-size:var(--t-15);text-transform:none;letter-spacing:0;color:var(--ink)">${pl.sched?'Done wk '+fmt(pl.finish):'Not Scheduled'}</button>${pl.st.k==='miss'?'<span class="late-l">after promise</span>':''}`);
+}
+function watchSchedule(){
+  unsubs.push(onSnapshot(collection(db,SCOL),snap=>{SCHED={};snap.docs.forEach(d=>{SCHED[d.id]=d.data();});SCHED_READY=true;SCHED_ERR=null;if(DIRTY){PENDING=true;return;}render();},err=>{console.error(err);SCHED_ERR=err.code||'error';SCHED_READY=true;render();}));
+  unsubs.push(onSnapshot(doc(db,SMCOL,'config'),snap=>{SMETA=snap.exists()?snap.data():null;if(!DIRTY)render();},err=>{console.error(err);}));
+}
+
+/* ===== controls ===== */
+const numOr=(v,d)=>{const n=+v;return Number.isFinite(n)&&n>0?n:d;};
+function refocus(id){const n=document.getElementById(id);if(n){n.focus();try{n.setSelectionRange(n.value.length,n.value.length);}catch(x){}}}
+document.addEventListener('click',async e=>{
+  const tg=e.target;
+  const ap=tg.closest('[data-app]');if(ap){if(ap.dataset.app==='ps'){if(UI.g!=='ps')LASTCOMMS=location.hash.slice(1)||'date-answer';location.hash='ps-planner';}else{UI.dw=null;location.hash=LASTCOMMS||'date-answer';}return;}
+  if(tg.closest('[data-dwclose]'))return closeDrawer();
+  const op=tg.closest('[data-sopen]');if(op){UI.so=op.dataset.sopen;UI.sq='';UI.draft=null;UI.dw=null;if(location.hash!=='#ps-lookup')location.hash='ps-lookup';else render();const b=document.querySelector('.ps-body');if(b)b.scrollTop=0;return;}
+  if(UI.g!=='ps')return;
+  const af=tg.closest('[data-autofit]');if(af){e.stopPropagation();const [so,ln]=af.dataset.autofit.split('|');af.disabled=true;return autoFit(so,+ln);}
+  const dr=tg.closest('[data-delrun]');if(dr){e.stopPropagation();const [so,id]=dr.dataset.delrun.split('|');return removeRun(so,id);}
+  const jc=tg.closest('[data-jc]');if(jc){const [so,id]=jc.dataset.jc.split('|');return openDrawer({t:'run',so,id});}
+  const tl=tg.closest('[data-tl]');if(tl){const [so,ln]=tl.dataset.tl.split('|');return openDrawer({t:'line',so,ln:+ln});}
+  const cm=tg.closest('[data-cellmenu]');if(cm)return openDrawer({t:'cell',k:cm.dataset.cellmenu});
+  const mo=tg.closest('[data-more]');if(mo){UI.expand[mo.dataset.more]=!UI.expand[mo.dataset.more];return render();}
+  const pk=tg.closest('[data-pk]');if(pk){UI.pk=pk.dataset.pk;UI.dw=null;return render();}
+  const dn=tg.closest('[data-dense]');if(dn){UI.dense=dn.dataset.dense==='1';try{localStorage.setItem('ps-dense',UI.dense?'1':'0');}catch(x){}return render();}
+  const nw=tg.closest('[data-nw]');if(nw){UI.nw=+nw.dataset.nw;return render();}
+  const pr=tg.closest('[data-placerec]');if(pr)return placeRecurring();
+  const fl=tg.closest('[data-fill]');if(fl)return armed(fl,()=>fillOldest());
+  const cx=tg.closest('[data-cx]');if(cx){const so=cx.dataset.cx;UI.cx[so]=!UI.cx[so];return render();}
+  if(tg.closest('[data-sclose]')){UI.so=null;UI.draft=null;UI.sq='';return render();}
+  const pw=tg.closest('[data-pw]');if(pw){UI.pw=pw.dataset.pw;return render();}
+  if(tg.closest('[data-undo]'))return undoLast();
+  const cf=tg.closest('[data-cf]');if(cf){UI.cf=cf.dataset.cf;return render();}
+  /* drawer actions */
+  const D=UI.dw;
+  if(D&&D.t==='run'){const x=runById(D.so,D.id);if(x){
+    const sh=tg.closest('[data-dshift]');if(sh){const to=addDays(x.wk,7*+sh.dataset.dshift);if(to<THISMON())return toast('That week has already started.');return moveRun(D.so,D.id,to,null);}
+    if(tg.closest('[data-dmove]')){const wk=dvGet('wk',x.wk),b=x.kind==='elbow'?+dvGet('bender',x.bender):null;if(wk===x.wk&&(b===null||b===+x.bender))return toast('Pick a different week or bender.');UI.dv={};return moveRun(D.so,D.id,wk,b);}
+    if(tg.closest('[data-dqty]')){const q=numOr(dvGet('qty',x.qty),0);if(!q)return toast('Enter a quantity.');UI.dv={};return setQty(D.so,D.id,q);}
+    if(tg.closest('[data-dsplit]')){const q=numOr(dvGet('sq',Math.floor(x.qty/2)),0);UI.dv={};return splitRun(D.so,D.id,q,dvGet('swk',addDays(x.wk,7)),x.kind==='elbow'?+dvGet('sb',x.bender):null);}
+    if(tg.closest('[data-dremove]'))return removeRun(D.so,D.id);}}
+  if(D&&(D.t==='run'||D.t==='line')){const ra=tg.closest('[data-dremoveall]');if(ra){const so=D.so;return armed(ra,()=>removeOrder(so));}}
+  if(D&&(D.t==='run'||D.t==='line')){
+    const rs=tg.closest('[data-drec]');if(rs){const ln=D.t==='run'?(runById(D.so,D.id)||{}).ln:D.ln,cur=recurOf(D.so)[ln],q=numOr(dvGet('rq',cur?cur.qty:''),0),ev=+dvGet('re',cur?cur.every:1)||1;if(!q)return toast('Enter the recurring quantity.');UI.dv={};
+      return saveRecur(D.so,ln,{qty:q,every:ev,from:cur&&cur.every===ev?cur.from:FIRSTWK()});}
+    const rf=tg.closest('[data-drecoff]');if(rf){const ln=D.t==='run'?(runById(D.so,D.id)||{}).ln:D.ln;UI.dv={};return saveRecur(D.so,ln,null);}
+  }
+  if(D&&D.t==='line'){
+    if(tg.closest('[data-dfit]')){UI.dw=null;return autoFit(D.so,D.ln);}
+    if(tg.closest('[data-dadd]')){const o=BY_SO[D.so],l=o.lines.find(y=>y.ln===D.ln),t=fitTarget(o,l,needOf(D.so,D.ln));const q=numOr(dvGet('qty',needOf(D.so,D.ln)),0);if(!q)return toast('Enter a quantity.');const wk=dvGet('wk',t.wk),b=kindOf(l)==='elbow'?+dvGet('bender',t.bender):null;UI.dw=null;UI.dv={};return addLine(D.so,D.ln,wk,b,q);}
+  }
+  if(D&&D.t==='cell'){const dc=tg.closest('[data-dcell]');if(dc){const [wk,row]=D.k.split('|'),dl=+dc.dataset.dcell;if(dl<0&&wk<=THISMON())return;UI.dw=null;return shiftCell(wk,row,dl);}}
+  /* order lookup editor */
+  if(tg.closest('[data-sedit]')){const so=tg.closest('[data-sedit]').dataset.sedit;UI.draft={so,runs:runsOf(so).map(x=>({...x})),note:''};return render();}
+  if(tg.closest('[data-scancel]')){UI.draft=null;return render();}
+  if(tg.closest('[data-ssave]')){const b=tg.closest('[data-ssave]'),Dr=UI.draft;if(!Dr||b.disabled)return;b.disabled=true;const after=mergeRuns(Dr.runs);UI.draft=null;
+    const ok=await commitRuns([{so:Dr.so,after}],Dr.note?`${Dr.so}: ${Dr.note}`:`${Dr.so} schedule updated`);if(!ok)UI.draft=Dr;return render();}
+  const ad=tg.closest('[data-ed-add]');if(ad&&UI.draft){const o=BY_SO[UI.draft.so],l=o.lines.find(y=>String(y.ln)===ad.dataset.edAdd),tm=THISMON();
+    const mine=UI.draft.runs.filter(x=>x.ln===l.ln),fut=mine.filter(x=>x.wk>=tm).reduce((s,x)=>s+(+x.qty||0),0),lastWk=mine.map(x=>x.wk).sort().pop(),size=sizeOf(l),wk=lastWk&&lastWk>=tm?addDays(lastWk,7):FIRSTWK();
+    const x={id:newRunId(),ln:l.ln,item:l.item,size,wk,qty:Math.max(0,l.rem-fut),bender:kindOf(l)==='elbow'?bestBender(size,wk,loadMap()):null,kind:kindOf(l),why:'Scheduled in order lookup'};x.hrs=hrsOf(x);UI.draft.runs.push(x);return render();}
+  const dl=tg.closest('[data-ed-del]');if(dl&&UI.draft){UI.draft.runs=UI.draft.runs.filter(x=>x.id!==dl.dataset.edDel);return render();}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&UI.dw&&modal.classList.contains('hidden')){closeDrawer();return;}
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.jc[role="button"]')){e.preventDefault();e.target.click();}
+  if(e.altKey&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&UI.g==='ps'&&UI.dw&&UI.dw.t==='run'&&canSched()){const x=runById(UI.dw.so,UI.dw.id);if(!x)return;e.preventDefault();const to=addDays(x.wk,e.key==='ArrowRight'?7:-7);if(to<THISMON())return toast('That week has already started.');moveRun(UI.dw.so,UI.dw.id,to,null);return;}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&UI.g==='ps'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)&&canSched()){e.preventDefault();undoLast();}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  /* store only: redrawing here would swap out the button being clicked */
+  if(t.dataset&&t.dataset.dv!==undefined){UI.dv[t.dataset.dv]=t.value;return;}
+  if(!t.dataset||!t.dataset.ed||!UI.draft)return;
+  const x=UI.draft.runs.find(r=>r.id===t.dataset.id);if(!x)return;
+  if(t.dataset.ed==='wk')x.wk=t.value;
+  if(t.dataset.ed==='qty')x.qty=Math.max(0,+t.value||0);
+  if(t.dataset.ed==='bender')x.bender=+t.value;
+  x.hrs=hrsOf(x);render();
+});
+let sqT;
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset&&t.dataset.dv!==undefined){UI.dv[t.dataset.dv]=t.value;return;}
+  if(t.id==='ednote'&&UI.draft){UI.draft.note=t.value;return;}
+  if(t.id==='slq'||t.id==='scq'||t.id==='pq'){clearTimeout(sqT);sqT=setTimeout(()=>{if(t.id==='slq')UI.sq=t.value;else if(t.id==='scq')UI.cq=t.value;else UI.pq=t.value;render();refocus(t.id);},180);}
+});
+/* drag and drop: cards and tray lines onto a bender-week */
+function dropCheck(cellKey){
+  if(!DRAG)return {ok:false};
+  const [wk,row]=cellKey.split('|');
+  if(wk<THISMON())return {ok:false,why:'That week has already passed.'};
+  let kind,size;
+  if(DRAG.t==='run'){const x=runById(DRAG.so,DRAG.id);if(!x)return {ok:false};kind=x.kind;size=x.size;}
+  else{const o=BY_SO[DRAG.so],l=o&&o.lines.find(y=>y.ln===DRAG.ln);if(!l)return {ok:false};kind=kindOf(l);size=sizeOf(l);if(kind==='acc')return {ok:false,why:'Adhesives and accessories are not scheduled.'};}
+  if(row==='conduit'||row==='fitting'){if(kind!==row)return {ok:false,why:`This is ${KINDL[kind].toLowerCase()}, not ${row}.`};return {ok:true,wk,bender:null};}
+  if(kind!=='elbow')return {ok:false,why:'Only elbows go on benders.'};
+  if(runsSize(size).length&&!runsSize(size).some(b=>String(b.n)===row))return {ok:false,why:`Bender ${row} doesn’t run ${size} elbows. Use Bender ${runsSize(size).map(b=>b.n).join(', ')}.`};
+  return {ok:true,wk,bender:+row};
+}
+document.addEventListener('dragstart',e=>{
+  const j=e.target.closest&&e.target.closest('[data-jc],[data-tl]');if(!j||!canSched()||UI.g!=='ps')return;
+  if(j.dataset.jc){const [so,id]=j.dataset.jc.split('|');DRAG={t:'run',so,id};}else{const [so,ln]=j.dataset.tl.split('|');DRAG={t:'line',so,ln:+ln};}
+  DIRTY=true;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',j.dataset.jc||j.dataset.tl);
+  requestAnimationFrame(()=>j.classList.add('dragging'));
+});
+const clearDZ=()=>document.querySelectorAll('.dz-ok,.dz-bad').forEach(c=>c.classList.remove('dz-ok','dz-bad'));
+document.addEventListener('dragend',()=>{document.querySelectorAll('.dragging').forEach(n=>n.classList.remove('dragging'));clearDZ();DRAG=null;DIRTY=!!UI.draft;if(PENDING){PENDING=false;render();}});
+document.addEventListener('dragover',e=>{
+  const c=e.target.closest&&e.target.closest('[data-cell]');if(!c||!DRAG)return;
+  e.preventDefault();const r=dropCheck(c.dataset.cell);
+  if(!c.classList.contains(r.ok?'dz-ok':'dz-bad')){clearDZ();c.classList.add(r.ok?'dz-ok':'dz-bad');}
+  e.dataTransfer.dropEffect=r.ok?'move':'none';
+});
+document.addEventListener('dragleave',e=>{const c=e.target.closest&&e.target.closest('[data-cell]');if(c&&!c.contains(e.relatedTarget))c.classList.remove('dz-ok','dz-bad');});
+document.addEventListener('drop',e=>{
+  const c=e.target.closest&&e.target.closest('[data-cell]');if(!c||!DRAG)return;e.preventDefault();
+  const d=DRAG,r=dropCheck(c.dataset.cell);DRAG=null;DIRTY=!!UI.draft;clearDZ();
+  if(!r.ok){if(r.why)toast(r.why);return;}
+  if(d.t==='run'){const x=runById(d.so,d.id);if(!x||(x.wk===r.wk&&(r.bender===null||+x.bender===r.bender)))return;moveRun(d.so,d.id,r.wk,r.bender);}
+  else addLine(d.so,d.ln,r.wk,r.bender,needOf(d.so,d.ln));
+});
+
+/* ===================== LINKED WITH COMMUNICATIONS =====================
+   Requests show what the schedule says about their lines; items read in plain words;
+   Sales can edit a request's items, quantities and date before Production answers. */
+
+/* items show by part number, with the NetSuite description beneath in tables (as in the portal) */
+const itemCell=l=>`<div class="iname">${esc(l.item)}</div><div class="isub">${esc(l.desc||'')}</div>`;
+/* request thread lists always name the items, by part number */
+function itemList(r,rows,reqLines,restTxt){
+  return `<ul class="msg-i">${rows.map(x=>{const l=x.ln!=null?lineOf(r.so,x.ln):null,rq=reqLines?reqLines.find(y=>y.ln===x.ln):null;return `<li><span class="q">${x.qty!=null?num(x.qty):''}</span><span class="n">${l?esc(l.item):'Whole order'}${rq&&rq.qty>x.qty?` <span class="hint">of ${num(rq.qty)}, ${restTxt}</span>`:''}</span></li>`;}).join('')}</ul>`;
+}
+const changesBlock=(r,changes)=>changesBlock_portal(r,changes);
+
+/* the schedule, seen from a request */
+function schedImpactHTML(r){
+  if(!SCHED_READY||SCHED_ERR||!SMETA)return '';
+  const o=BY_SO[r.so];if(!o||o.gone)return '';
+  const tm=THISMON(),lines=(r.lines&&r.lines.some(x=>x.ln!=null)?r.lines:o.lines.filter(l=>l.rem>0).map(l=>({ln:l.ln,qty:l.rem}))).filter(x=>x.ln!=null&&schedulable(lineOf(r.so,x.ln)||{}));
+  if(!lines.length)return '';
+  const runsFor=ln=>runsOf(r.so).filter(x=>x.ln===ln&&x.wk>=tm).sort((a,b)=>a.wk<b.wk?-1:1);
+  const qtyFor=ln=>runsFor(ln).reduce((a,y)=>a+(+y.qty||0),0);
+  const rowsH=lines.map(x=>{const l=lineOf(r.so,x.ln),rs=runsFor(x.ln);return `<tr><td>${l?itemCell(l):'Line '+x.ln}</td><td class="r mono">${num(x.qty)}</td><td>${rs.length?rs.map(y=>`<span class="rchip">${num(y.qty)} · Week ${fmt(y.wk)}${y.bender?' · B'+y.bender:''}</span>`).join(''):'<span class="stk red">Not scheduled</span>'}</td></tr>`;}).join('');
+  const fin=lines.flatMap(x=>runsFor(x.ln)).map(x=>x.wk).sort().pop();
+  const full=lines.every(x=>{const l=lineOf(r.so,x.ln);return qtyFor(x.ln)>=Math.min(x.qty||0,l?l.rem:x.qty||0);});
+  const target=r.type==='date'?(r.status==='alternative'&&r.decision&&r.decision.rows?datesOf(r.decision.rows).pop():r.commit&&COMMITTED.includes(r.status)?datesOf(r.commit.rows).pop():r.reqDate)
+    :r.type==='check'?(r.commit&&COMMITTED.includes(r.status)?datesOf(r.commit.rows).pop():o.esd):r.type==='change'?r.reqDate:null;
+  let verdict,cls='steel';
+  if(r.type==='cancel'){
+    const hrs=lines.reduce((a,x)=>{let left=x.qty==null?Infinity:x.qty;return a+runsFor(x.ln).slice().reverse().reduce((h,y)=>{const t=Math.min(left,+y.qty||0);left-=t;return h+(y.kind==='elbow'?t*rateFor(y.item,y.size):0);},0);},0);
+    verdict=fin?`Cancelling frees about ${num(Math.round(hrs))} bender hours`:'None of this is on the schedule';
+  }else if(!fin){verdict='Not on the schedule yet';cls='amber';}
+  else if(target){const tw=monOf(target);
+    if(!full){verdict=`Only part is scheduled; last run Week ${fmt(fin)}`;cls='amber';}
+    else if(fin<=tw){verdict=`Finishes Week ${fmt(fin)}: meets ${fmt(target)}`;cls='ok';}
+    else{verdict=`Finishes Week ${fmt(fin)}: ${plural(Math.round(daysBetween(tw,fin)/7),'week')} after ${fmt(target)}`;cls='red';}}
+  else verdict=`Finishes Week ${fmt(fin)}`;
+  const hint=r.type==='cancel'?'':cls==='red'?(isProd()?'Pull runs earlier in the Planner, or answer with the date the schedule can make.':'Production will see this when they answer.'):cls==='amber'&&isProd()?'Plan it in the Planner before committing a date.':'';
+  const canFree=isProd()&&r.type==='cancel'&&['cxl_wo','cxl_close','cancelled'].includes(r.status)&&fin;
+  return `<div class="simp" data-k="simp"><div class="simp-h"><b>Planner</b><span class="stk ${cls}">${esc(verdict)}</span></div>
+  ${hint?`<p class="simp-n">${hint}</p>`:''}<div class="scroll" style="max-height:none;border-top:0"><table class="it st"><thead><tr><th>Item</th><th class="r">${r.type==='cancel'?'Cancel qty':'Request qty'}</th><th>On the schedule</th></tr></thead><tbody>${rowsH}</tbody></table></div>
+  <div class="simp-a"><button class="btn-link" data-planso="${r.so}">Open In Planner</button>${canFree?`<button class="btn-ink sm" data-cxlfree="${r.id}">Take Cancelled Qty Off The Schedule</button>`:''}</div></div>`;
+}
+/* one fact on the New request form */
+function schedOrderStrip(so){
+  if(!SCHED_READY||SCHED_ERR)return '';const o=BY_SO[so];if(!o)return '';const pl=orderPlan(o);
+  return fact('On the schedule',pl.sched?`Done Week ${fmt(pl.finish)}<span class="sub-l">${num(pl.sched)} of ${num(pl.toBuild)}</span>`:'Not Scheduled','up');
+}
+function freeForCancel(r){
+  const tm=THISMON(),rows=(r.cxl&&r.cxl.rows)||r.lines||[];let keep=runsOf(r.so).map(x=>({...x}));
+  rows.forEach(c=>{
+    if(c.ln==null){keep=keep.filter(x=>x.wk<tm);return;}
+    let left=c.qty==null?Infinity:+c.qty;
+    keep.filter(x=>x.ln===c.ln&&x.wk>=tm).sort((a,b)=>a.wk<b.wk?1:-1).forEach(x=>{const t=Math.min(left,x.qty);x.qty=r2(x.qty-t);left-=t;});
+  });
+  return commitRuns([{so:r.so,after:mergeRuns(keep)}],`${r.so}: cancelled qty taken off the schedule (${r.id})`);
+}
+
+/* ----- Sales edits a request before Production answers ----- */
+let ER=null;
+const canEditReq=r=>isSales()&&['submitted','acknowledged'].includes(r.status)&&['date','check','cancel','change'].includes(r.type);
+function openEditReq(r){ER={id:r.id};renderEditReq();openModal();}
+function renderEditReq(){
+  const r=R(ER.id),o=BY_SO[r.so],sh=document.getElementById('sheet'),chg=r.type==='change';
+  const cur=new Map((r.lines||[]).map(x=>[x.ln,x])),cc=new Map((r.changes||[]).map(x=>[x.ln,x]));
+  const lines=o.lines.filter(l=>l.rem>0||cur.has(l.ln));
+  const rowsH=lines.map(l=>{const on=chg?cc.has(l.ln):cur.has(l.ln),c=cc.get(l.ln)||{},q=cur.has(l.ln)?cur.get(l.ln).qty:l.rem;
+    return chg?`<tr><td style="width:36px"><input type="checkbox" class="bx er-ck" data-ln="${l.ln}" ${on?'checked':''} aria-label="Change ${esc(l.item)}"></td><td>${itemCell(l)}</td><td class="r">${num(l.rem)}</td><td><input class="din item er-it" data-ln="${l.ln}" list="itemlist" value="${esc(c.newItem||'')}" placeholder="Same" ${on?'':'disabled'} aria-label="New item"></td><td class="r"><input class="qin er-nq" type="number" min="0" step="any" data-ln="${l.ln}" value="${c.newQty!=null?c.newQty:''}" placeholder="${num(l.rem)}" ${on?'':'disabled'} aria-label="New qty"></td></tr>`
+      :`<tr><td style="width:36px"><input type="checkbox" class="bx er-ck" data-ln="${l.ln}" ${on?'checked':''} aria-label="Include ${esc(l.item)}"></td><td>${itemCell(l)}</td><td class="r">${num(l.rem)}</td><td class="r"><input class="qin er-q" type="number" min="1" max="${l.rem}" step="any" value="${q}" data-ln="${l.ln}" ${on?'':'disabled'} aria-label="Quantity"></td></tr>`;}).join('');
+  const head=chg?'<th></th><th>Item</th><th class="r">Current qty</th><th>New item</th><th class="r">New qty</th>':`<th></th><th>Item</th><th class="r">Remaining</th><th class="r">${r.type==='cancel'?'Cancel qty':r.type==='check'?'Ask about qty':'Request qty'}</th>`;
+  const dateRow=r.type==='date'||chg?`<div class="row"><div><label class="lbl" for="er-d">${chg?'Date needed (optional)':'Date needed'}</label><input class="din" type="date" id="er-d" value="${r.reqDate||''}"></div></div>`:'';
+  sh.innerHTML=`<div class="sheet-head"><div><div class="t" id="mt">Edit ${r.id}</div><div class="s"><span class="mono"><b>${esc(r.so)}</b></span> ${esc(o.c)} · ${esc(typeLabel(r))}</div></div><button class="xbtn" data-close aria-label="Close">×</button></div>
+  <p class="hint" style="margin:0 0 10px">Change the items, quantities${r.type==='date'||chg?' or date':''}. Production gets a note listing exactly what changed.</p>
+  <div class="scroll" style="margin-top:6px"><table class="it"><thead><tr>${head}</tr></thead><tbody>${rowsH}</tbody></table></div>${chg?`<datalist id="itemlist">${Object.keys(ITEMS).sort().map(k=>`<option value="${esc(k)}">`).join('')}</datalist>`:''}
+  ${dateRow}<label class="lbl" for="er-n">Why it changed (optional)</label><textarea class="ta" id="er-n"></textarea>
+  <div class="err" id="er-err" role="alert"></div><div class="actions"><button class="btn-red" id="er-save">Save changes</button><button class="btn-ghost" data-close>Cancel</button></div>`;
+  sh.querySelectorAll('.er-ck').forEach(c=>c.onchange=()=>sh.querySelectorAll(`[data-ln="${c.dataset.ln}"]:not(.er-ck)`).forEach(i=>i.disabled=!c.checked));
+  document.getElementById('er-save').onclick=()=>saveEditReq(r,o);
+}
+async function saveEditReq(r,o){
+  const sh=document.getElementById('sheet'),err=m=>{document.getElementById('er-err').textContent=m;},chg=r.type==='change';
+  const picked=[...sh.querySelectorAll('.er-ck')].filter(c=>c.checked).map(c=>+c.dataset.ln);
+  if(!picked.length)return err('Pick at least one item.');
+  const d=document.getElementById('er-d')?document.getElementById('er-d').value:null,t=T();
+  const name=ln=>{const l=lineOf(r.so,ln);return l?l.item:'Line '+ln;};
+  const diffs=[];let lines,changes=null;
+  if(chg){
+    changes=[];let bad='';
+    picked.forEach(ln=>{const l=lineOf(r.so,ln),it=sh.querySelector(`.er-it[data-ln="${ln}"]`).value.trim().toUpperCase(),qv=sh.querySelector(`.er-nq[data-ln="${ln}"]`).value,nq=qv===''?null:+qv;
+      if(!it&&nq==null)bad=bad||`Enter a new item or qty for ${l.item}, or untick it.`;if(nq!=null&&!(nq>=0))bad=bad||`Check the qty for ${l.item}.`;changes.push({ln,newQty:nq,newItem:it});});
+    if(bad)return err(bad);if(d&&d<t)return err('That date is in the past.');
+    const old=new Map((r.changes||[]).map(c=>[c.ln,c]));
+    changes.forEach(c=>{const p=old.get(c.ln);if(!p)diffs.push(`added ${name(c.ln)}`);else if((p.newItem||'')!==(c.newItem||'')||p.newQty!==c.newQty)diffs.push(`${name(c.ln)}: ${p.newItem||'same item'} / ${p.newQty??'same qty'} → ${c.newItem||'same item'} / ${c.newQty??'same qty'}`);});
+    old.forEach((p,ln)=>{if(!changes.some(c=>c.ln===ln))diffs.push(`removed ${name(ln)}`);});
+    lines=changes.map(c=>({ln:c.ln,qty:lineOf(r.so,c.ln).rem}));
+  }else{
+    let bad='';
+    lines=picked.map(ln=>{const l=lineOf(r.so,ln),q=+sh.querySelector(`.er-q[data-ln="${ln}"]`).value;if(!(q>0)||q>l.rem)bad=bad||`Check the qty for ${l.item} (up to ${num(l.rem)}).`;return {ln,qty:q};});
+    if(bad)return err(bad);
+    if(r.type==='date'){if(!d)return err('Pick the date needed.');if(d<t)return err('That date is in the past.');}
+    const old=new Map((r.lines||[]).map(x=>[x.ln,x.qty]));
+    lines.forEach(x=>{if(!old.has(x.ln))diffs.push(`added ${name(x.ln)}, ${num(x.qty)}`);else if(old.get(x.ln)!==x.qty)diffs.push(`${name(x.ln)}: ${num(old.get(x.ln))} → ${num(x.qty)}`);});
+    old.forEach((q,ln)=>{if(!lines.some(x=>x.ln===ln))diffs.push(`removed ${name(ln)}`);});
+  }
+  if((r.type==='date'||chg)&&(d||null)!==(r.reqDate||null))diffs.push(`date needed ${r.reqDate?fmt(r.reqDate):'none'} → ${d?fmt(d):'none'}`);
+  if(!diffs.length)return err('Nothing changed.');
+  const note=document.getElementById('er-n').value.trim();
+  document.getElementById('er-save').disabled=true;
+  const before=snapshotReqs();BUF=[];
+  r.lines=lines;if(chg){r.changes=changes;r.reqDate=d||null;}
+  if(r.type==='date'){r.reqDate=d;r.dir=d<o.esd||o.esd<t?'earlier':'later';}
+  addNote(r,`Request edited: ${diffs.join('; ')}${note?'. '+note:''}`);
+  const ok=await persist(r.id,r.status,before);
+  if(!ok){document.getElementById('er-save').disabled=false;return;}
+  closeModal();render();toast(`${r.id} updated. Production was notified.`);
+}
+document.addEventListener('click',e=>{
+  const tg=e.target;
+  if(tg.id==='edreq'){const r=R(UI.openId);if(r&&canEditReq(r))openEditReq(r);return;}
+  const pl=tg.closest('[data-planso]');if(pl){const o=BY_SO[pl.dataset.planso];UI.pq=pl.dataset.planso;UI.pk=o&&o.lines.some(l=>l.rem>0&&kindOf(l)==='elbow')?'elbow':'cf';UI.dw=null;if(location.hash!=='#ps-planner')location.hash='ps-planner';else render();return;}
+  const cf=tg.closest('[data-cxlfree]');if(cf){const r=R(cf.dataset.cxlfree);if(r)armed(cf,()=>freeForCancel(r));return;}
+});
 
 /* ===================== FIREBASE LAYER ===================== */
 const CONFIG_OK=firebaseConfig.apiKey&&firebaseConfig.apiKey!=='PASTE_HERE';
@@ -1635,6 +2818,7 @@ async function startApp(user){
     if(!READY){READY=true;runEvaluate();}
     if(DIRTY){PENDING=true;return;}render();
   }));
+  watchSchedule();
 }
 
 /* ===================== ADMIN: IMPORT BACKLOG ===================== */
