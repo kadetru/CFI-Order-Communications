@@ -1111,10 +1111,10 @@ function statusOf(r){
     case 'submitted':return {t:r.rounds>1?'Countered':'New',c:'steel'};
     case 'acknowledged':return {t:r.rounds>1?'Countered':'Reviewing',c:'steel'};
     case 'alternative':return {t:s?'Answer offer':'With Sales',c:'amber'};
-    case 'committed':return {t:c?'Confirmed':'Committed',c:'ok'};
+    case 'committed':return {t:partShipped(r)?'Partly shipped':(c?'Confirmed':'Committed'),c:'ok'};
     case 'missed':return {t:'Missed',c:'red'};
     case 'met':return {t:'On time',c:'ok'};
-    case 'late':return {t:`Late ${lateDays(r)}d`,c:'redo'};
+    case 'late':return {t:'Late',c:'redo'};
     case 'cannot':return {t:c?'Can’t confirm':'Can’t commit',c:'muted'};
     case 'cxl_wo':case 'chg_wo':return {t:s?'Deleting WOs':'Delete WOs',c:s?'steel':'amber'};
     case 'cxl_close':return {t:s?(r.full?'Close order':'Delete line'):'With Sales',c:'amber'};
@@ -1168,7 +1168,7 @@ function acknowledge(r){r.status='acknowledged';ev(r,'ack');}
 function supersedeFrom(r,lines,why){S.requests.forEach(q=>{if(q!==r&&['date','check'].includes(q.type)&&(COMMITTED.includes(q.status)||['submitted','acknowledged','alternative'].includes(q.status))&&overlaps(q,{so:r.so,lines})){q.status='superseded';sysEv(q,'superseded',{note:`${r.id}, ${why}`});}});}
 function activate(r,rows){
   const o=BY_SO[r.so];
-  r.commit={rows:rows.map(x=>({ln:x.ln,qty:x.qty,date:x.date,readyAt:o.ac||null})),revisions:0};
+  r.commit={rows:rows.map(x=>({ln:x.ln,qty:x.qty,date:x.date,readyAt:null})),revisions:0,base:Object.fromEntries(o.lines.map(l=>[l.ln,l.rem]))};
   r.status='committed';
   S.requests.forEach(q=>{if(q!==r&&q.type===r.type&&COMMITTED.includes(q.status)&&overlaps(q,r)){q.status='superseded';sysEv(q,'superseded',{note:r.id});}});
 }
@@ -1221,7 +1221,7 @@ function changeDate(r,idxs,date,note){
 }
 function markComplete(r,ln){const rows=r.commit.rows.filter(x=>(ln===undefined||x.ln===ln)&&!x.readyAt);rows.forEach(x=>x.readyAt=T());ev(r,'complete',{rows:ln===undefined?null:rows,ref:'request',reqLines:r.lines.map(x=>({...x}))});}
 function addNote(r,text){ev(r,'note',{note:text});}
-function evaluate(){
+function evaluate_portal(){
   const t=T();
   S.requests.forEach(r=>{
     if(r.status==='alternative'&&t>r.offerExpires){r.status='expired';sysEv(r,'expired');}
@@ -2671,6 +2671,74 @@ document.addEventListener('click',e=>{
   const pl=tg.closest('[data-planso]');if(pl){const o=BY_SO[pl.dataset.planso];UI.pq=pl.dataset.planso;UI.pk=o&&o.lines.some(l=>l.rem>0&&kindOf(l)==='elbow')?'elbow':'cf';UI.dw=null;if(location.hash!=='#ps-planner')location.hash='ps-planner';else render();return;}
   const cf=tg.closest('[data-cxlfree]');if(cf){const r=R(cf.dataset.cxlfree);if(r)armed(cf,()=>freeForCancel(r));return;}
 });
+
+/* ===================== COMPLETION FROM THE NETSUITE BACKLOG =====================
+   Replaces the portal's evaluate(). A request is judged by what the backlog shows, not by emails:
+   - Commitments (date change, confirm ESD, change with a date): every committed row is matched to
+     what has shipped or been billed on its line since the commitment (remaining qty went down, or the
+     line / whole order left the backlog). Rows are filled earliest-due first, so partial shipments
+     complete the first rows and leave the rest open.
+       Backlog exports are taken in the morning, so the first backlog dated after the due day shows
+       where things stood at the end of it: shipped by then -> on time; still open on it -> missed
+       (and late if it ships afterwards).
+     Missed and late are tracked here only; the email automation sends nothing for them.
+   - Cancellations waiting on Sales to close the line/order: complete when the backlog shows the
+     cancelled qty gone (or the order closed).
+   - Changes waiting on Sales: complete when the new item is on the order and/or the line shows the
+     new qty.
+   The backlog's own date (META.asOf) is used, never the clock, so a stale export never marks
+   anything missed. */
+const backlogDay=()=>META&&META.asOf?META.asOf.slice(0,10):null;
+const graceDay=d=>addBD(d,1);
+/* remaining qty per line when the commitment was made (older commitments: when the request was made) */
+function baseRem(r){const b={};((r.osnap&&r.osnap.lines)||[]).forEach(l=>{b[l.ln]=l.rem;});return {...b,...((r.commit&&r.commit.base)||{})};}
+function curRem(r,ln){const o=BY_SO[r.so];if(!o||o.gone)return 0;const l=o.lines.find(y=>y.ln===ln);return l?l.rem:0;}
+/* how many of each committed row has shipped: {rowIndex: qty} */
+function rowProgress(r){
+  const rows=r.commit.rows,base=baseRem(r),o=BY_SO[r.so],gone=!o||o.gone,shipped={},out={};
+  rows.forEach(x=>{if(x.ln!=null&&shipped[x.ln]==null)shipped[x.ln]=base[x.ln]==null?0:Math.max(0,base[x.ln]-curRem(r,x.ln));});
+  rows.map((x,i)=>({x,i})).sort((a,b)=>a.x.date<b.x.date?-1:a.x.date>b.x.date?1:a.i-b.i).forEach(({x,i})=>{
+    if(x.ln==null){out[i]=gone?(x.qty||1):0;return;}
+    const q=Math.min(+x.qty||0,shipped[x.ln]||0);shipped[x.ln]-=q;out[i]=q;
+  });
+  return out;
+}
+const partShipped=r=>{if(!r.commit||!COMMITTED.includes(r.status))return false;const p=rowProgress(r);return r.commit.rows.some((x,i)=>!x.readyAt&&p[i]>0)||(r.commit.rows.some(x=>x.readyAt)&&r.commit.rows.some(x=>!x.readyAt));};
+function evalCommit(r,day){
+  const rows=r.commit.rows,p=rowProgress(r),newly=[];
+  rows.forEach((x,i)=>{if(!x.readyAt&&p[i]>=(x.ln==null?1:(+x.qty||0))-1e-9){x.readyAt=day;newly.push({...x});}});
+  if(newly.length){const o=BY_SO[r.so];sysEv(r,'complete',{rows:newly,ref:'request',reqLines:r.lines.map(x=>({...x})),note:!o||o.gone?'Off the NetSuite backlog':'Shipped or billed in NetSuite'});}
+  if(rows.every(x=>x.readyAt)){const ok=rows.every(x=>x.readyAt<=graceDay(x.date));r.status=ok?'met':'late';sysEv(r,ok?'met':'late');}
+  /* a backlog dated after the due day shows where things stood at the end of it */
+  else if(r.status==='committed'&&rows.some(x=>!x.readyAt&&day>x.date)){r.status='missed';setTurn(r);sysEv(r,'missed',{date:nextDue(r)});}
+}
+function evalCancel(r){
+  const o=BY_SO[r.so],gone=!o||o.gone,base={};((r.osnap&&r.osnap.lines)||[]).forEach(l=>{base[l.ln]=l.rem;});
+  const rows=(r.cxl&&r.cxl.rows)||r.lines||[];
+  const done=gone||(!r.full&&rows.length&&rows.every(c=>c.ln!=null&&base[c.ln]!=null&&curRem(r,c.ln)<=base[c.ln]-(c.qty==null?base[c.ln]:+c.qty)+1e-9));
+  if(!done)return;
+  r.status='cancelled';r.doneAt=T();sysEv(r,'cxl_done',{note:'Shows in NetSuite'});supersedeFrom(r,rows,'cancelled');
+}
+function evalChange(r){
+  const o=BY_SO[r.so];if(!o||o.gone||!r.changes||!r.changes.length)return;
+  const done=r.changes.every(c=>{
+    const itemOk=!c.newItem||o.lines.some(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase());
+    const qtyOk=c.newQty==null||(c.newItem?o.lines.some(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase()&&Math.abs(l.rem-c.newQty)<1e-9):Math.abs(curRem(r,c.ln)-c.newQty)<1e-9);
+    return itemOk&&qtyOk;});
+  if(!done)return;
+  r.status='changed';r.doneAt=T();r.unread=r.unread||{};r.unread.production=true;sysEv(r,'chg_done',{note:'Shows in NetSuite',date:r.agreedDate||null});supersedeFrom(r,r.lines,'changed');
+  if(r.agreedDate)activate(r,r.changes.map(c=>{const nl=c.newItem?o.lines.find(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase()):null;return {ln:nl?nl.ln:c.ln,qty:c.newQty!=null?c.newQty:(lineOf(r.so,c.ln)||{}).rem,date:r.agreedDate};}));
+}
+function evaluate(){
+  const t=T(),day=backlogDay();
+  S.requests.forEach(r=>{
+    if(r.status==='alternative'&&t>r.offerExpires){r.status='expired';sysEv(r,'expired');}
+    if(!day)return;
+    if(COMMITTED.includes(r.status)&&r.commit)evalCommit(r,day);
+    else if(r.status==='cxl_close')evalCancel(r);
+    else if(r.status==='chg_sales')evalChange(r);
+  });
+}
 
 /* ===================== FIREBASE LAYER ===================== */
 const CONFIG_OK=firebaseConfig.apiKey&&firebaseConfig.apiKey!=='PASTE_HERE';
