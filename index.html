@@ -998,15 +998,16 @@ const addBD=(s,n)=>{let d=s,st=n>=0?1:-1,c=Math.abs(n);while(c>0){d=addDays(d,st
 const bdBetween=(a,b)=>{if(a===b)return 0;let sg=1;if(a>b){[a,b]=[b,a];sg=-1;}let n=0,d=a;while(d<b){d=addDays(d,1);if(!isWk(d))n++;}return n*sg;};
 const daysBetween=(a,b)=>Math.round((pd(b)-pd(a))/864e5);
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],MONL=['January','February','March','April','May','June','July','August','September','October','November','December'],WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-let CLK=null;
-const today=()=>{const t=fd(new Date());return t<AS_OF_DATE?AS_OF_DATE:t;};
-const T=()=>CLK||today();
+/* every date and time is Central (the plant's time), whatever the computer's own time zone */
+const CT=()=>new Date().toLocaleString('sv-SE',{timeZone:'America/Chicago'}).replace(' ','T').slice(0,16);
+const today=()=>{const t=CT().slice(0,10);return t<AS_OF_DATE?AS_OF_DATE:t;};
+const T=today;
 function fmt(s){if(!s)return '—';const d=pd(s),y=d.getFullYear();return `${d.getMonth()+1}/${d.getDate()}`+(y!==pd(today()).getFullYear()?`/${String(y).slice(2)}`:'');}
 function fmtW(s){const d=pd(s);return `${WD[d.getDay()]} ${fmt(s)}`;}
 function hm12(hm){let [h,m]=hm.split(':').map(Number);const ap=h>=12?'PM':'AM';h=h%12||12;return `${h}:${String(m).padStart(2,'0')} ${ap}`;}
 const fmtTs=t=>fmt(t.slice(0,10))+', '+hm12(t.slice(11,16));
-const nowHM=()=>{const d=new Date();return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;};
-let TM=null;const ts=()=>`${T()}T${TM||nowHM()}`;
+const nowHM=()=>CT().slice(11);
+const ts=()=>`${T()}T${nowHM()}`;
 const money=n=>n==null?'—':(Math.abs(n)>=1e6?'$'+(n/1e6).toFixed(1)+'M':'$'+Math.round(n).toLocaleString('en-US'));
 const num=n=>n==null?'—':(+n).toLocaleString('en-US',{maximumFractionDigits:2});
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1175,19 +1176,6 @@ function changeDate(r,idxs,date,note){
 }
 function markComplete(r,ln){const rows=r.commit.rows.filter(x=>(ln===undefined||x.ln===ln)&&!x.readyAt);rows.forEach(x=>x.readyAt=T());ev(r,'complete',{rows:ln===undefined?null:rows,ref:'request',reqLines:r.lines.map(x=>({...x}))});}
 function addNote(r,text){ev(r,'note',{note:text});}
-function evaluate_portal(){
-  const t=T();
-  S.requests.forEach(r=>{
-    if(r.status==='alternative'&&t>r.offerExpires){r.status='expired';sysEv(r,'expired');}
-    if(COMMITTED.includes(r.status)){
-      const rows=r.commit.rows,oo=BY_SO[r.so];
-      if(oo&&oo.ac&&!oo.gone&&rows.some(x=>!x.readyAt)){rows.forEach(x=>{if(!x.readyAt)x.readyAt=oo.ac;});sysEv(r,'complete',{note:'Actual Complete set in NetSuite '+fmt(oo.ac)});}
-      if(rows.every(x=>x.readyAt)){const ok=rows.every(x=>x.readyAt<=x.date);r.status=ok?'met':'late';sysEv(r,ok?'met':'late');}
-      else if(r.status==='committed'&&rows.some(x=>!x.readyAt&&t>x.date)){r.status='missed';setTurn(r);sysEv(r,'missed',{date:nextDue(r)});}
-    }
-  });
-}
-function as(view,date,time,fn){const pv=S.view;S.view=view;CLK=date;TM=time;fn();S.view=pv;CLK=null;TM=null;}
 
 /* ===== list rows ===== */
 const chevSvg='<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
@@ -1444,7 +1432,7 @@ function recordHeaderHTML(r){
 /* The open request: pinned record header, scrolling conversation, docked note composer.
    The class "rq-panel" is kept on purpose: the unsaved-typing guard at the bottom of this file looks for it. */
 function detailHTML(r){
-  const gone=BY_SO[r.so].gone?'<div class="notice" data-k="gone">Off the NetSuite backlog (shipped or closed)</div>':'';
+  const gone=BY_SO[r.so].gone?'<div class="notice" data-k="gone">Off the NetSuite backlog (shipped or closed)</div>':BY_SO[r.so].held?'<div class="notice" data-k="gone">On hold in NetSuite (or no Ship Date), so it is not in the backlog</div>':'';
   const viewer=S.view==='viewer';
   const canWithdraw=isSales()&&(['submitted','acknowledged','alternative'].includes(r.status)||COMMITTED.includes(r.status));
   /* data-fresh = always redraw (keeps answer forms behaving exactly as before) */
@@ -2040,17 +2028,19 @@ function placeRecurring(){
   return commitRuns(r.changes,`Recurring placed: ${plural(r.n,'run')}, ${num(r.pcs)} pcs`);
 }
 async function saveRecur(so,ln,rec){
-  const ref=doc(db,SCOL,so),l=lineOf(so,ln),all={...((SCHED[so]&&SCHED[so].recur)||{})};
+  const ref=doc(db,SCOL,so),l=lineOf(so,ln),prev=(SCHED[so]&&SCHED[so].recur)||{},all={...prev};
   if(rec)all[ln]={qty:rec.qty,every:rec.every,from:rec.from};else delete all[ln];
   const text=`Line ${ln}${l?' '+l.item:''}: `+(rec?`recurring ${recText(rec)}`:'no longer recurring');
   SCHED[so]={...(SCHED[so]||{so,runs:[],promise:null,notes:null,note:'',rev:0}),recur:all};render();
   try{
     let nr=0;
     await runTransaction(db,async tx=>{const s=await tx.get(ref),cur=s.exists()?s.data():{so,runs:[],promise:null,notes:null,note:'',rev:0};nr=(cur.rev||0)+1;
-      tx.set(ref,{...cur,so,recur:all,rev:nr,updatedAt:nowTs(),updatedBy:ME.name||ME.email});
+      /* merge into what is saved now, so a line someone else just set isn't lost */
+      const merged={...(cur.recur||{})};if(rec)merged[ln]=all[ln];else delete merged[ln];
+      tx.set(ref,{...cur,so,recur:merged,rev:nr,updatedAt:nowTs(),updatedBy:ME.name||ME.email});
       tx.set(doc(collection(db,SCOL,so,'log')),{at:nowTs(),ms:Date.now(),by:ME.email,name:ME.name||ME.email,text,note:''});});
     if(SCHED[so]&&(SCHED[so].rev||0)<nr)SCHED[so].rev=nr;delete LOGS[so];
-  }catch(e){console.error(e);toast('Couldn’t save. Check your connection and try again.');return false;}
+  }catch(e){console.error(e);SCHED[so]={...SCHED[so],recur:prev};render();toast('Couldn’t save. Check your connection and try again.');return false;}
   /* put it on the board right away (or take its recurring runs off) */
   const o=BY_SO[so],line=o&&o.lines.find(y=>y.ln===ln),r=recurRuns([{so,ln,rec,l:line}],true);
   if(r.changes.length)await commitRuns(r.changes,`${so} ${l?l.item:''}: ${rec?'recurring '+recText(rec)+', '+plural(r.n,'run')+' placed':'recurring runs removed'}`);
@@ -2653,8 +2643,10 @@ function evalCancel(r){
 }
 function evalChange(r){
   const o=BY_SO[r.so];if(!o||o.gone||!r.changes||!r.changes.length)return;
+  const was=baseOf(r,'item','none');
   const done=r.changes.every(c=>{
-    const itemOk=!c.newItem||o.lines.some(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase());
+    /* the new item is on the order, and the changed line no longer has the old item (the new item may already be on another line) */
+    const itemOk=!c.newItem||(o.lines.some(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase())&&(curLine(r,c.ln)||{}).item!==was[c.ln]);
     const qtyOk=c.newQty==null||(c.newItem?o.lines.some(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase()&&Math.abs(l.rem-c.newQty)<1e-9):Math.abs(((curLine(r,c.ln)||{}).rem||0)-c.newQty)<1e-9);
     return itemOk&&qtyOk;});
   if(!done)return;
@@ -2679,7 +2671,7 @@ let ME=null,META=null,READY=false,DIRTY=false,PENDING=false,BUF=[],SEQN=0;
 let unsubs=[],evUnsub=null,evFor=null;
 const clean=o=>JSON.parse(JSON.stringify(o));
 const snapshotReqs=()=>new Map(S.requests.map(q=>[q.id,JSON.stringify(q)]));
-const nowTs=()=>{const d=new Date();return `${fd(d)}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;};
+const nowTs=CT;
 
 /* save everything that changed since `before`, in one transaction.
    mainId/expect: the request the user acted on must still have the status they saw. */
@@ -2746,7 +2738,7 @@ function orderSnap(o){return {so:o.so,c:o.c,po:o.po,esd:o.esd,pesd:o.pesd,amt:o.
 function hydrateMissing(){
   S.requests.forEach(r=>{
     const s=r.osnap;if(!s)return;
-    if(!BY_SO[r.so]){BY_SO[r.so]={...s,lines:s.lines.map(l=>({...l})),classes:[...new Set(s.lines.map(l=>l.cls))],ac:null,gone:true};}
+    if(!BY_SO[r.so]){BY_SO[r.so]={...s,lines:s.lines.map(l=>({...l})),classes:[...new Set(s.lines.map(l=>l.cls))],ac:null,gone:!(META&&META.held||[]).includes(r.so),held:(META&&META.held||[]).includes(r.so)};}
     s.lines.forEach(l=>{GHOST[r.so+'|'+l.ln]=l;});
   });
 }
@@ -2839,7 +2831,7 @@ function colGet(row,name){if(name in row)return row[name];const k=Object.keys(ro
 function agencyOf(row){for(const k of ['Sales Rep.1','Sales Rep_1','Sales Rep 1']){if(k in row)return row[k];}return null;}
 function missingCols(rows,map,need){if(!rows.length)return need.map(k=>map[k]);const r=rows[0];return need.filter(k=>colGet(r,map[k])===undefined).map(k=>map[k]);}
 function buildImport(orows,lrows,stale){
-  const warn=[];let pending=0,noEsd=0,shipped=0;
+  const warn=[],held=[];let pending=0,noEsd=0,shipped=0;
   const items={},lines={};let lineCount=0;const seen=new Set();let dups=0;
   lrows.forEach(r=>{const so=xStr(colGet(r,LINE_COLS.so));if(!so||!/^SO/i.test(so))return;
     const ln=xNum(colGet(r,LINE_COLS.ln));const item=xStr(colGet(r,LINE_COLS.item))||'';
@@ -2848,15 +2840,15 @@ function buildImport(orows,lrows,stale){
     (lines[so]=lines[so]||[]).push({n:ln,i:item,q:xNum(colGet(r,LINE_COLS.qty)),b:xNum(colGet(r,LINE_COLS.billed)),r:xNum(colGet(r,LINE_COLS.rem)),a:xNum(colGet(r,LINE_COLS.amt))});lineCount++;});
   const orders=[];
   orows.forEach(r=>{const so=xStr(colGet(r,ORDER_COLS.so));if(!so||!/^SO/i.test(so))return;
-    const st=xStr(colGet(r,ORDER_COLS.st))||'';if(/^pending$/i.test(st)){pending++;return;}
+    const st=xStr(colGet(r,ORDER_COLS.st))||'';if(/^pending$/i.test(st)){pending++;held.push(so);return;}
     if(stale&&!(lines[so]||[]).length){shipped++;return;}
-    const esd=xDate(colGet(r,ORDER_COLS.esd));if(!esd){noEsd++;return;}
+    const esd=xDate(colGet(r,ORDER_COLS.esd));if(!esd){noEsd++;held.push(so);return;}
     orders.push({so,c:xStr(colGet(r,ORDER_COLS.c))||'',po:xStr(colGet(r,ORDER_COLS.po)),od:xDate(colGet(r,ORDER_COLS.od)),esd,pesd:xDate(colGet(r,ORDER_COLS.pesd)),ac:xDate(colGet(r,ORDER_COLS.ac)),st,sm:xStr(colGet(r,ORDER_COLS.sm)),zip:xStr(colGet(r,ORDER_COLS.zip)),state:xStr(colGet(r,ORDER_COLS.state)),amt:xNum(colGet(r,ORDER_COLS.amt))||0,memo:xStr(colGet(r,ORDER_COLS.memo)),days:xNum(colGet(r,ORDER_COLS.days)),rep:xStr(colGet(r,ORDER_COLS.rep)),agency:xStr(agencyOf(r)),l:lines[so]||[]});});
   if(dups)warn.push(`${dups} duplicate Order # + Line # rows. Line # must be unique per order.`);
   if(noEsd)warn.push(`${noEsd} orders skipped because they have no Ship Date.`);
   if(shipped)warn.push(`${shipped} orders left out: the order file is older than the line file and they have no lines left, so they shipped since.`);
   const noLines=orders.filter(o=>!o.l.length).length;
-  return {orders,items:Object.values(items),lineCount:orders.reduce((s,o)=>s+o.l.length,0),pending,noLines,warn};
+  return {orders,items:Object.values(items),lineCount:orders.reduce((s,o)=>s+o.l.length,0),pending,noLines,warn,held};
 }
 function openImport(){
   const sh=document.getElementById('sheet');
@@ -2892,7 +2884,7 @@ function openImport(){
       b.set(doc(db,'backlog','items'),{items:built.items});
       chunks.forEach((c,i)=>b.set(doc(db,'backlog','chunk_'+i),{orders:clean(c)}));
       const oldN=META?META.chunkCount||0:0;for(let i=chunks.length;i<oldN;i++)b.delete(doc(db,'backlog','chunk_'+i));
-      b.set(doc(db,'backlog','meta'),{asOf:nowTs(),syncedAt:Date.now(),orderCount:built.orders.length,lineCount:built.lineCount,chunkCount:chunks.length,by:ME.name||ME.email});
+      b.set(doc(db,'backlog','meta'),{asOf:nowTs(),syncedAt:Date.now(),orderCount:built.orders.length,lineCount:built.lineCount,chunkCount:chunks.length,held:built.held,by:ME.name||ME.email});
       await b.commit();
       closeModal();toast(`Backlog updated: ${num(built.orders.length)} orders`);
     }catch(x){console.error(x);$('igo').disabled=false;$('igo').textContent='Upload to portal';err('Upload failed. Check your connection and try again.');}
