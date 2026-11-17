@@ -615,7 +615,6 @@ footer{flex-shrink:0;padding:7px var(--gutter);font-size:var(--t-11);letter-spac
 .ps{flex:1;min-height:0;display:flex;flex-direction:column;}
 .ps .groupbar a .gbadge{min-width:26px;}
 .ps-body{flex:1;min-height:0;overflow:auto;background:var(--paper);}
-.ps-body.board{overflow:hidden;overflow:clip;display:flex;flex-direction:column;}
 .ps-page{max-width:1440px;margin:0 auto;padding:var(--s5) var(--gutter) var(--s7);}
 .ps-h{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;margin:0 0 var(--s4);}
 .ps-h h1{font-family:var(--cond);font-weight:700;font-size:var(--t-32);letter-spacing:.04em;text-transform:uppercase;line-height:1;margin:0;}
@@ -649,7 +648,6 @@ footer{flex-shrink:0;padding:7px var(--gutter);font-size:var(--t-11);letter-spac
 .wklbl{font-family:var(--cond);font-weight:700;font-size:var(--t-18);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
 
 /* planner layout: tray | board */
-.pl{flex:1;min-height:0;display:grid;grid-template-columns:var(--ps-tray) minmax(0,1fr);}
 .tray{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:var(--surface);}
 .tray-h{padding:14px 16px 10px;background:var(--surface);border-bottom:1px solid var(--line);}
 .tray-h b{display:flex;align-items:baseline;justify-content:space-between;font-family:var(--cond);font-weight:700;font-size:var(--t-15);letter-spacing:.1em;text-transform:uppercase;}
@@ -715,11 +713,8 @@ footer{flex-shrink:0;padding:7px var(--gutter);font-size:var(--t-11);letter-spac
 .board.dense .jc .r3{margin-top:0;}
 .board.dense .jc .so{font-size:var(--t-11);}
 .board.dense .jc .q{font-size:var(--t-12);}
-.gh .wl{font-size:10px;min-height:0;letter-spacing:.1em;}
 .rh .ru{font-family:var(--mono);font-size:var(--t-11);color:#7fd6a4;}
 .rh .ru.over{color:#ff6b70;}
-.tray-h .fitall{margin-top:10px;width:100%;min-height:34px;}
-.tray-h .fitall[data-armed]{background:var(--red);border-color:var(--red);color:#fff;}
 .tray .jc{cursor:grab;}
 .tray .jc .need{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
 .mini{min-height:26px;padding:0 9px;border:1px solid var(--ink);background:var(--white);font-family:var(--cond);font-weight:700;font-size:var(--t-11);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background var(--d-fast) ease,color var(--d-fast) ease,transform var(--d-press) var(--ease-out);}
@@ -799,11 +794,6 @@ table.it tr.clk{cursor:pointer;}
 .empty-ps{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:var(--s8) var(--s5);color:var(--muted);}
 .empty-ps svg{color:var(--steel);}
 .empty-ps b{font-family:var(--cond);font-weight:700;font-size:var(--t-32);letter-spacing:.04em;text-transform:uppercase;color:var(--ink);line-height:1;}
-.ed-line{border-top:1px solid var(--line);padding:12px 0;}
-.ed-head{display:flex;gap:6px 12px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px;}
-.ed-run{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0;}
-.ed-run .sel,.ed-run .qin{min-height:40px;font-size:var(--t-14);}
-.ed-run .hrs{font-family:var(--mono);font-size:var(--t-12);color:var(--muted);min-width:76px;}
 
 /* skeleton */
 .psk{display:block;height:14px;background:linear-gradient(90deg,#e6e6e8 0%,#f2f2f3 50%,#e6e6e8 100%);background-size:200% 100%;animation:psk 1.2s linear infinite;}
@@ -817,8 +807,6 @@ table.it tr.clk{cursor:pointer;}
 
 /* small screens: tray on top, board scrolls sideways */
 @media (max-width:900px){
-  .ps-body.board{overflow:auto;display:block;}
-  .pl{display:block;}
   .tray{border-right:0;border-bottom:1px solid var(--line);max-height:34vh;}
   .board{height:72vh;}
   .kband{grid-template-columns:repeat(4,1fr);}
@@ -841,36 +829,7 @@ table.it tr.clk{cursor:pointer;}
   .ps-body,.board{overflow:visible;}
 }
 
-/* ----- 3-week plan panel (top of the tray) ----- */
-.plan3{background:var(--ink);color:#fff;padding:14px 16px 12px;border-bottom:3px solid var(--red);}
-.p3-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-.p3-h b{font-family:var(--cond);font-weight:700;font-size:var(--t-18);letter-spacing:.08em;text-transform:uppercase;}
-.p3-h span{font-size:var(--t-12);color:var(--on-ink-2);}
-.p3-load{display:grid;gap:5px;margin:10px 0 6px;}
-.p3-load>div{display:grid;grid-template-columns:52px 1fr 40px;align-items:center;gap:8px;font-size:var(--t-12);}
-.p3-load span:first-child{color:var(--on-ink-2);font-family:var(--mono);}
-.p3-load .cb{height:6px;background:rgba(255,255,255,.14);position:relative;overflow:hidden;}
-.p3-load .cb i{position:absolute;inset:0 auto 0 0;background:#7fd6a4;transition:width var(--d-panel) var(--ps-ease);}
-.p3-load .over .cb i{background:#ff6b70;}
-.p3-load b{font-family:var(--mono);text-align:right;}
-.p3-steps{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:10px;}
-.p3-steps>li{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;}
-.p3-steps .sn{width:26px;height:26px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.4);font-family:var(--cond);font-weight:700;font-size:var(--t-14);}
-.p3-steps li.done .sn{background:var(--ps-ok);border-color:var(--ps-ok);color:#fff;font-size:0;}
-.p3-steps li.done .sn::after{content:"✓";font-size:var(--t-14);}
-.p3-steps .sb{display:flex;flex-direction:column;gap:4px;min-width:0;}
-.p3-steps .sb>b{font-family:var(--cond);font-weight:700;font-size:var(--t-14);letter-spacing:.1em;text-transform:uppercase;}
-.p3-steps .sb>span{font-size:var(--t-12);color:var(--on-ink-2);line-height:1.35;}
-.p3-steps .p3-next{color:#fff!important;}
-.p3-rec{list-style:none;margin:2px 0;padding:0;display:flex;flex-direction:column;gap:3px;}
-.p3-rec li{display:flex;align-items:center;gap:6px;font-size:var(--t-12);background:rgba(255,255,255,.06);padding:3px 6px;}
-.p3-rec .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--on-ink-2);}
-.p3-rec .x{border:0;background:transparent;color:var(--on-ink-2);cursor:pointer;font-size:16px;line-height:1;padding:0 2px;}
-.p3-rec .x[data-armed]{color:#ff6b70;font-size:var(--t-11);}
 .btn-ink.sm{min-height:36px;padding:0 14px;font-size:var(--t-12);align-self:flex-start;margin-top:2px;}
-.plan3 .btn-ink{background:#fff;color:var(--ink);}
-.plan3 .btn-ink.red{background:var(--red);color:#fff;}
-.plan3 .btn-ink[data-armed]{background:#000;color:#fff;box-shadow:0 0 0 1px #fff inset;}
 .tray-h .search{min-height:40px;margin-top:8px;font-size:var(--t-14);}
 .rtag{display:inline-block;font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--steel);padding:1px 5px;line-height:1.3;white-space:nowrap;}
 td .rtag{margin-top:4px;}
@@ -887,9 +846,6 @@ tr.xrow>td{background:var(--field)!important;padding:12px 16px 16px!important;bo
 tr.xrow .xa{display:flex;gap:8px;margin-top:10px;}
 
 /* ----- plain item names ----- */
-.iname2{font-weight:700;font-size:var(--t-14);line-height:1.25;}
-.icode{font-family:var(--mono);font-weight:700;font-size:var(--t-12);color:var(--muted);}
-.msg-i .n .icode{margin-left:6px;}
 
 /* ----- the schedule on a request ----- */
 .simp{background:var(--white);border:1px solid var(--line);border-left:4px solid var(--steel);margin:0 0 var(--s5);box-shadow:var(--e1);}
@@ -933,8 +889,6 @@ tr.xrow .xa{display:flex;gap:8px;margin-top:10px;}
 @media (hover:none){.jc .r1 .q{visibility:visible;}}
 
 /* commitments from Order Communications */
-.rh.lane{background:var(--steel);}
-.cell.lane{background:#f3f7fb;min-height:0;border-bottom:2px solid var(--steel-edge);}
 .jc.cm{border:1px dashed var(--steel);border-left:4px solid var(--steel);background:var(--steel-tint);box-shadow:none;}
 .jc.cm .due{color:var(--steel);}
 .jc.cm.ok{border-color:var(--ps-ok);border-left-color:var(--ps-ok);background:var(--ok-tint);}
@@ -1292,7 +1246,7 @@ function rowsBlock(r,e,head){
     const h=head||('Ready by '+fmt(d));
     return `<div class="msg-d">${h} <span class="of">${label}</span></div>${itemList(r,g,e.ref==='order'?null:e.reqLines,rest)}`;}).join('');
 }
-function changesBlock_portal(r,changes){
+function changesBlock(r,changes){
   return `<ul class="msg-i">${changes.map(c=>{const l=lineOf(r.so,c.ln);const parts=[];
     if(c.newItem)parts.push(`<span class="n">${esc(l.item)}</span><span class="chg-arrow">→</span><span class="n"><b>${esc(c.newItem)}</b></span>`);else parts.push(`<span class="n">${esc(l.item)}</span>`);
     const q=c.newQty!=null?`<span class="q" style="min-width:0">${num(l.rem)}</span><span class="chg-arrow">→</span><span class="q" style="min-width:0">${num(c.newQty)}</span>`:`<span class="hint">qty ${num(l.rem)} unchanged</span>`;
@@ -1888,7 +1842,7 @@ const PS_TABS=['planner','lookup','week','completion'];
 const PS_L={planner:'Schedule',lookup:'Order Lookup',week:'Ships This Week',completion:'Order Completion'};
 const PLAN_WEEKS=3;
 const LOGS={},COUNTS={};let UNDO=[],DRAG=null,LASTCOMMS='date-answer';
-Object.assign(UI,{so:null,sq:'',cf:'all',cq:'',cx:{},sw:null,draft:null,pw:null,pk:'elbow',pq:'',dw:null,dv:{},expand:{},dense:true,nw:PLAN_WEEKS});
+Object.assign(UI,{so:null,sq:'',cf:'all',cq:'',cx:{},sw:null,pw:null,pk:'elbow',pq:'',dw:null,dv:{},expand:{},dense:true,nw:PLAN_WEEKS});
 try{const d=localStorage.getItem('ps-dense');if(d!==null)UI.dense=d==='1';}catch(x){}
 
 /* ----- helpers ----- */
@@ -2319,7 +2273,7 @@ function lookupHTML(){
 }
 function orderCardHTML(so){
   const o=BY_SO[so];if(!o)return `<div class="empty-ps"><b>Not on the backlog</b><span>${esc(so)} may have shipped or closed.</span></div>`;
-  const tm=THISMON(),pl=orderPlan(o),p=pl.p,nt=(SCHED[so]&&SCHED[so].notes)||{},editing=UI.draft&&UI.draft.so===so;
+  const tm=THISMON(),pl=orderPlan(o),p=pl.p,nt=(SCHED[so]&&SCHED[so].notes)||{};
   const reqs=S.requests.filter(r=>r.so===so).sort((a,b)=>a.id<b.id?1:-1);
   const ls={};pl.runs.filter(x=>x.wk>=tm).forEach(x=>{ls[x.ln]=(ls[x.ln]||0)+(+x.qty||0);});
   const lateRuns=pl.runs.filter(x=>runFlag(o,x,p,ls[x.ln]||0)==='After Promise');
@@ -2336,36 +2290,14 @@ function orderCardHTML(so){
   const log=Array.isArray(LOGS[so])?LOGS[so]:[];
   return `<div class="ohero" data-k="oc-${so}">
   <div class="ohero-top"><div><div class="so">${esc(so)} ${kaTag(so)}</div><h2>${esc(o.c)}</h2><div class="meta">${[o.po?'PO '+esc(o.po):'',esc(o.agency||o.rep||''),esc(o.sm||''),'NetSuite: '+esc(o.st||'—')].filter(Boolean).join(' · ')}</div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${tick(pl.st.c,pl.st.t)}${!o.gone?`<button class="btn-ghost btn-sm" data-planso="${so}">Plan On The Schedule</button>`:''}${canSched()&&!editing&&!o.gone?`<button class="btn-ghost btn-sm" data-sedit="${so}">Edit schedule</button>`:''}<button class="tbtn ic" data-sclose aria-label="Close this order" title="Close order">×</button></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${tick(pl.st.c,pl.st.t)}${!o.gone?`<button class="btn-ghost btn-sm" data-planso="${so}">Plan On The Schedule</button>`:''}<button class="tbtn ic" data-sclose aria-label="Close this order" title="Close order">×</button></div></div>
   ${o.gone?'<div class="notice" style="margin:12px 22px 0">Off the NetSuite backlog (shipped or closed)</div>':''}
   <div class="ostats">${st('Promised',p&&p.date?fmt(p.date):'—')}${st('Finishes',pl.finish?'Week '+fmt(pl.finish):'—',pl.st.k==='miss'?'red':pl.st.k==='ok'?'ok':'')}${st('Scheduled',pl.sched?`${num(pl.sched)} / ${num(pl.toBuild)}`:'None')}${st('Backlog ESD',fmt(o.esd))}${st('Production ESD',fmt(o.pesd))}${st('Unbilled',money(o.amt))}</div>
   <div class="obody">${conflict}${prom}${reqH}
-  ${editing?editorHTML(o,pl):lineTableHTML(o,pl)}
+  ${lineTableHTML(o,pl)}
   ${notes.length?`<details class="more" style="margin-top:14px"><summary>Instructions and notes</summary>${notes.map(([k,v])=>`<div class="reason"><span class="k">${k}</span>${esc(v).replace(/\n/g,'<br>')}</div>`).join('')}</details>`:''}
   <details class="more"><summary>Schedule change history</summary><ul class="hist">${log.map(e=>`<li><time>${fmtTs(e.at)} · ${esc(e.name)}</time>${esc(e.text)}${e.note&&e.note!==e.text?`<div class="isub">${esc(e.note)}</div>`:''}</li>`).join('')}${log.length?'':'<li class="auto">No schedule changes yet</li>'}</ul></details>
   </div></div>`;
-}
-function editorHTML(o,pl){
-  const D=UI.draft,tm=THISMON(),L=loadMap(),mine={},after={};
-  runsOf(o.so).forEach(x=>{if(x.kind==='elbow'&&x.bender){const k=x.wk+'|'+x.bender;mine[k]=(mine[k]||0)+(+x.hrs||0);}});
-  D.runs.forEach(x=>{if(x.kind==='elbow'&&x.bender){const k=x.wk+'|'+x.bender;after[k]=(after[k]||0)+(+x.hrs||0);}});
-  const warns=[],errs=[];
-  Object.keys(after).forEach(k=>{const [wk,b]=k.split('|'),cap=(BENDERS().find(z=>String(z.n)===b)||{}).hrs||0,tot=((L[wk]||{})[b]||0)-(mine[k]||0)+after[k];
-    if(cap&&tot>cap+.5&&Math.abs(after[k]-(mine[k]||0))>.01)warns.push(`Bender ${b}, Week ${fmt(wk)}: ${num(Math.round(tot))} of ${num(cap)} hrs`);});
-  const lns=[...new Set([...o.lines.filter(l=>l.rem>0).map(l=>l.ln),...D.runs.map(x=>x.ln)])];
-  const blocks=lns.map(ln=>{
-    const l=o.lines.find(y=>y.ln===ln),runs=D.runs.filter(x=>x.ln===ln),fut=runs.filter(x=>x.wk>=tm).reduce((s,x)=>s+(+x.qty||0),0);
-    if(l&&fut>l.rem)errs.push(`${l.item}: ${num(fut)} scheduled but only ${num(l.rem)} remaining`);
-    const kind=l?kindOf(l):(runs[0]||{}).kind||'fitting',size=l?sizeOf(l):(runs[0]||{}).size,lp=linePromise(pl.p,ln);
-    return `<div class="ed-line"><div class="ed-head"><span class="iname">${esc(l?l.item:(runs[0]||{}).item||'Line '+ln)}</span><span class="isub">${l?esc(l.desc):'No longer on the backlog'}</span>${tick('muted',KINDL[kind])}<span class="isub">Remaining <b>${l?num(l.rem):0}</b> · Scheduled <b>${num(fut)}</b>${lp?` · Promised <b>${fmt(lp)}</b>`:''}</span></div>
-    ${runs.map(x=>`<div class="ed-run"><select class="sel" data-ed="wk" data-id="${x.id}" aria-label="Week">${weekOpts(x.wk)}</select><input class="qin" type="number" min="0" step="any" value="${x.qty}" data-ed="qty" data-id="${x.id}" aria-label="Quantity">${kind==='elbow'?`<select class="sel" data-ed="bender" data-id="${x.id}" aria-label="Bender">${benderOpts(size,x.bender)}</select><span class="hrs">${num(x.hrs)} h</span>`:''}${x.wk<tm?'<span class="flag amb">Past week</span>':''}${lp&&monOf(lp)>=tm&&x.wk>monOf(lp)?'<span class="flag">After promise</span>':''}<button class="btn-link" data-ed-del="${x.id}">Remove</button></div>`).join('')}
-    ${l?`<button class="mini" data-ed-add="${ln}">+ Add a week</button>`:''}</div>`;
-  }).join('');
-  return `<div class="tcard" data-k="editor" style="padding:16px 18px;background:var(--field)"><div class="cardhead"><h3>Edit schedule</h3><span class="isub">Weeks start Monday. Elbow hours = qty × the item's run rate.</span></div>
-  ${errs.map(e=>`<div class="warn red">${esc(e)}</div>`).join('')}${warns.map(e=>`<div class="warn">Over capacity: ${esc(e)}</div>`).join('')}
-  ${blocks||'<p class="hint">No open lines on this order.</p>'}
-  <label class="lbl" for="ednote">Note for the change history (optional)</label><input class="din" id="ednote" style="width:100%" value="${esc(D.note||'')}" autocomplete="off">
-  <div class="actions"><button class="btn-red" data-ssave ${errs.length?'disabled':''}>Save schedule</button><button class="btn-ghost" data-scancel>Cancel</button></div></div>`;
 }
 
 /* ===== SHIPS THIS WEEK ===== */
@@ -2409,7 +2341,7 @@ function completionHTML(){
 function schedPageHTML(){
   if(SCHED_ERR)return `<div class="ps-page"><div class="warn red">The schedule can’t be read (${esc(SCHED_ERR)}). Check the Firestore rules, then reload.</div></div>`;
   if(!SCHED_READY)return `<div class="ps-page">${[1,2,3,4,5].map(()=>'<span class="psk" style="margin:14px 0;height:44px"></span>').join('')}</div>`;
-  if(!SMETA)return `<div class="ps-page"><div class="warn">No schedule set up yet. Run <span class="mono">py seed_schedule.py --write</span> to load the starting schedule.</div></div>`;
+  if(!SMETA)return `<div class="ps-page"><div class="warn">Bender capacity isn&#39;t set up yet (no schedule_meta/config). Ask your administrator.</div></div>`;
   return {planner:plannerHTML,lookup:lookupHTML,week:shipsHTML,completion:completionHTML}[UI.tab]();
 }
 function appSwitchHTML(){const ps=UI.g==='ps';return `<div class="appsw" role="group" aria-label="Area"><button data-app="comms" aria-pressed="${!ps}">Communications</button><button data-app="ps" aria-pressed="${ps}">Planner</button></div>`;}
@@ -2424,7 +2356,7 @@ function schedRender(){
   const html=`<div class="desk ps" data-k="ps" data-deep><nav class="groupbar" data-k="psgb" data-deep aria-label="Planner">${gb}</nav><div class="ps-body" data-k="psb" data-deep><div class="ps-wrap ${board?'':'solo'}" data-k="psw" data-deep>${ready&&board?searchTrayHTML():''}<div class="ps-main ${board?'board':''}" data-k="psm-${UI.tab}" data-deep>${schedPageHTML()}</div></div></div></div>`;
   paint(html,'ps-'+UI.tab);
   renderDrawer();countUp();
-  DIRTY=!!UI.draft||!!DRAG;
+  DIRTY=!!DRAG;
 }
 /* request screens: when the schedule finishes this order */
 function schedFact(so){
@@ -2444,7 +2376,7 @@ document.addEventListener('click',async e=>{
   const tg=e.target;
   const ap=tg.closest('[data-app]');if(ap){if(ap.dataset.app==='ps'){if(UI.g!=='ps')LASTCOMMS=location.hash.slice(1)||'date-answer';location.hash='ps-planner';}else{UI.dw=null;location.hash=LASTCOMMS||'date-answer';}return;}
   if(tg.closest('[data-dwclose]'))return closeDrawer();
-  const op=tg.closest('[data-sopen]');if(op){UI.so=op.dataset.sopen;UI.sq='';UI.draft=null;UI.dw=null;if(location.hash!=='#ps-lookup')location.hash='ps-lookup';else render();const b=document.querySelector('.ps-body');if(b)b.scrollTop=0;return;}
+  const op=tg.closest('[data-sopen]');if(op){UI.so=op.dataset.sopen;UI.sq='';UI.dw=null;if(location.hash!=='#ps-lookup')location.hash='ps-lookup';else render();const b=document.querySelector('.ps-body');if(b)b.scrollTop=0;return;}
   if(UI.g!=='ps')return;
   const af=tg.closest('[data-autofit]');if(af){e.stopPropagation();const [so,ln]=af.dataset.autofit.split('|');af.disabled=true;return autoFit(so,+ln);}
   const dr=tg.closest('[data-delrun]');if(dr){e.stopPropagation();const [so,id]=dr.dataset.delrun.split('|');return removeRun(so,id);}
@@ -2458,7 +2390,7 @@ document.addEventListener('click',async e=>{
   const pr=tg.closest('[data-placerec]');if(pr)return placeRecurring();
   const fl=tg.closest('[data-fill]');if(fl)return armed(fl,()=>fillOldest());
   const cx=tg.closest('[data-cx]');if(cx){const so=cx.dataset.cx;UI.cx[so]=!UI.cx[so];return render();}
-  if(tg.closest('[data-sclose]')){UI.so=null;UI.draft=null;UI.sq='';return render();}
+  if(tg.closest('[data-sclose]')){UI.so=null;UI.sq='';return render();}
   const pw=tg.closest('[data-pw]');if(pw){UI.pw=pw.dataset.pw;return render();}
   if(tg.closest('[data-undo]'))return undoLast();
   const cf=tg.closest('[data-cf]');if(cf){UI.cf=cf.dataset.cf;return render();}
@@ -2481,15 +2413,6 @@ document.addEventListener('click',async e=>{
     if(tg.closest('[data-dadd]')){const o=BY_SO[D.so],l=o.lines.find(y=>y.ln===D.ln),t=fitTarget(o,l,needOf(D.so,D.ln));const q=numOr(dvGet('qty',needOf(D.so,D.ln)),0);if(!q)return toast('Enter a quantity.');const wk=dvGet('wk',t.wk),b=kindOf(l)==='elbow'?+dvGet('bender',t.bender):null;UI.dw=null;UI.dv={};return addLine(D.so,D.ln,wk,b,q);}
   }
   if(D&&D.t==='cell'){const dc=tg.closest('[data-dcell]');if(dc){const [wk,row]=D.k.split('|'),dl=+dc.dataset.dcell;if(dl<0&&wk<=THISMON())return;UI.dw=null;return shiftCell(wk,row,dl);}}
-  /* order lookup editor */
-  if(tg.closest('[data-sedit]')){const so=tg.closest('[data-sedit]').dataset.sedit;UI.draft={so,runs:runsOf(so).map(x=>({...x})),note:''};return render();}
-  if(tg.closest('[data-scancel]')){UI.draft=null;return render();}
-  if(tg.closest('[data-ssave]')){const b=tg.closest('[data-ssave]'),Dr=UI.draft;if(!Dr||b.disabled)return;b.disabled=true;const after=mergeRuns(Dr.runs);UI.draft=null;
-    const ok=await commitRuns([{so:Dr.so,after}],Dr.note?`${Dr.so}: ${Dr.note}`:`${Dr.so} schedule updated`);if(!ok)UI.draft=Dr;return render();}
-  const ad=tg.closest('[data-ed-add]');if(ad&&UI.draft){const o=BY_SO[UI.draft.so],l=o.lines.find(y=>String(y.ln)===ad.dataset.edAdd),tm=THISMON();
-    const mine=UI.draft.runs.filter(x=>x.ln===l.ln),fut=mine.filter(x=>x.wk>=tm).reduce((s,x)=>s+(+x.qty||0),0),lastWk=mine.map(x=>x.wk).sort().pop(),size=sizeOf(l),wk=lastWk&&lastWk>=tm?addDays(lastWk,7):FIRSTWK();
-    const x={id:newRunId(),ln:l.ln,item:l.item,size,wk,qty:Math.max(0,l.rem-fut),bender:kindOf(l)==='elbow'?bestBender(size,wk,loadMap()):null,kind:kindOf(l),why:'Scheduled in order lookup'};x.hrs=hrsOf(x);UI.draft.runs.push(x);return render();}
-  const dl=tg.closest('[data-ed-del]');if(dl&&UI.draft){UI.draft.runs=UI.draft.runs.filter(x=>x.id!==dl.dataset.edDel);return render();}
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&UI.dw&&modal.classList.contains('hidden')){closeDrawer();return;}
@@ -2501,18 +2424,11 @@ document.addEventListener('change',e=>{
   const t=e.target;
   /* store only: redrawing here would swap out the button being clicked */
   if(t.dataset&&t.dataset.dv!==undefined){UI.dv[t.dataset.dv]=t.value;return;}
-  if(!t.dataset||!t.dataset.ed||!UI.draft)return;
-  const x=UI.draft.runs.find(r=>r.id===t.dataset.id);if(!x)return;
-  if(t.dataset.ed==='wk')x.wk=t.value;
-  if(t.dataset.ed==='qty')x.qty=Math.max(0,+t.value||0);
-  if(t.dataset.ed==='bender')x.bender=+t.value;
-  x.hrs=hrsOf(x);render();
 });
 let sqT;
 document.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset&&t.dataset.dv!==undefined){UI.dv[t.dataset.dv]=t.value;return;}
-  if(t.id==='ednote'&&UI.draft){UI.draft.note=t.value;return;}
   if(t.id==='slq'||t.id==='scq'||t.id==='pq'){clearTimeout(sqT);sqT=setTimeout(()=>{if(t.id==='slq')UI.sq=t.value;else if(t.id==='scq')UI.cq=t.value;else UI.pq=t.value;render();refocus(t.id);},180);}
 });
 /* drag and drop: cards and tray lines onto a bender-week */
@@ -2535,7 +2451,7 @@ document.addEventListener('dragstart',e=>{
   requestAnimationFrame(()=>j.classList.add('dragging'));
 });
 const clearDZ=()=>document.querySelectorAll('.dz-ok,.dz-bad').forEach(c=>c.classList.remove('dz-ok','dz-bad'));
-document.addEventListener('dragend',()=>{document.querySelectorAll('.dragging').forEach(n=>n.classList.remove('dragging'));clearDZ();DRAG=null;DIRTY=!!UI.draft;if(PENDING){PENDING=false;render();}});
+document.addEventListener('dragend',()=>{document.querySelectorAll('.dragging').forEach(n=>n.classList.remove('dragging'));clearDZ();DRAG=null;DIRTY=false;if(PENDING){PENDING=false;render();}});
 document.addEventListener('dragover',e=>{
   const c=e.target.closest&&e.target.closest('[data-cell]');if(!c||!DRAG)return;
   e.preventDefault();const r=dropCheck(c.dataset.cell);
@@ -2545,7 +2461,7 @@ document.addEventListener('dragover',e=>{
 document.addEventListener('dragleave',e=>{const c=e.target.closest&&e.target.closest('[data-cell]');if(c&&!c.contains(e.relatedTarget))c.classList.remove('dz-ok','dz-bad');});
 document.addEventListener('drop',e=>{
   const c=e.target.closest&&e.target.closest('[data-cell]');if(!c||!DRAG)return;e.preventDefault();
-  const d=DRAG,r=dropCheck(c.dataset.cell);DRAG=null;DIRTY=!!UI.draft;clearDZ();
+  const d=DRAG,r=dropCheck(c.dataset.cell);DRAG=null;DIRTY=false;clearDZ();
   if(!r.ok){if(r.why)toast(r.why);return;}
   if(d.t==='run'){const x=runById(d.so,d.id);if(!x||(x.wk===r.wk&&(r.bender===null||+x.bender===r.bender)))return;moveRun(d.so,d.id,r.wk,r.bender);}
   else addLine(d.so,d.ln,r.wk,r.bender,needOf(d.so,d.ln));
@@ -2561,7 +2477,6 @@ const itemCell=l=>`<div class="iname">${esc(l.item)}</div><div class="isub">${es
 function itemList(r,rows,reqLines,restTxt){
   return `<ul class="msg-i">${rows.map(x=>{const l=x.ln!=null?lineOf(r.so,x.ln):null,rq=reqLines?reqLines.find(y=>y.ln===x.ln):null;return `<li><span class="q">${x.qty!=null?num(x.qty):''}</span><span class="n">${l?esc(l.item):'Whole order'}${rq&&rq.qty>x.qty?` <span class="hint">of ${num(rq.qty)}, ${restTxt}</span>`:''}</span></li>`;}).join('')}</ul>`;
 }
-const changesBlock=(r,changes)=>changesBlock_portal(r,changes);
 
 /* the schedule, seen from a request */
 function schedImpactHTML(r){
