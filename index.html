@@ -1168,7 +1168,7 @@ function acknowledge(r){r.status='acknowledged';ev(r,'ack');}
 function supersedeFrom(r,lines,why){S.requests.forEach(q=>{if(q!==r&&['date','check'].includes(q.type)&&(COMMITTED.includes(q.status)||['submitted','acknowledged','alternative'].includes(q.status))&&overlaps(q,{so:r.so,lines})){q.status='superseded';sysEv(q,'superseded',{note:`${r.id}, ${why}`});}});}
 function activate(r,rows){
   const o=BY_SO[r.so];
-  r.commit={rows:rows.map(x=>({ln:x.ln,qty:x.qty,date:x.date,readyAt:null})),revisions:0,base:Object.fromEntries(o.lines.map(l=>[l.ln,l.rem]))};
+  r.commit={rows:rows.map(x=>({ln:x.ln,qty:x.qty,date:x.date,readyAt:null})),revisions:0,base:Object.fromEntries(o.lines.map(l=>[l.ln,l.rem])),baseB:Object.fromEntries(o.lines.map(l=>[l.ln,l.billed]))};
   r.status='committed';
   S.requests.forEach(q=>{if(q!==r&&q.type===r.type&&COMMITTED.includes(q.status)&&overlaps(q,r)){q.status='superseded';sysEv(q,'superseded',{note:r.id});}});
 }
@@ -2675,28 +2675,37 @@ document.addEventListener('click',e=>{
 /* ===================== COMPLETION FROM THE NETSUITE BACKLOG =====================
    Replaces the portal's evaluate(). A request is judged by what the backlog shows, not by emails:
    - Commitments (date change, confirm ESD, change with a date): every committed row is matched to
-     what has shipped or been billed on its line since the commitment (remaining qty went down, or the
-     line / whole order left the backlog). Rows are filled earliest-due first, so partial shipments
-     complete the first rows and leave the rest open.
+     what has shipped on its line since the commitment: the rise in billed qty, or the line / whole
+     order leaving the backlog. A drop in remaining qty alone (a cancel or a qty edit in NetSuite) is
+     not shipping. Rows are filled earliest-due first, so partial shipments complete the first rows
+     and leave the rest open.
        Backlog exports are taken in the morning, so the first backlog dated after the due day shows
        where things stood at the end of it: shipped by then -> on time; still open on it -> missed
-       (and late if it ships afterwards).
+       (and late if it ships afterwards). Each open row remembers the last backlog day it was seen
+       open, and a completion is dated the business day after that, so a shipment the portal only
+       notices days later (nobody had it open) is still judged by when it happened.
      Missed and late are tracked here only; the email automation sends nothing for them.
-   - Cancellations waiting on Sales to close the line/order: complete when the backlog shows the
-     cancelled qty gone (or the order closed).
+   - Cancellations waiting on Sales to close the line/order: complete when the line's ordered qty
+     drops by the cancelled qty (or the line / order is closed off the backlog).
    - Changes waiting on Sales: complete when the new item is on the order and/or the line shows the
      new qty.
    The backlog's own date (META.asOf) is used, never the clock, so a stale export never marks
    anything missed. */
 const backlogDay=()=>META&&META.asOf?META.asOf.slice(0,10):null;
 const graceDay=d=>addBD(d,1);
-/* remaining qty per line when the commitment was made (older commitments: when the request was made) */
-function baseRem(r){const b={};((r.osnap&&r.osnap.lines)||[]).forEach(l=>{b[l.ln]=l.rem;});return {...b,...((r.commit&&r.commit.base)||{})};}
-function curRem(r,ln){const o=BY_SO[r.so];if(!o||o.gone)return 0;const l=o.lines.find(y=>y.ln===ln);return l?l.rem:0;}
+/* each line as it was when the commitment was made (older commitments: when the request was made) */
+function baseOf(r,key,saved){const b={};((r.osnap&&r.osnap.lines)||[]).forEach(l=>{b[l.ln]=l[key];});return {...b,...((r.commit&&r.commit[saved])||{})};}
+const curLine=(r,ln)=>{const o=BY_SO[r.so];return !o||o.gone?null:o.lines.find(y=>y.ln===ln)||null;};
+/* qty shipped on a line since the commitment: billed went up, or the line left the backlog */
+function shippedOn(r,ln){
+  const l=curLine(r,ln),rem=baseOf(r,'rem','base')[ln],billed=baseOf(r,'billed','baseB')[ln];
+  if(!l)return rem==null?0:rem;
+  return billed==null?0:Math.max(0,(+l.billed||0)-(+billed||0));
+}
 /* how many of each committed row has shipped: {rowIndex: qty} */
 function rowProgress(r){
-  const rows=r.commit.rows,base=baseRem(r),o=BY_SO[r.so],gone=!o||o.gone,shipped={},out={};
-  rows.forEach(x=>{if(x.ln!=null&&shipped[x.ln]==null)shipped[x.ln]=base[x.ln]==null?0:Math.max(0,base[x.ln]-curRem(r,x.ln));});
+  const rows=r.commit.rows,o=BY_SO[r.so],gone=!o||o.gone,shipped={},out={};
+  rows.forEach(x=>{if(x.ln!=null&&shipped[x.ln]==null)shipped[x.ln]=shippedOn(r,x.ln);});
   rows.map((x,i)=>({x,i})).sort((a,b)=>a.x.date<b.x.date?-1:a.x.date>b.x.date?1:a.i-b.i).forEach(({x,i})=>{
     if(x.ln==null){out[i]=gone?(x.qty||1):0;return;}
     const q=Math.min(+x.qty||0,shipped[x.ln]||0);shipped[x.ln]-=q;out[i]=q;
@@ -2706,16 +2715,24 @@ function rowProgress(r){
 const partShipped=r=>{if(!r.commit||!COMMITTED.includes(r.status))return false;const p=rowProgress(r);return r.commit.rows.some((x,i)=>!x.readyAt&&p[i]>0)||(r.commit.rows.some(x=>x.readyAt)&&r.commit.rows.some(x=>!x.readyAt));};
 function evalCommit(r,day){
   const rows=r.commit.rows,p=rowProgress(r),newly=[];
-  rows.forEach((x,i)=>{if(!x.readyAt&&p[i]>=(x.ln==null?1:(+x.qty||0))-1e-9){x.readyAt=day;newly.push({...x});}});
+  rows.forEach((x,i)=>{
+    if(x.readyAt)return;
+    if(p[i]>=(x.ln==null?1:(+x.qty||0))-1e-9){
+      /* shipped some time after the last backlog that still showed it open */
+      const after=x.open?graceDay(x.open):day;x.readyAt=after<day?after:day;delete x.open;newly.push({...x});
+    }else if(x.open!==day)x.open=day;
+  });
   if(newly.length){const o=BY_SO[r.so];sysEv(r,'complete',{rows:newly,ref:'request',reqLines:r.lines.map(x=>({...x})),note:!o||o.gone?'Off the NetSuite backlog':'Shipped or billed in NetSuite'});}
   if(rows.every(x=>x.readyAt)){const ok=rows.every(x=>x.readyAt<=graceDay(x.date));r.status=ok?'met':'late';sysEv(r,ok?'met':'late');}
   /* a backlog dated after the due day shows where things stood at the end of it */
   else if(r.status==='committed'&&rows.some(x=>!x.readyAt&&day>x.date)){r.status='missed';setTurn(r);sysEv(r,'missed',{date:nextDue(r)});}
 }
 function evalCancel(r){
-  const o=BY_SO[r.so],gone=!o||o.gone,base={};((r.osnap&&r.osnap.lines)||[]).forEach(l=>{base[l.ln]=l.rem;});
+  const o=BY_SO[r.so],gone=!o||o.gone,ordered=baseOf(r,'qty','none');
   const rows=(r.cxl&&r.cxl.rows)||r.lines||[];
-  const done=gone||(!r.full&&rows.length&&rows.every(c=>c.ln!=null&&base[c.ln]!=null&&curRem(r,c.ln)<=base[c.ln]-(c.qty==null?base[c.ln]:+c.qty)+1e-9));
+  /* a cancel lowers the ordered qty (or closes the line); shipping does not */
+  const cut=c=>{const l=curLine(r,c.ln);if(!l)return true;const was=ordered[c.ln];return was!=null&&(c.qty==null?(+l.qty||0)<=(+l.billed||0):was-(+l.qty||0)>=+c.qty-1e-9);};
+  const done=gone||(!r.full&&rows.length&&rows.every(c=>c.ln!=null&&cut(c)));
   if(!done)return;
   r.status='cancelled';r.doneAt=T();sysEv(r,'cxl_done',{note:'Shows in NetSuite'});supersedeFrom(r,rows,'cancelled');
 }
@@ -2723,7 +2740,7 @@ function evalChange(r){
   const o=BY_SO[r.so];if(!o||o.gone||!r.changes||!r.changes.length)return;
   const done=r.changes.every(c=>{
     const itemOk=!c.newItem||o.lines.some(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase());
-    const qtyOk=c.newQty==null||(c.newItem?o.lines.some(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase()&&Math.abs(l.rem-c.newQty)<1e-9):Math.abs(curRem(r,c.ln)-c.newQty)<1e-9);
+    const qtyOk=c.newQty==null||(c.newItem?o.lines.some(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase()&&Math.abs(l.rem-c.newQty)<1e-9):Math.abs(((curLine(r,c.ln)||{}).rem||0)-c.newQty)<1e-9);
     return itemOk&&qtyOk;});
   if(!done)return;
   r.status='changed';r.doneAt=T();r.unread=r.unread||{};r.unread.production=true;sysEv(r,'chg_done',{note:'Shows in NetSuite',date:r.agreedDate||null});supersedeFrom(r,r.lines,'changed');
@@ -2786,7 +2803,7 @@ async function runEvaluate(){
   const changed=S.requests.filter(q=>before.get(q.id)!==JSON.stringify(q)),evs=BUF.splice(0);
   for(const q of changed){
     const exp=JSON.parse(before.get(q.id)).status,qe=evs.filter(e=>e.req===q.id);
-    try{await runTransaction(db,async tx=>{const s=await tx.get(doc(db,'requests',q.id));if(!s.exists()||s.data().status!==exp)throw new Error('STALE');tx.set(doc(db,'requests',q.id),clean(q));qe.forEach(e=>tx.set(doc(collection(db,'requests',q.id,'events')),clean(e)));});}catch(e){}
+    try{await runTransaction(db,async tx=>{const s=await tx.get(doc(db,'requests',q.id));if(!s.exists()||s.data().status!==exp||(s.data().lastAt||'')!==(JSON.parse(before.get(q.id)).lastAt||''))throw new Error('STALE');tx.set(doc(db,'requests',q.id),clean(q));qe.forEach(e=>tx.set(doc(collection(db,'requests',q.id,'events')),clean(e)));});}catch(e){}
   }
 }
 function watchEvents(){
@@ -2906,8 +2923,8 @@ const xStr=v=>v==null?null:String(v).trim()||null;
 function colGet(row,name){if(name in row)return row[name];const k=Object.keys(row).find(k=>k.trim().toLowerCase()===name.toLowerCase());return k?row[k]:undefined;}
 function agencyOf(row){for(const k of ['Sales Rep.1','Sales Rep_1','Sales Rep 1']){if(k in row)return row[k];}return null;}
 function missingCols(rows,map,need){if(!rows.length)return need.map(k=>map[k]);const r=rows[0];return need.filter(k=>colGet(r,map[k])===undefined).map(k=>map[k]);}
-function buildImport(orows,lrows){
-  const warn=[];let pending=0,noEsd=0;
+function buildImport(orows,lrows,stale){
+  const warn=[];let pending=0,noEsd=0,shipped=0;
   const items={},lines={};let lineCount=0;const seen=new Set();let dups=0;
   lrows.forEach(r=>{const so=xStr(colGet(r,LINE_COLS.so));if(!so||!/^SO/i.test(so))return;
     const ln=xNum(colGet(r,LINE_COLS.ln));const item=xStr(colGet(r,LINE_COLS.item))||'';
@@ -2917,10 +2934,12 @@ function buildImport(orows,lrows){
   const orders=[];
   orows.forEach(r=>{const so=xStr(colGet(r,ORDER_COLS.so));if(!so||!/^SO/i.test(so))return;
     const st=xStr(colGet(r,ORDER_COLS.st))||'';if(/^pending$/i.test(st)){pending++;return;}
+    if(stale&&!(lines[so]||[]).length){shipped++;return;}
     const esd=xDate(colGet(r,ORDER_COLS.esd));if(!esd){noEsd++;return;}
     orders.push({so,c:xStr(colGet(r,ORDER_COLS.c))||'',po:xStr(colGet(r,ORDER_COLS.po)),od:xDate(colGet(r,ORDER_COLS.od)),esd,pesd:xDate(colGet(r,ORDER_COLS.pesd)),ac:xDate(colGet(r,ORDER_COLS.ac)),st,sm:xStr(colGet(r,ORDER_COLS.sm)),zip:xStr(colGet(r,ORDER_COLS.zip)),state:xStr(colGet(r,ORDER_COLS.state)),amt:xNum(colGet(r,ORDER_COLS.amt))||0,memo:xStr(colGet(r,ORDER_COLS.memo)),days:xNum(colGet(r,ORDER_COLS.days)),rep:xStr(colGet(r,ORDER_COLS.rep)),agency:xStr(agencyOf(r)),l:lines[so]||[]});});
   if(dups)warn.push(`${dups} duplicate Order # + Line # rows. Line # must be unique per order.`);
   if(noEsd)warn.push(`${noEsd} orders skipped because they have no Ship Date.`);
+  if(shipped)warn.push(`${shipped} orders left out: the order file is older than the line file and they have no lines left, so they shipped since.`);
   const noLines=orders.filter(o=>!o.l.length).length;
   return {orders,items:Object.values(items),lineCount:orders.reduce((s,o)=>s+o.l.length,0),pending,noLines,warn};
 }
@@ -2937,11 +2956,13 @@ function openImport(){
   $('icheck').onclick=async()=>{err('');$('isum').innerHTML='';$('igo').classList.add('hidden');
     const fo=$('fo').files[0],fl=$('fl').files[0];if(!fo||!fl)return err('Choose both files.');
     let orows,lrows;try{[orows,lrows]=await Promise.all([readSheet(fo),readSheet(fl)]);}catch(x){return err('Couldn’t read one of the files. Export them again as .xlsx.');}
-    if(colGet(orows[0]||{},'Line #')!==undefined&&colGet(lrows[0]||{},'Line #')===undefined)[orows,lrows]=[lrows,orows];
+    let [ofile,lfile]=[fo,fl];
+    if(colGet(orows[0]||{},'Line #')!==undefined&&colGet(lrows[0]||{},'Line #')===undefined){[orows,lrows]=[lrows,orows];[ofile,lfile]=[fl,fo];}
     const mo=missingCols(orows,ORDER_COLS,NEED_O),ml=missingCols(lrows,LINE_COLS,NEED_L);
     if(mo.length)return err('Order file is missing: '+mo.join(', '));
     if(ml.length)return err('Line item file is missing: '+ml.join(', '));
-    built=buildImport(orows,lrows);
+    const dayOf=f=>(f.name.match(/\d{4}-\d{2}-\d{2}/)||[''])[0];
+    built=buildImport(orows,lrows,!!dayOf(ofile)&&!!dayOf(lfile)&&dayOf(ofile)<dayOf(lfile));
     const prev=META?META.orderCount:null,drop=prev&&built.orders.length<prev*0.7;
     $('isum').innerHTML=`<div class="facts perf" style="margin-top:16px">${fact('Orders',num(built.orders.length),'big')}${fact('Lines',num(built.lineCount),'big')}${fact('On hold (left out)',num(built.pending),'big')}${fact('Orders with no lines',num(built.noLines),'big')}${prev!=null?fact('Last import',num(prev)+' orders','big'):''}</div>
       ${built.warn.map(w=>`<div class="notice">${esc(w)}</div>`).join('')}${drop?'<div class="notice" style="color:var(--red-dark);border-color:var(--red-dark);background:var(--red-tint)">That’s over 30% fewer orders than last time. Make sure both exports are complete before uploading.</div>':''}`;
