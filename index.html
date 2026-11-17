@@ -49,7 +49,7 @@
   --on-ink:#fff; --on-ink-2:rgba(255,255,255,.66); --on-ink-3:rgba(255,255,255,.38);
 
   /* EXTENSION POINT: one color per department ("party"). Add a line here
-     and a matching .party[data-dept="..."] rule in section 6. */
+     and a matching .tag[data-dept="..."] rule in section 6. */
   --party-sales:var(--steel);
   --party-production:var(--ink);
   --party-system:var(--muted-2);
@@ -227,7 +227,7 @@ input[type="checkbox"].bx:checked::after{content:"";width:12px;height:6px;border
 .list-pane.wide{grid-column:1/-1;border-right:0;overflow:auto;}
 .list-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;}
 
-/* State tabs (Needs answer, Waiting on ..., Upcoming ...). They wrap. */
+/* State tabs (Needs answer, Waiting on ..., Answered ...). They wrap. */
 .subtabs{display:flex;flex-wrap:wrap;gap:0 var(--s4);padding:6px var(--s4) 0;border-bottom:1px solid var(--line);flex-shrink:0;}
 .subtabs a{position:relative;display:flex;align-items:center;gap:7px;min-height:44px;font-family:var(--cond);font-weight:600;font-size:var(--t-14);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);text-decoration:none;white-space:nowrap;transition:color var(--d-fast) ease;}
 .subtabs a::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform var(--d-base) var(--ease-out);}
@@ -322,20 +322,32 @@ input[type="checkbox"].bx:checked::after{content:"";width:12px;height:6px;border
 /* The conversation. One left-aligned stream; each message carries a square
    department badge, so it scales past two departments. */
 .thread{position:relative;display:flex;flex-direction:column;gap:var(--s3);margin:0 0 var(--s5);}
-.thread::before{content:"";position:absolute;left:17px;top:6px;bottom:6px;width:1px;background:var(--line);}
-.msg{position:relative;display:grid;grid-template-columns:36px minmax(0,1fr);gap:var(--s3);align-items:start;}
-.party{width:36px;height:36px;display:grid;place-items:center;font-family:var(--cond);font-weight:700;font-size:var(--t-15);letter-spacing:.04em;color:#fff;background:var(--party-system);position:relative;}
-.party[data-dept="sales"]{background:var(--party-sales);}
-.party[data-dept="production"]{background:var(--party-production);}
-.msg-b{background:var(--white);border:1px solid var(--line);box-shadow:var(--e1);padding:11px var(--s4) 13px;min-width:0;}
+.msg{position:relative;max-width:min(88%,720px);}
+.msg.prod{margin-left:auto;}
+.tag{display:inline-block;font-size:var(--t-11);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--party-system);padding:2px 7px;}
+.tag[data-dept="sales"]{background:var(--party-sales);}
+.tag[data-dept="production"]{background:var(--party-production);}
+.tag.hi{background:var(--red);}
+.msg-b{background:var(--white);border:1px solid var(--line);border-left:4px solid var(--party-sales);box-shadow:var(--e1);padding:10px var(--s4) 12px;min-width:0;}
+.msg.prod .msg-b{border-left:1px solid var(--line);border-right:4px solid var(--party-production);}
+.says{margin-top:6px;font-size:var(--t-15);line-height:1.45;}
+.says b{font-weight:700;}
+.msg-ref{margin-top:4px;font-size:var(--t-12);color:var(--muted);}
+.rqcard{background:var(--white);border:1px solid var(--line);border-top:3px solid var(--party-sales);box-shadow:var(--e1);padding:12px var(--s4);margin:0 0 var(--s4);}
+.rqc-h{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;font-size:var(--t-13);color:var(--muted);}
+.rqc-h b{color:var(--ink);}
+.rqc-ask{margin:8px 0 6px;font-family:var(--cond);font-weight:700;font-size:var(--t-18);letter-spacing:.03em;text-transform:uppercase;line-height:1.15;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;}
+.rqc-esd{font-family:var(--sans);font-weight:500;font-size:var(--t-12);letter-spacing:.04em;color:var(--muted);text-transform:none;}
+.rqc-whole{margin:0;font-size:var(--t-13);}
+.rqc-why,.rqc-now{display:flex;gap:10px;margin-top:10px;font-size:var(--t-14);line-height:1.45;}
+.rqc-why .k,.rqc-now .k{flex:0 0 44px;font-size:var(--t-11);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:2px;}
+.rqc-now{padding-top:10px;border-top:1px solid var(--line-soft);font-weight:600;}
+.rqc-now.done{color:var(--ok);}
 .msg.last .msg-b{border-color:var(--line-strong);box-shadow:var(--e2);}
 .msg-h{display:flex;gap:4px 10px;align-items:baseline;flex-wrap:wrap;}
-.who{font-size:var(--t-11);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--party-sales);}
-.msg.prod .who{color:var(--party-production);}
-.msg-by{font-size:var(--t-13);color:var(--muted);}
 .when{margin-left:auto;font-size:var(--t-12);color:var(--muted-2);white-space:nowrap;}
-.act{font-family:var(--cond);font-weight:600;font-size:var(--t-18);letter-spacing:.06em;text-transform:uppercase;line-height:1.2;margin-top:2px;}
-.msg-d{margin-top:8px;font-family:var(--cond);font-weight:600;font-size:var(--t-18);letter-spacing:.04em;text-transform:uppercase;line-height:1.15;}
+.act{font-size:var(--t-11);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.msg-d{margin-top:8px;font-family:var(--cond);font-weight:600;font-size:var(--t-15);letter-spacing:.04em;text-transform:uppercase;line-height:1.15;}
 .msg-d .of{font-family:var(--sans);font-weight:500;font-size:var(--t-12);letter-spacing:.06em;color:var(--muted);}
 .msg-i{margin:6px 0 0;padding:0;list-style:none;font-size:var(--t-13);}
 .msg-i li{display:flex;gap:10px;padding:2px 0;}
@@ -346,10 +358,9 @@ input[type="checkbox"].bx:checked::after{content:"";width:12px;height:6px;border
 .msg-wo.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-tint);}
 .chg-arrow{color:var(--muted-2);margin:0 6px;}
 /* System events and day dividers sit on the timeline rule */
-.sys{position:relative;font-size:var(--t-12);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:2px 0 2px 48px;}
-.sys::before{content:"";position:absolute;left:13px;top:50%;width:9px;height:9px;margin-top:-5px;background:currentColor;box-shadow:0 0 0 4px var(--field);}
+.sys{position:relative;font-size:var(--t-12);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:2px 0;text-align:center;}
 .sys.ok{color:var(--ok);} .sys.red{color:var(--red-text);} .sys.amber{color:var(--amber);}
-.day-div{position:relative;padding:var(--s2) 0 0 48px;font-family:var(--cond);font-weight:600;font-size:var(--t-13);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);}
+.day-div{position:relative;padding:var(--s2) 0 0;text-align:center;font-family:var(--cond);font-weight:600;font-size:var(--t-13);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);}
 
 /* Composer: the note box, docked under the conversation */
 .composer{flex-shrink:0;background:var(--white);border-top:1px solid var(--line);box-shadow:0 -6px 16px rgba(29,31,32,.05);padding:var(--s3) var(--gutter);position:relative;z-index:2;}
@@ -560,11 +571,7 @@ footer{flex-shrink:0;padding:7px var(--gutter);font-size:var(--t-11);letter-spac
   .notebar .btn-link{flex-basis:100%;text-align:right;margin:0!important;}
   .rec-party{padding-left:var(--s3);}
   .turnband{font-size:var(--t-14);}
-  .thread::before{display:none;}
-  .msg{grid-template-columns:28px minmax(0,1fr);gap:var(--s2);}
-  .party{width:28px;height:28px;font-size:var(--t-13);}
-  .sys,.day-div{padding-left:36px;}
-  .sys::before{left:9px;}
+  .msg{max-width:94%;}
   .actions .btn-red{flex:1 1 100%;}
   /* answer choices stack on phones, so no cell is left empty */
   .choices,.choices.c3,.choices.c4{grid-template-columns:1fr;}
@@ -848,8 +855,12 @@ tr.xrow .xa{display:flex;gap:8px;margin-top:10px;}
 /* ----- plain item names ----- */
 
 /* ----- the schedule on a request ----- */
-.simp{background:var(--white);border:1px solid var(--line);border-left:4px solid var(--steel);margin:0 0 var(--s5);box-shadow:var(--e1);}
-.simp-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line-soft);}
+.simp{background:var(--white);border:1px solid var(--line);border-left:4px solid var(--steel);margin:var(--s4) 0;box-shadow:var(--e1);}
+.simp-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;cursor:pointer;list-style:none;}
+.simp-h::-webkit-details-marker{display:none;}
+.simp-h b::before{content:'\25B8';display:inline-block;margin-right:8px;transition:transform .15s;}
+.simp[open]>.simp-h{border-bottom:1px solid var(--line-soft);}
+.simp[open]>.simp-h b::before{transform:rotate(90deg);}
 .simp-h b{font-family:var(--cond);font-weight:700;font-size:var(--t-14);letter-spacing:.12em;text-transform:uppercase;}
 .simp-n{margin:8px 14px 0;font-size:var(--t-13);color:var(--muted);}
 .simp-a{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px 10px;}
@@ -1025,12 +1036,12 @@ const otherName=()=>isProd()?'Sales':'Production';
 
 /* ===== groups ===== */
 const GROUPS=[
-  {k:'date',l:'Date change',tabs:['answer','waiting','upcoming','complete','closed','calendar']},
-  {k:'check',l:'Confirm ESD / Check in',tabs:['answer','waiting','upcoming','complete','closed','calendar']},
+  {k:'date',l:'Date change',tabs:['answer','waiting','answered','closed','calendar']},
+  {k:'check',l:'Confirm ESD / Check in',tabs:['answer','waiting','answered','closed','calendar']},
   {k:'cancel',l:'Cancellation',tabs:['answer','waiting','done','closed']},
-  {k:'change',l:'Change',tabs:['answer','waiting','upcoming','done','closed']}];
+  {k:'change',l:'Change',tabs:['answer','waiting','done','closed']}];
 const G=k=>GROUPS.find(g=>g.k===k);
-const TABL=()=>({answer:'Needs answer',waiting:`Waiting on ${otherName()}`,upcoming:'Upcoming',complete:'Complete',done:'Done',closed:'Closed',calendar:'Calendar'});
+const TABL=()=>({answer:'Needs answer',waiting:`Waiting on ${otherName()}`,answered:'Answered',done:'Done',closed:'Closed',calendar:'Calendar'});
 
 /* ===== model helpers ===== */
 const R=id=>S.requests.find(r=>r.id===id);
@@ -1044,20 +1055,19 @@ function typeLabel(r){
   const q=r.changes.some(c=>c.newQty!=null),i=r.changes.some(c=>c.newItem);
   return (q&&i?'Qty + item':i?'Item':'Qty')+' change';
 }
-const COMMITTED=['committed','missed'],DONEC=['met','late'];
+/* a date given by Production. The request is answered; nothing is tracked after it.
+   missed / met / late are statuses of older requests from when commitments were tracked. */
+const COMMITTED=['committed','missed','met','late'];
 const datesOf=rows=>[...new Set(rows.map(x=>x.date))].sort();
-function nextDue(r){const u=r.commit?r.commit.rows.filter(x=>!x.readyAt):[];return u.length?u.map(x=>x.date).sort()[0]:null;}
-const doneDate=r=>r.commit&&r.commit.rows.every(x=>x.readyAt)?r.commit.rows.map(x=>x.readyAt).sort().pop():null;
-const lateDays=r=>r.commit?Math.max(0,...r.commit.rows.filter(x=>x.readyAt).map(x=>daysBetween(x.date,x.readyAt))):0;
 function listDates(ds){if(!ds.length)return '—';return ds.map(fmt).join(' + ');}
 function overlaps(a,b){if(a.so!==b.so)return false;const s=new Set(a.lines.map(x=>x.ln));return b.lines.some(x=>s.has(x.ln));}
 const rowsFrom=(lines,date)=>lines.map(x=>({ln:x.ln,qty:x.qty,date}));
 function ballWith(r){
-  if(['submitted','acknowledged','missed','cxl_wo','chg_wo'].includes(r.status))return 'production';
+  if(['submitted','acknowledged','cxl_wo','chg_wo'].includes(r.status))return 'production';
   if(['alternative','cxl_close','chg_sales'].includes(r.status))return 'sales';
   return null;
 }
-const isOverdue=r=>ballWith(r)&&r.status!=='missed'&&bdBetween(r.turn||r.created,T())>1;
+const isOverdue=r=>ballWith(r)&&bdBetween(r.turn||r.created,T())>1;
 const unread=r=>!!(r.unread&&r.unread[S.view]);
 function statusOf(r){
   if(isOverdue(r))return {t:'Overdue',c:'red'};
@@ -1066,10 +1076,7 @@ function statusOf(r){
     case 'submitted':return {t:r.rounds>1?'Countered':'New',c:'steel'};
     case 'acknowledged':return {t:r.rounds>1?'Countered':'Reviewing',c:'steel'};
     case 'alternative':return {t:s?'Answer offer':'With Sales',c:'amber'};
-    case 'committed':return {t:partShipped(r)?'Partly shipped':(c?'Confirmed':'Committed'),c:'ok'};
-    case 'missed':return {t:'Missed',c:'red'};
-    case 'met':return {t:'On time',c:'ok'};
-    case 'late':return {t:'Late',c:'redo'};
+    case 'committed':case 'missed':case 'met':case 'late':return {t:c?'Confirmed':'Committed',c:'ok'};
     case 'cannot':return {t:c?'Can’t confirm':'Can’t commit',c:'muted'};
     case 'cxl_wo':case 'chg_wo':return {t:s?'Deleting WOs':'Delete WOs',c:s?'steel':'amber'};
     case 'cxl_close':return {t:s?(r.full?'Close order':'Delete line'):'With Sales',c:'amber'};
@@ -1087,22 +1094,17 @@ function statusOf(r){
 }
 function tabOf(r){
   const b=ballWith(r);
-  if(COMMITTED.includes(r.status))return 'upcoming';
   if(b)return b===S.view?'answer':'waiting';
-  if(DONEC.includes(r.status))return r.type==='change'?'done':'complete';
-  if(['cancelled','changed'].includes(r.status))return 'done';
+  if(['cancelled','changed'].includes(r.status)||(r.type==='change'&&COMMITTED.includes(r.status)))return 'done';
+  if(COMMITTED.includes(r.status)||['cannot','declined'].includes(r.status))return 'answered';
   return 'closed';
 }
 function listFor(g,tab){
   const Q=S.requests.filter(r=>r.type===g);
   const byC=(a,b)=>a.createdTs<b.createdTs?-1:1,byRecent=(a,b)=>(a.lastAt||'')<(b.lastAt||'')?1:-1;
-  if(tab==='answer')return Q.filter(r=>ballWith(r)===S.view).sort((a,b)=>{const w=r=>r.status==='missed'||isOverdue(r)?0:1;return w(a)-w(b)||byC(a,b);});
-  if(tab==='waiting')return Q.filter(r=>ballWith(r)&&ballWith(r)!==S.view&&r.status!=='missed').sort(byRecent);
-  if(tab==='upcoming')return Q.filter(r=>COMMITTED.includes(r.status)).sort((a,b)=>(a.status==='missed'?0:1)-(b.status==='missed'?0:1)||((nextDue(a)||'9')<(nextDue(b)||'9')?-1:1));
-  if(tab==='complete')return Q.filter(r=>DONEC.includes(r.status)).sort((a,b)=>(doneDate(a)||'')<(doneDate(b)||'')?1:-1);
-  if(tab==='done')return Q.filter(r=>['cancelled','changed'].includes(r.status)||(g==='change'&&DONEC.includes(r.status))).sort(byRecent);
-  if(tab==='closed')return Q.filter(r=>!ballWith(r)&&!COMMITTED.includes(r.status)&&!DONEC.includes(r.status)&&!['cancelled','changed'].includes(r.status)).sort(byRecent);
-  return [];
+  if(tab==='answer')return Q.filter(r=>ballWith(r)===S.view).sort((a,b)=>{const w=r=>isOverdue(r)?0:1;return w(a)-w(b)||byC(a,b);});
+  if(tab==='waiting')return Q.filter(r=>ballWith(r)&&ballWith(r)!==S.view).sort(byRecent);
+  return Q.filter(r=>tabOf(r)===tab).sort(byRecent);
 }
 const groupBadge=g=>listFor(g,'answer').length+S.requests.filter(r=>r.type===g&&unread(r)).length;
 
@@ -1120,12 +1122,11 @@ function createRequest(f){
   return r;
 }
 function acknowledge(r){r.status='acknowledged';ev(r,'ack');}
-function supersedeFrom(r,lines,why){S.requests.forEach(q=>{if(q!==r&&['date','check'].includes(q.type)&&(COMMITTED.includes(q.status)||['submitted','acknowledged','alternative'].includes(q.status))&&overlaps(q,{so:r.so,lines})){q.status='superseded';sysEv(q,'superseded',{note:`${r.id}, ${why}`});}});}
+function supersedeFrom(r,lines,why){S.requests.forEach(q=>{if(q!==r&&['date','check'].includes(q.type)&&['committed','missed','submitted','acknowledged','alternative'].includes(q.status)&&overlaps(q,{so:r.so,lines})){q.status='superseded';sysEv(q,'superseded',{note:`${r.id}, ${why}`});}});}
 function activate(r,rows){
-  const o=BY_SO[r.so];
-  r.commit={rows:rows.map(x=>({ln:x.ln,qty:x.qty,date:x.date,readyAt:null})),revisions:0,base:Object.fromEntries(o.lines.map(l=>[l.ln,l.rem])),baseB:Object.fromEntries(o.lines.map(l=>[l.ln,l.billed]))};
+  r.commit={rows:rows.map(x=>({ln:x.ln,qty:x.qty,date:x.date})),revisions:0};
   r.status='committed';
-  S.requests.forEach(q=>{if(q!==r&&q.type===r.type&&COMMITTED.includes(q.status)&&overlaps(q,r)){q.status='superseded';sysEv(q,'superseded',{note:r.id});}});
+  S.requests.forEach(q=>{if(q!==r&&q.type===r.type&&['committed','missed'].includes(q.status)&&overlaps(q,r)){q.status='superseded';sysEv(q,'superseded',{note:r.id});}});
 }
 /* date change */
 function dateDecide(r,outcome,rows,note){
@@ -1165,24 +1166,27 @@ function changeDecide(r,kind,date,note){
 }
 function changeCounter(r,date,note){r.reqDate=date;r.rounds++;r.status='acknowledged';setTurn(r);ev(r,'counter',{date,note});}
 function changeWO(r,wo){r.status='chg_sales';setTurn(r);ev(r,'wo_del',{wo});}
-function changeDone(r,note){r.status='changed';r.doneAt=T();r.unread.production=true;ev(r,'chg_done',{note,date:r.agreedDate||null});supersedeFrom(r,r.lines,'changed');if(r.agreedDate)activate(r,r.changes.map(c=>({ln:c.ln,qty:c.newQty!=null?c.newQty:lineOf(r.so,c.ln).rem,date:r.agreedDate})));}
+function changeDone(r,note){r.status='changed';r.doneAt=T();r.unread.production=true;ev(r,'chg_done',{note,date:r.agreedDate||null});supersedeFrom(r,r.lines,'changed');}
 /* common */
 function withdraw(r){r.status='withdrawn';ev(r,'withdraw');}
 function changeDate(r,idxs,date,note){
   idxs.forEach(i=>{r.commit.rows[i].date=date;});
-  const m=[];r.commit.rows.forEach(x=>{const f=m.find(y=>y.ln===x.ln&&y.date===x.date&&!y.readyAt&&!x.readyAt);if(f)f.qty+=x.qty;else m.push({...x});});
+  const m=[];r.commit.rows.forEach(x=>{const f=m.find(y=>y.ln===x.ln&&y.date===x.date);if(f)f.qty+=x.qty;else m.push({...x});});
   r.commit.rows=m;r.commit.revisions++;r.status='committed';
   ev(r,'change',{rows:r.commit.rows.filter(x=>x.date===date),ref:'request',reqLines:r.lines.map(x=>({...x})),note});
 }
-function markComplete(r,ln){const rows=r.commit.rows.filter(x=>(ln===undefined||x.ln===ln)&&!x.readyAt);rows.forEach(x=>x.readyAt=T());ev(r,'complete',{rows:ln===undefined?null:rows,ref:'request',reqLines:r.lines.map(x=>({...x}))});}
 function addNote(r,text){ev(r,'note',{note:text});}
+/* the only automatic step: a counter offer with no answer by its deadline expires */
+function evaluate(){
+  const t=T();
+  S.requests.forEach(r=>{if(r.status==='alternative'&&t>r.offerExpires){r.status='expired';sysEv(r,'expired');}});
+}
 
 /* ===== list rows ===== */
 const chevSvg='<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
 function keyDate(r){
   const short=ds=>fmt(ds[0])+(ds.length>1?` +${ds.length-1}`:'');
-  if(DONEC.includes(r.status))return `Done ${fmt(doneDate(r))}<small>Due ${short(datesOf(r.commit.rows))}</small>`;
-  if(r.commit&&COMMITTED.includes(r.status)){const n=bdBetween(T(),nextDue(r)||T());return `${short(datesOf(r.commit.rows))}<small class="${n<0?'red':''}">${n<0?`${-n} days late`:n===0?'Due today':`Due in ${n} day${n===1?'':'s'}`}</small>`;}
+  if(r.commit&&COMMITTED.includes(r.status))return `${short(datesOf(r.commit.rows))}<small>${r.type==='check'?'Confirmed':'Ready by'}</small>`;
   if(r.type==='date'&&r.status==='alternative')return `${short(datesOf(r.decision.rows))}<small>Offered</small>`;
   if(r.type==='change'&&r.status==='alternative')return `${fmt(r.offerDate)}<small>Offered</small>`;
   if(['cancelled','changed'].includes(r.status))return `${fmt(r.doneAt)}<small>Done</small>`;
@@ -1194,7 +1198,7 @@ const EVTXT={request:'sent',counter:'countered',offer:'counter offer',commit:'co
 function lastText(r){if(!r.lastT)return '';const n=bdBetween(r.lastAt.slice(0,10),T());return `${r.lastBy==='auto'?'':(r.lastName||NAMES[r.lastBy])+' '}${EVTXT[r.lastT]||r.lastT}, ${n<=0?'today':n===1?'yesterday':n+' days ago'}`;}
 function rowHTML(r,g){
   const o=BY_SO[r.so],st=statusOf(r),open=UI.openId===r.id;
-  const act=COMMITTED.includes(r.status)?`<button class="btn-ok" data-complete="${r.id}">Complete</button>`:`<button class="chevbtn" data-toggle="${r.id}" aria-label="${open?'Collapse':'Expand'} ${r.id}">${chevSvg}</button>`;
+  const act=`<button class="chevbtn" data-toggle="${r.id}" aria-label="${open?'Collapse':'Expand'} ${r.id}">${chevSvg}</button>`;
   const scope=r.type==='change'?plural(r.changes.length,'item'):scopeText(r);
   /* data-k = stable key so only changed rows are redrawn; data-sig changes when the request itself changes (used for the live-update flash) */
   return `<div class="rq ${open?'open':''}" id="rq-${r.id}" data-k="${r.id}" data-sig="${esc(r.status+'|'+(r.lastAt||'')+'|'+(r.lastT||''))}"><div class="rq-line">
@@ -1241,13 +1245,63 @@ function changesBlock(r,changes){
     return `<li style="flex-wrap:wrap;gap:6px 14px"><span>${parts.join('')}</span><span>${q}</span></li>`;}).join('')}</ul>`;
 }
 const woBadge=(txt,cls)=>`<div class="msg-wo ${cls||''}">${txt}</div>`;
+/* the date Sales gave on a Confirm ESD / Status check. Older ones only stored the ESD of the day, which isn't a date anyone asked for. */
+const neededBy=r=>r.type==='check'&&r.osnap&&r.reqDate===r.osnap.esd?null:r.reqDate;
+/* What was asked, by whom, and where it stands now: always the first thing in the thread */
+function requestCardHTML(r){
+  const o=BY_SO[r.so],by=r.createdByName||'Sales';
+  const ask=r.type==='date'?`${typeLabel(r)}: needed by ${fmtW(r.reqDate)}`
+    :r.type==='check'?`${typeLabel(r)}${neededBy(r)?': needed by '+fmtW(neededBy(r)):''}`
+    :r.type==='cancel'?(r.full?'Cancel the whole order':'Cancel items')
+    :`${typeLabel(r)}${r.reqDate?': needed by '+fmtW(r.reqDate):''}`;
+  const items=r.type==='change'?changesTable(r)
+    :r.lines.some(x=>x.ln!=null)?`<div class="scroll"><table class="it"><thead><tr><th>Item</th><th class="r">${r.type==='cancel'?'Cancel qty':'Qty'}</th></tr></thead><tbody>${r.lines.map(x=>{const l=x.ln!=null?lineOf(r.so,x.ln):null;return `<tr><td><div class="iname">${l?esc(l.item):'Whole order'}</div>${l?`<div class="isub">${esc(l.desc)}</div>`:''}</td><td class="r"><b class="mono">${num(x.qty)}</b></td></tr>`;}).join('')}</tbody></table></div>`
+    :'<p class="rqc-whole">Whole order</p>';
+  const w=ballWith(r);
+  const now=w?`Waiting on ${NAMES[w]} since ${fmtW(r.turn||r.created)}`
+    :r.commit&&COMMITTED.includes(r.status)?`${esc(r.answeredBy||'Production')} answered: ready by ${listDates(datesOf(r.commit.rows))}`
+    :esc(statusOf(r).t);
+  return `<section class="rqcard" data-k="rqc" aria-label="The request">
+  <div class="rqc-h"><span class="tag" data-dept="sales">Sales</span><span class="rqc-who"><b>${esc(by)}</b> asked on ${fmtTs(r.createdTs||r.created+'T00:00')}</span>${r.urgency==='High'?'<span class="tag hi">High urgency</span>':''}</div>
+  <div class="rqc-ask">${ask}<span class="rqc-esd">ESD now ${fmtW(o.esd)}</span></div>
+  ${items}
+  ${r.reason?`<div class="rqc-why"><span class="k">Why</span>${esc(r.reason)}</div>`:''}
+  <div class="rqc-now ${w?'wait':'done'}"><span class="k">Now</span>${now}</div></section>`;
+}
+/* one sentence per message: who did what, with the date when there is one */
+function saysHTML(r,e){
+  const ds=e.rows&&e.rows.some(x=>x.date)?listDates(datesOf(e.rows.filter(x=>x.date))):e.date?fmtW(e.date):'';
+  const by=ds?' '+ds:'',chk=r.type==='check';
+  const v={
+    request:r.type==='date'?`asked for a ${r.dir==='earlier'?'pull-in':'push-out'} to${by||' '+fmtW(r.reqDate)}`
+      :r.type==='check'?(e.ask==='status'?'asked where this order stands':'asked Production to confirm the ESD')+(neededBy(r)?`. Needed by ${fmtW(neededBy(r))}`:'')
+      :r.type==='cancel'?'asked to cancel':`asked for a change${e.date?'. Needed by '+fmtW(e.date):''}`,
+    counter:`countered: needs it by${by}`,
+    offer:`can’t make it, offered instead: ready by${by}`,
+    commit:`committed: ready by${by}`,
+    chk_ok:e.kind==='ontrack'?`confirmed it’s on track for${by}`:e.kind==='part'?`confirmed part of it: ready by${by}`:`gave a new date: ready by${by}`,
+    cant:chk?'can’t confirm a date right now':'can’t commit to a date right now',
+    decline:'declined the offer',
+    change:`sent a new date: ready by${by}`,
+    complete:'marked it complete',
+    note:'added a note',
+    withdraw:'withdrew the request',
+    cxl_ok:'approved the cancellation',
+    cxl_no:'can’t cancel it',
+    wo_del:'deleted the work orders in NetSuite',
+    cxl_done:r.full?'closed out the order in NetSuite':'deleted the line in NetSuite',
+    chg_ok:`approved the change${by?': ready by'+by:''}`,
+    chg_no:'denied the change',
+    chg_done:'made the changes in NetSuite'}[e.t]||e.t;
+  return `<div class="says"><b>${esc(e.name||NAMES[e.by])}</b> ${v}</div>`;
+}
 function threadHTML(r){
   const evs=S.ev.filter(e=>e.req===r.id);
   const lastParty=[...evs].reverse().find(e=>e.by!=='auto');
   /* Events load a moment after a request opens: show message-shaped skeletons until they arrive */
   if(!evs.length)return `<div class="thread" data-k="th" data-deep data-enter="tail" aria-busy="true">${[1,2,3].map(i=>`<div class="sk-msg" data-k="sk${i}" data-sk><span class="sk"></span><span class="sk"></span></div>`).join('')}</div>`;
   let lastDay='';
-  return `<div class="thread" data-k="th" data-deep data-enter="tail">${evs.map(e=>{
+  return `${requestCardHTML(r)}<div class="thread" data-k="th" data-deep data-enter="tail">${evs.map(e=>{
     /* a divider each time the day changes keeps long histories easy to scan */
     const day=e.at.slice(0,10),div=day!==lastDay?`<div class="day-div" data-k="d${e.ms}">${day===T()?'Today':fmtW(day)}</div>`:'';lastDay=day;
     const sys=(txt,c)=>`${div}<div class="sys ${c||''}" data-k="e${e.ms}">${txt}, ${fmt(e.at.slice(0,10))}</div>`;
@@ -1256,7 +1310,7 @@ function threadHTML(r){
       case 'missed':return sys('Missed, not complete by '+fmt(e.date),'red');
       case 'expired':return sys('Offer expired, no answer','amber');
       case 'met':return sys('Complete on time','ok');
-      case 'late':return sys(`Complete, ${plural(lateDays(r),'day')} late`,'red');
+      case 'late':return sys('Complete late','red');
       case 'superseded':return sys('Replaced by '+esc(e.note));
       case 'accept':return sys('Sales accepted','ok');
       case 'cxl_line':return sys('Line cancelled. Sales notified','ok');
@@ -1264,11 +1318,7 @@ function threadHTML(r){
     let label='',body='';
     switch(e.t){
       case 'request':
-        if(r.type==='date'){label=`${typeLabel(r)} request`;body=rowsBlock(r,e);}
-        else if(r.type==='check'){label=e.ask==='status'?'Status check':'Confirm ESD';body=e.rows&&e.rows.length?rowsBlock(r,e,e.ask==='status'?'Where is it?':'Confirm ESD '+fmt(BY_SO[r.so].esd)):`<div class="msg-d">${e.ask==='status'?'Where is it?':'Confirm ESD '+fmt(BY_SO[r.so].esd)} <span class="of">Whole order</span></div>`;}
-        else if(r.type==='cancel'){label='Cancel request';body=rowsBlock(r,e,'Cancel');}
-        else{label='Change request';body=`<div class="msg-d">Change <span class="of">${plural(e.changes.length,'item')}</span></div>${changesBlock(r,e.changes)}${e.date?`<div class="msg-d" style="font-size:16px;margin-top:8px">Needed by ${fmt(e.date)}</div>`:''}`;}
-        break;
+        body='<div class="msg-ref">Details in the request above</div>';break;
       case 'counter':label='Counter';body=r.type==='change'?`<div class="msg-d">Needed by ${fmt(e.date)}</div>`:rowsBlock(r,e);break;
       case 'offer':label='Counter offer';body=r.type==='change'?`<div class="msg-d">Ready by ${fmt(e.date)} <span class="of">with the requested changes</span></div>`:rowsBlock(r,e);break;
       case 'commit':label='Committed';body=rowsBlock(r,e);break;
@@ -1285,12 +1335,13 @@ function threadHTML(r){
       case 'cxl_done':label=r.full?'Order closed out':'Line deleted';body=woBadge('Cancellation complete','ok');break;
       case 'chg_ok':label='Change approved';body=e.date?`<div class="msg-d">Ready by ${fmt(e.date)}</div>`:'';break;
       case 'chg_no':label='Change denied';break;
-      case 'chg_done':label='Changes made';body=woBadge('Changed in NetSuite','ok')+(e.date?`<div class="msg-d" style="margin-top:8px">Ready by ${fmt(e.date)} <span class="of">tracked</span></div>`:'');break;
+      case 'chg_done':label='Changes made';body=woBadge('Changed in NetSuite','ok')+(e.date?`<div class="msg-d" style="margin-top:8px">Ready by ${fmt(e.date)}</div>`:'');break;
       default:label=e.t;
     }
     const side=e.by==='production'?'prod':'sales';
-    /* .party = square department badge. data-dept drives its color, so new departments only need a CSS rule. */
-    return `${div}<div class="msg ${side} ${e===lastParty?'last':''}" data-k="e${e.ms}" data-dept="${esc(e.by)}"><span class="party" data-dept="${esc(e.by)}" aria-hidden="true">${esc((NAMES[e.by]||'?').charAt(0))}</span><div class="msg-b"><div class="msg-h"><span class="who">${NAMES[e.by]}</span>${e.name?`<span class="msg-by">${esc(e.name)}</span>`:''}<span class="when">${fmtTs(e.at)}</span></div><div class="act">${label}</div>${body}${e.note?`<div class="msg-n">${esc(e.note)}</div>`:''}</div></div>`;
+    /* Sales on the left, Production on the right. The team tag's data-dept drives its colour, so a new department only needs a CSS rule. */
+    const note=e.t==='request'?'':e.note;
+    return `${div}<div class="msg ${side} ${e===lastParty?'last':''}" data-k="e${e.ms}" data-dept="${esc(e.by)}"><div class="msg-b"><div class="msg-h"><span class="tag" data-dept="${esc(e.by)}">${NAMES[e.by]}</span><span class="act">${label}</span><span class="when">${fmtTs(e.at)}</span></div>${saysHTML(r,e)}${body}${note?`<div class="msg-n">${esc(note)}</div>`:''}</div></div>`;
   }).join('')}</div>`;
 }
 
@@ -1320,15 +1371,13 @@ function contextHTML(r){
   ${near.length?`<div class="scroll" style="margin-top:10px"><table class="it"><thead><tr><th>Order</th><th>Customer</th><th>ESD</th><th class="r">$ In class</th></tr></thead><tbody>${near.slice(0,40).map(z=>`<tr><td class="mono"><b>${z.o.so}</b></td><td>${esc(z.o.c)}</td><td class="up">${fmt(z.o.esd)}${z.o.esd<t?`<span class="late-l">${plural(daysBetween(z.o.esd,t),'day')} late</span>`:''}</td><td class="r">${money(z.a)}</td></tr>`).join('')}</tbody></table></div>`:''}</div></details>`;
 }
 function commitCard(r){
-  const un=r.commit.rows.map((x,i)=>({x,i})).filter(z=>!z.x.readyAt);
-  const multi=datesOf(un.map(z=>z.x)).length>1;
-  const n=bdBetween(T(),nextDue(r)||T());
-  return `<div class="turn ${isProd()?'':'wait'}"><h3>${r.status==='missed'?'Missed':r.type==='check'?'Confirmed date':'Commitment'}<span class="r up" style="color:${n<0?'var(--red-text)':'var(--ok)'}">${listDates(datesOf(un.map(z=>z.x)))}, ${n<0?plural(-n,'day')+' late':n===0?'due today':'due in '+plural(n,'day')}</span></h3>
-  ${multi?`<div class="scroll"><table class="it"><thead><tr><th>Item</th><th class="r">Qty</th><th>Ready by</th><th></th></tr></thead><tbody>${un.map(z=>{const l=z.x.ln!=null?lineOf(r.so,z.x.ln):null;return `<tr><td><div class="iname">${l?esc(l.item):'Whole order'}</div></td><td class="r">${z.x.ln!=null?num(z.x.qty):''}</td><td class="up">${fmt(z.x.date)}</td><td class="r"><button class="btn-ok" data-ready="${z.x.ln}">Complete</button></td></tr>`;}).join('')}</tbody></table></div>`:''}
-  <div class="actions" style="${multi?'':'margin-top:0;padding-top:0;border-top:0'}"><button class="btn-red" id="cmpl">Mark complete</button>${isProd()?'<button class="btn-ghost" id="chgopen">Change date</button>':''}</div>
-  ${isProd()?`<div class="hidden" id="chgpane" style="margin-top:14px"><div class="scroll"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Qty</th><th>Was</th></tr></thead><tbody>${un.map(z=>{const l=z.x.ln!=null?lineOf(r.so,z.x.ln):null;return `<tr><td style="width:36px"><input type="checkbox" class="bx mv" data-i="${z.i}" checked aria-label="Move"></td><td><div class="iname">${l?esc(l.item):'Whole order'}</div></td><td class="r">${z.x.ln!=null?num(z.x.qty):''}</td><td class="up">${fmt(z.x.date)}</td></tr>`;}).join('')}</tbody></table></div>
+  if(!isProd())return '';
+  const rows=r.commit.rows.map((x,i)=>({x,i}));
+  return `<div class="turn wait"><h3>${r.type==='check'?'Confirmed':'Committed'}<span class="r up" style="color:var(--ok)">Ready by ${listDates(datesOf(r.commit.rows))}</span></h3>
+  <div class="actions" style="margin-top:0;padding-top:0;border-top:0"><button class="btn-ghost" id="chgopen">Send Sales a new date</button></div>
+  <div class="hidden" id="chgpane" style="margin-top:14px"><div class="scroll"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Qty</th><th>Was</th></tr></thead><tbody>${rows.map(z=>{const l=z.x.ln!=null?lineOf(r.so,z.x.ln):null;return `<tr><td style="width:36px"><input type="checkbox" class="bx mv" data-i="${z.i}" checked aria-label="Move"></td><td><div class="iname">${l?esc(l.item):'Whole order'}</div></td><td class="r">${z.x.ln!=null?num(z.x.qty):''}</td><td class="up">${fmt(z.x.date)}</td></tr>`;}).join('')}</tbody></table></div>
     <div class="row"><div><label class="lbl" for="newd">New date</label><input class="din" type="date" id="newd"></div></div><label class="lbl" for="n-chg">Reason</label><textarea class="ta" id="n-chg"></textarea><div class="err" id="aerr" role="alert"></div>
-    <div class="actions"><button class="btn-red" id="savechg">Save new date</button></div></div>`:''}</div>`;
+    <div class="actions"><button class="btn-red" id="savechg">Send new date</button></div></div></div>`;
 }
 function offerAnswerCard(r){
   const o=BY_SO[r.so];
@@ -1403,7 +1452,7 @@ function factsHTML(r){
   const esdF=fact('ESD',fmt(o.esd)+(late?`<span class="late-l">${plural(late,'day')} late</span>`:''),'up');
   const tail=fact('Sent',fmt(r.created),'up')+fact('Requested by',esc(r.createdByName||'—'))+fact('Answered by',esc(r.answeredBy||'—'))+fact('Unbilled',money(o.amt))+fact('Urgency',esc(r.urgency),'up'+(r.urgency==='High'?' red':''))+schedFact(r.so);
   if(r.type==='date'){const dl=daysBetween(r.reqDate,o.esd);return `<div class="facts">${esdF}${fact('Requested',fmt(r.reqDate)+(dl?`<span class="sub-l">${plural(Math.abs(dl),'day')} ${dl>0?'before':'after'} ESD</span>`:''),'up')}${tail}</div>`;}
-  if(r.type==='check')return `<div class="facts">${esdF}${fact('Production ESD',fmt(o.pesd),'up')}${tail}</div>`;
+  if(r.type==='check')return `<div class="facts">${neededBy(r)?fact('Date needed',fmt(neededBy(r)),'up'):''}${esdF}${fact('Production ESD',fmt(o.pesd),'up')}${tail}</div>`;
   if(r.type==='cancel'){const v=r.lines.reduce((s,x)=>{const l=x.ln!=null?lineOf(r.so,x.ln):null;return s+(l&&l.amt&&l.rem?l.amt*x.qty/l.rem:0);},0);return `<div class="facts">${esdF}${fact('$ To cancel',money(o.lines.length?v:o.amt),'red')}${tail}</div>`;}
   return `<div class="facts">${esdF}${fact('Date needed',r.reqDate?fmt(r.reqDate):'No change','up')}${tail}</div>`;
 }
@@ -1417,7 +1466,7 @@ function turnBand(r){
   const w=ballWith(r),st=statusOf(r);
   if(w&&w===S.view)return `<div class="turnband tb-you">${ICON.you}<span>Your turn</span><span class="tb-s">${isOverdue(r)?'Overdue, ':''}${esc(st.t)}</span></div>`;
   if(w)return `<div class="turnband tb-wait">${ICON.wait}<span>Waiting on ${NAMES[w]}</span><span class="tb-s">${isOverdue(r)?'Overdue, no answer after 1 business day':r.status==='alternative'?'Offer open until '+fmtW(r.offerExpires):'Since '+fmt(r.turn||r.created)}</span></div>`;
-  if(COMMITTED.includes(r.status)){const n=bdBetween(T(),nextDue(r)||T());return `<div class="turnband tb-track">${ICON.track}<span>${esc(st.t)}</span><span class="tb-s">${n===0?'Due today':'Due in '+plural(n,'day')}</span></div>`;}
+  if(COMMITTED.includes(r.status)&&r.commit)return `<div class="turnband tb-closed">${ICON.closed}<span>Answered</span><span class="tb-s">${esc(st.t)}, ready by ${listDates(datesOf(r.commit.rows))}</span></div>`;
   return `<div class="turnband tb-closed">${ICON.closed}<span>No one is waiting</span><span class="tb-s">${esc(st.t)}</span></div>`;
 }
 function recordHeaderHTML(r){
@@ -1437,7 +1486,7 @@ function detailHTML(r){
   const canWithdraw=isSales()&&(['submitted','acknowledged','alternative'].includes(r.status)||COMMITTED.includes(r.status));
   /* data-fresh = always redraw (keeps answer forms behaving exactly as before) */
   return `${recordHeaderHTML(r)}
-  <div class="tp-scroll" id="tps" data-k="tps" data-deep tabindex="-1"><div class="tp-col" data-k="col" data-deep>${gone}${viewer?'':`<div data-k="recip">${recipLine(r)}</div>`}${schedImpactHTML(r)}${threadHTML(r)}${viewer?'':`<div data-k="turn" data-fresh>${turnHTML(r)}</div>`}</div></div>
+  <div class="tp-scroll" id="tps" data-k="tps" data-deep tabindex="-1"><div class="tp-col" data-k="col" data-deep>${gone}${viewer?'':`<div data-k="recip">${recipLine(r)}</div>`}${threadHTML(r)}${schedImpactHTML(r)}${viewer?'':`<div data-k="turn" data-fresh>${turnHTML(r)}</div>`}</div></div>
   ${viewer?'':`<div class="composer" data-k="comp" data-fresh><div class="notebar"><input class="din" id="cmt" placeholder="Add a note for both teams" aria-label="Add a note" autocomplete="off"><button class="btn-ghost" id="cmtb">Add note</button>${canEditReq(r)?'<button class="btn-link" id="edreq" style="margin-left:auto">Edit request</button>':''}${canWithdraw?`<button class="btn-link" id="wd" style="margin-left:${canEditReq(r)?'18px':'auto'}">Withdraw request</button>`:''}</div></div>`}`;
 }
 /* Shown in the thread pane when no request is open */
@@ -1463,7 +1512,7 @@ function bindDetail(r){
     $('send').onclick=()=>{const v=get(),note=$('note').value.trim();
       if(v==='cant'){if(!note)return err('Add a reason.');dateDecide(r,'cannot',null,note);return done('Sent. Moved to Closed');}
       const d=$('ansd').value;if(!d)return err('Pick a ready date.');if(past(d))return err('That date is in the past.');
-      if(v==='all'){const rows=rowsFrom(r.lines,d);if(d===r.reqDate){dateDecide(r,'commit',rows,note);return done(`Committed ${fmt(d)}. Moved to Upcoming`);}if(!note)return err('Add a reason for the new date.');dateDecide(r,'alternative',rows,note);return done('Counter offer sent to Sales');}
+      if(v==='all'){const rows=rowsFrom(r.lines,d);if(d===r.reqDate){dateDecide(r,'commit',rows,note);return done(`Committed ${fmt(d)}. Moved to Answered`);}if(!note)return err('Add a reason for the new date.');dateDecide(r,'alternative',rows,note);return done('Counter offer sent to Sales');}
       const pk=readPicker('pa');if(pk.bad)return err('Check the quantities.');if(!pk.rows.length)return err('Pick at least one item.');
       if(r.lines.every(x=>pk.rows.some(y=>y.ln===x.ln&&y.qty>=x.qty)))return err('That’s everything. Use Complete.');if(!note)return err('Add a reason.');
       dateDecide(r,'alternative',rowsFrom(pk.rows,d),note);done('Counter offer sent to Sales');};
@@ -1473,12 +1522,12 @@ function bindDetail(r){
     tog('ck');
     const get=bindChoice('ck',v=>{$('ckdate').classList.toggle('hidden',!(v==='newdate'||v==='part'));$('ckpick').classList.toggle('hidden',v!=='part');$('cklbl').textContent=v==='ontrack'?'Where it stands (optional)':'Where it stands';});
     $('cksend').onclick=()=>{const v=get(),note=$('cknote').value.trim();
-      if(v==='ontrack'){checkAnswer(r,'ontrack',BY_SO[r.so].esd,note);return done('Confirmed. Moved to Upcoming');}
+      if(v==='ontrack'){checkAnswer(r,'ontrack',BY_SO[r.so].esd,note);return done('Confirmed. Moved to Answered');}
       if(!note)return err('Say where the order stands.');
       if(v==='cant'){checkAnswer(r,'cant',null,note);return done('Sent. Moved to Closed');}
       const d=$('ckd').value;if(!d)return err('Pick a ready date.');if(past(d))return err('That date is in the past.');
-      if(v==='part'){const pk=readPicker('ck');if(pk.bad)return err('Check the quantities.');if(!pk.rows.length)return err('Pick at least one item.');checkAnswer(r,'part',d,note,pk.rows);return done(`Confirmed ${fmt(d)}. Moved to Upcoming`);}
-      checkAnswer(r,'newdate',d,note);done(`Confirmed ${fmt(d)}. Moved to Upcoming`);};
+      if(v==='part'){const pk=readPicker('ck');if(pk.bad)return err('Check the quantities.');if(!pk.rows.length)return err('Pick at least one item.');checkAnswer(r,'part',d,note,pk.rows);return done(`Confirmed ${fmt(d)}. Moved to Answered`);}
+      checkAnswer(r,'newdate',d,note);done(`Confirmed ${fmt(d)}. Moved to Answered`);};
   }
   /* cancel answer */
   if($('cxsend')){
@@ -1503,9 +1552,9 @@ function bindDetail(r){
       const d=$('cgd').value;if(!d)return err('Pick a date.');if(past(d))return err('That date is in the past.');if(d===r.reqDate)return err('Same as requested. Use Approve.');
       changeDecide(r,'counter',d,note);done('Counter offer sent to Sales');};
   }
-  if($('cgdone'))$('cgdone').onclick=()=>{changeDone(r,$('cgdn').value.trim());done(r.agreedDate?'Changes done. Date tracked in Upcoming':'Changes done. Production notified');};
+  if($('cgdone'))$('cgdone').onclick=()=>{changeDone(r,$('cgdn').value.trim());done(r.agreedDate?'Changes done. Production notified':'Changes done. Production notified');};
   /* offers */
-  if($('acc'))$('acc').onclick=()=>{accept(r);done(r.type==='date'?'Accepted. Moved to Upcoming':'Accepted. Production will delete the work orders');};
+  if($('acc'))$('acc').onclick=()=>{accept(r);done(r.type==='date'?'Accepted. Moved to Answered':'Accepted. Production will delete the work orders');};
   if($('dec'))$('dec').onclick=()=>{decline(r,'');done('Declined. Moved to Closed');};
   if($('ctr'))$('ctr').onclick=()=>$('ctrpane').classList.toggle('hidden');
   if($('ctrsend'))$('ctrsend').onclick=()=>{const d=$('ctrd').value,n=$('ctrn').value.trim();if(!d)return err('Pick a date.');if(past(d))return err('That date is in the past.');if(!n)return err('Add a reason.');
@@ -1513,8 +1562,6 @@ function bindDetail(r){
     else changeCounter(r,d,n);
     done('Counter sent to Production');};
   /* commitments */
-  if($('cmpl'))$('cmpl').onclick=()=>armed($('cmpl'),()=>{markComplete(r);done('Marked complete. Moved to Complete');});
-  document.querySelectorAll('[data-ready]').forEach(b=>b.onclick=()=>{const v=b.dataset.ready;markComplete(r,v==='null'?null:+v);done('Item complete',true);});
   if($('chgopen'))$('chgopen').onclick=()=>$('chgpane').classList.toggle('hidden');
   if($('savechg'))$('savechg').onclick=()=>{const idx=[...document.querySelectorAll('.mv:checked')].map(c=>+c.dataset.i),d=$('newd').value,n=$('n-chg').value.trim();if(!idx.length)return err('Pick at least one item.');if(!d)return err('Pick the new date.');if(past(d))return err('That date is in the past.');if(!n)return err('Add a reason.');changeDate(r,idx,d,n);done(`New date ${fmt(d)}`,true);};
   const addN=()=>{const n=$('cmt').value.trim();if(!n)return;addNote(r,n);done('Note added',true);};
@@ -1527,10 +1574,8 @@ const UI={g:'date',tab:'answer',q:'',openId:null,cal:null};
 function parseHash(){const sm=location.hash.match(/^#(SO\d+)$/i);if(sm){UI.so=sm[1].toUpperCase();UI.sq='';history.replaceState(null,'','#ps-lookup');}
   if(/^#ps(-|$)/.test(location.hash)){const t=location.hash.slice(4);UI.g='ps';UI.tab=PS_TABS.includes(t)?t:'planner';return;}
   const h=location.hash.slice(1).split('-');const g=G(h[0])?h[0]:'date';const tab=G(g).tabs.includes(h[1])?h[1]:'answer';UI.g=g;UI.tab=tab;}
-const EMPTY={answer:'All caught up',waiting:'Nothing waiting',upcoming:'Nothing coming up',complete:'Nothing complete yet',done:'Nothing done yet',closed:'Nothing closed'};
-function onTime(g){const Q=S.requests.filter(r=>r.type===g),m=Q.filter(r=>r.status==='met').length,n=Q.filter(r=>['met','late','missed'].includes(r.status)).length;return n?Math.round(m/n*100)+'%':'—';}
+const EMPTY={answer:'All caught up',waiting:'Nothing waiting',answered:'Nothing answered yet',done:'Nothing done yet',closed:'Nothing closed'};
 function avgAnswer(g){const xs=S.requests.filter(r=>r.type===g&&r.firstAnswerAt).map(r=>(new Date(r.firstAnswerAt)-new Date(r.createdTs))/36e5);if(!xs.length)return '—';const h=xs.reduce((a,b)=>a+b,0)/xs.length;return h<24?Math.max(1,Math.round(h))+' hrs':(h/24).toFixed(1)+' days';}
-function avgLate(g){const xs=S.requests.filter(r=>r.type===g&&r.status==='late').map(lateDays);return xs.length?(xs.reduce((a,b)=>a+b,0)/xs.length).toFixed(1)+' days':'—';}
 /* the requests shown in the list right now (tab + search) */
 function currentList(){
   const q=UI.q.trim().toLowerCase();
@@ -1544,8 +1589,6 @@ function pageHTML(){
   const q=UI.q.trim().toLowerCase();
   const list=currentList();
   let perf='';
-  if(tab==='complete'){const Q=S.requests.filter(r=>r.type===g),t=T(),m=Q.filter(r=>r.status==='met').length,l=Q.filter(r=>r.status==='late').length,ms=Q.filter(r=>r.status==='missed').length,wk=Q.filter(r=>r.status==='committed'&&nextDue(r)&&nextDue(r)<=addBD(t,5)).length;
-    perf=`<div class="facts perf">${fact('On time',onTime(g),'big ok')}${fact('Complete on time',m,'big')}${fact('Complete late',l,'big')}${fact('Avg days late',avgLate(g),'big')}${fact('Avg answer time',avgAnswer(g),'big')}${fact('Missed',ms,'big'+(ms?' red':''))}${fact('Due this week',wk,'big')}</div>`;}
   /* EXTENSION POINT: department or record-type filter chips would go inside .list-tools, next to the search box */
   return `<div class="list-tools" data-k="tools"><div class="pagetitle"><h1 class="sr">${TABL()[tab]}</h1><span class="sp"><input class="search" type="search" id="rq" placeholder="Search order, customer, PO" value="${esc(UI.q)}" aria-label="Search ${esc(TABL()[tab])}"></span></div></div>
   <div class="list-scroll" id="ls" data-k="ls" data-deep>${perf?perf.replace('<div class="facts perf">','<div class="facts perf" data-k="perf">'):''}${listHTML(list,q?'No matches':EMPTY[tab])}</div>`;
@@ -1555,7 +1598,7 @@ function calendarHTML(g){
   const {y,m}=UI.cal,first=new Date(y,m,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
   const items={},add=(d,x)=>{if(d)(items[d]=items[d]||[]).push(x);};
   S.requests.filter(r=>r.type===g).forEach(r=>{
-    if(r.commit&&[...COMMITTED,...DONEC].includes(r.status))datesOf(r.commit.rows).forEach(d=>add(d,{r,c:r.status==='missed'||r.status==='late'?'red':r.status==='committed'?'ok':'muted'}));
+    if(r.commit&&COMMITTED.includes(r.status))datesOf(r.commit.rows).forEach(d=>add(d,{r,c:'ok'}));
     else if(r.status==='alternative'&&r.decision&&r.decision.rows)datesOf(r.decision.rows).forEach(d=>add(d,{r,c:'amber'}));
     else if(['submitted','acknowledged'].includes(r.status))add(g==='check'?BY_SO[r.so].esd:r.reqDate,{r,c:'want'});
   });
@@ -1585,7 +1628,8 @@ function renderNew(){
   let body='';
   if(ty==='date')body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Remaining</th><th class="r">Request qty</th></tr></thead><tbody>${pickRows}</tbody></table></div>`:''}
     <div class="row"><div><label class="lbl" for="nd">Date needed</label><input class="din" type="date" id="nd"></div><span class="dirlbl" id="dirlbl" style="margin-bottom:14px"></span></div>`;
-  else if(ty==='check')body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Remaining</th><th class="r">Ask about qty</th></tr></thead><tbody>${pickRows}</tbody></table></div>`:''}<label class="lbl">Question</label><div class="seg" role="group"><button type="button" data-ask="confirm" aria-pressed="${!late}">Confirm ESD</button><button type="button" data-ask="status" aria-pressed="${!!late}">Status check</button></div>`;
+  else if(ty==='check')body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Remaining</th><th class="r">Ask about qty</th></tr></thead><tbody>${pickRows}</tbody></table></div>`:''}<label class="lbl">Question</label><div class="seg" role="group"><button type="button" data-ask="confirm" aria-pressed="${!late}">Confirm ESD</button><button type="button" data-ask="status" aria-pressed="${!!late}">Status check</button></div>
+    <div class="row"><div><label class="lbl" for="nd">Date the customer needs it</label><input class="din" type="date" id="nd" value="${o.esd<t?t:o.esd}"></div></div>`;
   else if(ty==='cancel')body=o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Remaining</th><th class="r">Cancel qty</th></tr></thead><tbody>${pickRows}</tbody></table></div>`:'';
   else body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Current qty</th><th>New item</th><th class="r">New qty</th></tr></thead><tbody>${chgRows}</tbody></table></div><datalist id="itemlist">${Object.keys(ITEMS).sort().map(k=>`<option value="${esc(k)}">`).join('')}</datalist>`:'<p class="hint up">This order has no item lines to change.</p>'}
     <div class="row"><div><label class="lbl" for="nd">Date needed (optional)</label><input class="din" type="date" id="nd"></div></div>`;
@@ -1615,7 +1659,8 @@ function renderNew(){
     if(ty==='date'){const p=picked();if(o.lines.length&&!p.length)return e('Pick at least one item.');if(p.some(x=>!(x.qty>0)||x.qty>x.max))return e('Check the quantities.');
       const d=$('nd').value;if(!d)return e('Pick the date needed.');if(d<t)return e('That date is in the past.');const v=dir(d);if(v==='same')return e('That’s the ESD. Use Confirm ESD instead.');
       f={type:'date',dir:v,lines:p.map(x=>({ln:x.ln,qty:x.qty})),reqDate:d};}
-    else if(ty==='check'){const p=picked();if(o.lines.length&&!p.length)return e('Pick at least one item.');if(p.some(x=>!(x.qty>0)||x.qty>x.max))return e('Check the quantities.');f={type:'check',ask,reqDate:o.esd,lines:p.map(x=>({ln:x.ln,qty:x.qty}))};}
+    else if(ty==='check'){const p=picked();if(o.lines.length&&!p.length)return e('Pick at least one item.');if(p.some(x=>!(x.qty>0)||x.qty>x.max))return e('Check the quantities.');
+      const d=$('nd').value;if(!d)return e('Enter the date the customer needs it.');if(d<t)return e('That date is in the past.');f={type:'check',ask,reqDate:d,lines:p.map(x=>({ln:x.ln,qty:x.qty}))};}
     else if(ty==='cancel'){const p=picked();if(o.lines.length&&!p.length)return e('Pick at least one item.');if(p.some(x=>!(x.qty>0)||x.qty>x.max))return e('Check the quantities.');f={type:'cancel',lines:p.map(x=>({ln:x.ln,qty:x.qty}))};}
     else{const ch=[];let bad='';
       document.querySelectorAll('.nc').forEach(c=>{if(!c.checked)return;const ln=+c.dataset.ln,l=lineOf(o.so,ln),it=document.querySelector(`.nci[data-ln="${ln}"]`).value.trim().toUpperCase(),qv=document.querySelector(`.ncq[data-ln="${ln}"]`).value;const nq=qv===''?null:+qv;
@@ -1792,7 +1837,6 @@ document.addEventListener('click',e=>{
   if(tg.id==='admin-import')return openImport();
   if(tg.id==='admin-users')return openUsers();
   const go=tg.closest('[data-goto]');if(go){const r=R(go.dataset.goto);UI.openId=r.id;UI.q='';const h=`${r.type}-${tabOf(r)}`;if(location.hash!=='#'+h)location.hash=h;else render();setTimeout(()=>{const el=document.getElementById('rq-'+r.id);if(el)el.scrollIntoView({block:'start'});},30);return;}
-  const cp=tg.closest('[data-complete]');if(cp){return armed(cp,async()=>{const r=R(cp.dataset.complete);if(!r)return;const before=snapshotReqs(),exp=r.status;BUF=[];markComplete(r);evaluate();if(UI.openId===r.id)UI.openId=null;const ok=await persist(r.id,exp,before);render();if(ok)toast(`${r.so} complete. Moved to Complete`);});}
   const tgl=tg.closest('[data-toggle]');if(tgl){const id=tgl.dataset.toggle;UI.openId=UI.openId===id?null:id;render();if(UI.openId){const el=document.getElementById('rq-'+id);if(el){const top=el.getBoundingClientRect().top;if(top<0||top>window.innerHeight*.6)el.scrollIntoView({block:'start'});}}return;}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.classList.contains('hidden'))closeModal();});
@@ -1872,7 +1916,7 @@ const wkLabel=w=>`${MON[pd(w).getMonth()]} ${pd(w).getDate()}`;
 /* The promise an order is held to: an open portal commitment first, then the tracker / email
    promise seeded from Excel, else none. perLine holds committed dates by line. */
 function promiseOf(so){
-  const reqs=S.requests.filter(r=>r.so===so&&r.commit&&[...COMMITTED,...DONEC].includes(r.status));
+  const reqs=S.requests.filter(r=>r.so===so&&r.commit&&COMMITTED.includes(r.status));
   if(reqs.length){
     const open=reqs.filter(r=>COMMITTED.includes(r.status)),rows=open.flatMap(r=>r.commit.rows.filter(x=>!x.readyAt));
     const last=[...reqs].sort((a,b)=>(a.lastAt||'')<(b.lastAt||'')?-1:1).pop();
@@ -2470,7 +2514,7 @@ function itemList(r,rows,reqLines,restTxt){
 
 /* the schedule, seen from a request */
 function schedImpactHTML(r){
-  if(!SCHED_READY||SCHED_ERR||!SMETA)return '';
+  if(!isProd()||!SCHED_READY||SCHED_ERR||!SMETA)return '';
   const o=BY_SO[r.so];if(!o||o.gone)return '';
   const tm=THISMON(),lines=(r.lines&&r.lines.some(x=>x.ln!=null)?r.lines:o.lines.filter(l=>l.rem>0).map(l=>({ln:l.ln,qty:l.rem}))).filter(x=>x.ln!=null&&schedulable(lineOf(r.so,x.ln)||{}));
   if(!lines.length)return '';
@@ -2493,9 +2537,10 @@ function schedImpactHTML(r){
   else verdict=`Finishes Week ${fmt(fin)}`;
   const hint=r.type==='cancel'?'':cls==='red'?(isProd()?'Pull runs earlier in the Planner, or answer with the date the schedule can make.':'Production will see this when they answer.'):cls==='amber'&&isProd()?'Plan it in the Planner before committing a date.':'';
   const canFree=isProd()&&r.type==='cancel'&&['cxl_wo','cxl_close','cancelled'].includes(r.status)&&fin;
-  return `<div class="simp" data-k="simp"><div class="simp-h"><b>Planner</b><span class="stk ${cls}">${esc(verdict)}</span></div>
+  /* Production only, folded to one line under the conversation; opening it is remembered while you move between requests */
+  return `<details class="simp" data-k="simp" ${UI.simpOpen?'open':''}><summary class="simp-h"><b>Planner</b><span class="stk ${cls}">${esc(verdict)}</span></summary>
   ${hint?`<p class="simp-n">${hint}</p>`:''}<div class="scroll" style="max-height:none;border-top:0"><table class="it st"><thead><tr><th>Item</th><th class="r">${r.type==='cancel'?'Cancel qty':'Request qty'}</th><th>On the schedule</th></tr></thead><tbody>${rowsH}</tbody></table></div>
-  <div class="simp-a"><button class="btn-link" data-planso="${r.so}">Open In Planner</button>${canFree?`<button class="btn-ink sm" data-cxlfree="${r.id}">Take Cancelled Qty Off The Schedule</button>`:''}</div></div>`;
+  <div class="simp-a"><button class="btn-link" data-planso="${r.so}">Open In Planner</button>${canFree?`<button class="btn-ink sm" data-cxlfree="${r.id}">Take Cancelled Qty Off The Schedule</button>`:''}</div></details>`;
 }
 /* one fact on the New request form */
 function schedOrderStrip(so){
@@ -2570,99 +2615,13 @@ async function saveEditReq(r,o){
   if(!ok){document.getElementById('er-save').disabled=false;return;}
   closeModal();render();toast(`${r.id} updated. Production was notified.`);
 }
+document.addEventListener('toggle',e=>{if(e.target.classList&&e.target.classList.contains('simp'))UI.simpOpen=e.target.open;},true);
 document.addEventListener('click',e=>{
   const tg=e.target;
   if(tg.id==='edreq'){const r=R(UI.openId);if(r&&canEditReq(r))openEditReq(r);return;}
   const pl=tg.closest('[data-planso]');if(pl){const o=BY_SO[pl.dataset.planso];UI.pq=pl.dataset.planso;UI.pk=o&&o.lines.some(l=>l.rem>0&&kindOf(l)==='elbow')?'elbow':'cf';UI.dw=null;if(location.hash!=='#ps-planner')location.hash='ps-planner';else render();return;}
   const cf=tg.closest('[data-cxlfree]');if(cf){const r=R(cf.dataset.cxlfree);if(r)armed(cf,()=>freeForCancel(r));return;}
 });
-
-/* ===================== COMPLETION FROM THE NETSUITE BACKLOG =====================
-   Replaces the portal's evaluate(). A request is judged by what the backlog shows, not by emails:
-   - Commitments (date change, confirm ESD, change with a date): every committed row is matched to
-     what has shipped on its line since the commitment: the rise in billed qty, or the line / whole
-     order leaving the backlog. A drop in remaining qty alone (a cancel or a qty edit in NetSuite) is
-     not shipping. Rows are filled earliest-due first, so partial shipments complete the first rows
-     and leave the rest open.
-       Backlog exports are taken in the morning, so the first backlog dated after the due day shows
-       where things stood at the end of it: shipped by then -> on time; still open on it -> missed
-       (and late if it ships afterwards). Each open row remembers the last backlog day it was seen
-       open, and a completion is dated the business day after that, so a shipment the portal only
-       notices days later (nobody had it open) is still judged by when it happened.
-     Missed and late are tracked here only; the email automation sends nothing for them.
-   - Cancellations waiting on Sales to close the line/order: complete when the line's ordered qty
-     drops by the cancelled qty (or the line / order is closed off the backlog).
-   - Changes waiting on Sales: complete when the new item is on the order and/or the line shows the
-     new qty.
-   The backlog's own date (META.asOf) is used, never the clock, so a stale export never marks
-   anything missed. */
-const backlogDay=()=>META&&META.asOf?META.asOf.slice(0,10):null;
-const graceDay=d=>addBD(d,1);
-/* each line as it was when the commitment was made (older commitments: when the request was made) */
-function baseOf(r,key,saved){const b={};((r.osnap&&r.osnap.lines)||[]).forEach(l=>{b[l.ln]=l[key];});return {...b,...((r.commit&&r.commit[saved])||{})};}
-const curLine=(r,ln)=>{const o=BY_SO[r.so];return !o||o.gone?null:o.lines.find(y=>y.ln===ln)||null;};
-/* qty shipped on a line since the commitment: billed went up, or the line left the backlog */
-function shippedOn(r,ln){
-  const l=curLine(r,ln),rem=baseOf(r,'rem','base')[ln],billed=baseOf(r,'billed','baseB')[ln];
-  if(!l)return rem==null?0:rem;
-  return billed==null?0:Math.max(0,(+l.billed||0)-(+billed||0));
-}
-/* how many of each committed row has shipped: {rowIndex: qty} */
-function rowProgress(r){
-  const rows=r.commit.rows,o=BY_SO[r.so],gone=!o||o.gone,shipped={},out={};
-  rows.forEach(x=>{if(x.ln!=null&&shipped[x.ln]==null)shipped[x.ln]=shippedOn(r,x.ln);});
-  rows.map((x,i)=>({x,i})).sort((a,b)=>a.x.date<b.x.date?-1:a.x.date>b.x.date?1:a.i-b.i).forEach(({x,i})=>{
-    if(x.ln==null){out[i]=gone?(x.qty||1):0;return;}
-    const q=Math.min(+x.qty||0,shipped[x.ln]||0);shipped[x.ln]-=q;out[i]=q;
-  });
-  return out;
-}
-const partShipped=r=>{if(!r.commit||!COMMITTED.includes(r.status))return false;const p=rowProgress(r);return r.commit.rows.some((x,i)=>!x.readyAt&&p[i]>0)||(r.commit.rows.some(x=>x.readyAt)&&r.commit.rows.some(x=>!x.readyAt));};
-function evalCommit(r,day){
-  const rows=r.commit.rows,p=rowProgress(r),newly=[];
-  rows.forEach((x,i)=>{
-    if(x.readyAt)return;
-    if(p[i]>=(x.ln==null?1:(+x.qty||0))-1e-9){
-      /* shipped some time after the last backlog that still showed it open */
-      const after=x.open?graceDay(x.open):day;x.readyAt=after<day?after:day;delete x.open;newly.push({...x});
-    }else if(x.open!==day)x.open=day;
-  });
-  if(newly.length){const o=BY_SO[r.so];sysEv(r,'complete',{rows:newly,ref:'request',reqLines:r.lines.map(x=>({...x})),note:!o||o.gone?'Off the NetSuite backlog':'Shipped or billed in NetSuite'});}
-  if(rows.every(x=>x.readyAt)){const ok=rows.every(x=>x.readyAt<=graceDay(x.date));r.status=ok?'met':'late';sysEv(r,ok?'met':'late');}
-  /* a backlog dated after the due day shows where things stood at the end of it */
-  else if(r.status==='committed'&&rows.some(x=>!x.readyAt&&day>x.date)){r.status='missed';setTurn(r);sysEv(r,'missed',{date:nextDue(r)});}
-}
-function evalCancel(r){
-  const o=BY_SO[r.so],gone=!o||o.gone,ordered=baseOf(r,'qty','none');
-  const rows=(r.cxl&&r.cxl.rows)||r.lines||[];
-  /* a cancel lowers the ordered qty (or closes the line); shipping does not */
-  const cut=c=>{const l=curLine(r,c.ln);if(!l)return true;const was=ordered[c.ln];return was!=null&&(c.qty==null?(+l.qty||0)<=(+l.billed||0):was-(+l.qty||0)>=+c.qty-1e-9);};
-  const done=gone||(!r.full&&rows.length&&rows.every(c=>c.ln!=null&&cut(c)));
-  if(!done)return;
-  r.status='cancelled';r.doneAt=T();sysEv(r,'cxl_done',{note:'Shows in NetSuite'});supersedeFrom(r,rows,'cancelled');
-}
-function evalChange(r){
-  const o=BY_SO[r.so];if(!o||o.gone||!r.changes||!r.changes.length)return;
-  const was=baseOf(r,'item','none');
-  const done=r.changes.every(c=>{
-    /* the new item is on the order, and the changed line no longer has the old item (the new item may already be on another line) */
-    const itemOk=!c.newItem||(o.lines.some(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase())&&(curLine(r,c.ln)||{}).item!==was[c.ln]);
-    const qtyOk=c.newQty==null||(c.newItem?o.lines.some(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase()&&Math.abs(l.rem-c.newQty)<1e-9):Math.abs(((curLine(r,c.ln)||{}).rem||0)-c.newQty)<1e-9);
-    return itemOk&&qtyOk;});
-  if(!done)return;
-  r.status='changed';r.doneAt=T();r.unread=r.unread||{};r.unread.production=true;sysEv(r,'chg_done',{note:'Shows in NetSuite',date:r.agreedDate||null});supersedeFrom(r,r.lines,'changed');
-  if(r.agreedDate)activate(r,r.changes.map(c=>{const nl=c.newItem?o.lines.find(l=>String(l.item).toUpperCase()===String(c.newItem).toUpperCase()):null;return {ln:nl?nl.ln:c.ln,qty:c.newQty!=null?c.newQty:(lineOf(r.so,c.ln)||{}).rem,date:r.agreedDate};}));
-}
-function evaluate(){
-  const t=T(),day=backlogDay();
-  S.requests.forEach(r=>{
-    if(r.status==='alternative'&&t>r.offerExpires){r.status='expired';sysEv(r,'expired');}
-    if(!day)return;
-    if(COMMITTED.includes(r.status)&&r.commit)evalCommit(r,day);
-    else if(r.status==='cxl_close')evalCancel(r);
-    else if(r.status==='chg_sales')evalChange(r);
-  });
-}
 
 /* ===================== FIREBASE LAYER ===================== */
 const CONFIG_OK=firebaseConfig.apiKey&&firebaseConfig.apiKey!=='PASTE_HERE';
@@ -2701,7 +2660,7 @@ async function nextId(){
   const n=await runTransaction(db,async tx=>{const s=await tx.get(ref);const v=s.exists()?s.data().next:1001;tx.set(ref,{next:v+1});return v;});
   return 'R-'+n;
 }
-/* automatic checks: missed, expired offers, auto-complete from Actual Complete. Each request is
+/* automatic check: counter offers that expire. Each request is
    written in its own transaction so two open browsers can't record the same event twice. */
 async function runEvaluate(){
   if(!ME||!['sales','production'].includes(ME.role)||!READY)return;
