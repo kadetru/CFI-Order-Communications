@@ -1497,7 +1497,7 @@ function bindChoice(name,cb){let v=null;document.querySelectorAll(`[data-${name}
 function bindDetail(r){
   const $=id=>document.getElementById(id),err=m=>{const e=$('aerr');if(e)e.textContent=m;return false;};
   const before=snapshotReqs(),expect=r.status;BUF=[];
-  const done=async(m,stay)=>{evaluate();DIRTY=false;const ok=await persist(r.id,expect,before);if(ok&&!stay&&tabOf(r)!==UI.tab)UI.openId=null;render();if(ok)toast(m);};
+  const done=async(m,stay)=>{const k=S.requests.findIndex(q=>q.id===r.id);if(k>=0)S.requests[k]=r;evaluate();DIRTY=false;const ok=await persist(r.id,expect,before);if(ok&&!stay&&tabOf(r)!==UI.tab)UI.openId=null;render();if(ok)toast(m);};
   const tog=id=>document.querySelectorAll(`.${id}-ck`).forEach(c=>c.onchange=()=>{document.querySelector(`.${id}-q[data-ln="${c.dataset.ln}"]`).disabled=!c.checked;});
   ['pa','sc','cx'].forEach(tog);
   const past=d=>d<T();
@@ -1769,17 +1769,13 @@ function paint(html,viewKey){
   const ls=document.getElementById('ls');
   if(ls&&switched){ls.scrollTop=0;if(ls.animate)ls.animate([{opacity:0},{opacity:1}],{duration:160,easing:'ease-out'});}
   if(ls&&first)ls.querySelectorAll('.rq').forEach((n,i)=>{if(i<12)enterAnim(n,i,false);});
-  /* conversation scroll: a newly opened request starts at the latest message and the answer card below it;
+  /* conversation scroll: a newly opened request starts at the top (the request card), so the context is read first;
      after that, follow new messages only if the reader was already at the bottom */
   const ns=document.getElementById('tps');
   if(ns){
     const fresh=PANE_FOR!==UI.openId||ns.querySelector('[data-sk]')||!ns._filled;
-    if(fresh||stick){
-      ns.scrollTop=ns.scrollHeight;
-      /* never scroll the latest message out of sight: if it and the answer card don't both fit, start at the message */
-      const msgs=ns.querySelectorAll('.msg'),card=msgs.length?msgs[msgs.length-1]:ns.querySelector('.turn');
-      if(card){const d=card.getBoundingClientRect().top-ns.getBoundingClientRect().top;if(d<0)ns.scrollTop+=d-12;}
-    }
+    if(fresh)ns.scrollTop=0;
+    else if(stick)ns.scrollTop=ns.scrollHeight;
     if(!ns.querySelector('[data-sk]'))ns._filled=true;
     PANE_FOR=UI.openId;
   }else PANE_FOR=null;
@@ -2637,6 +2633,7 @@ async function persist(mainId,expect,before){
   const evs=BUF.splice(0);
   if(!changed.length&&!evs.length)return true;
   try{
+    if(evs.some(e=>!changed.some(q=>q.id===e.req)))throw new Error('STALE');
     await runTransaction(db,async tx=>{
       if(mainId){const s=await tx.get(doc(db,'requests',mainId));
         if(expect==='__new__'){if(s.exists())throw new Error('STALE');}
