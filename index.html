@@ -1107,7 +1107,7 @@ function listFor(g,tab){
 const groupBadge=g=>listFor(g,'answer').length+S.requests.filter(r=>r.type===g&&unread(r)).length;
 
 /* ===== actions ===== */
-function ev(r,t,o){const e={req:r.id,at:ts(),ms:Date.now()*100+(SEQN++%100),by:S.view,name:S.view==='auto'||!ME?'':(ME.name||ME.email),t,...(o||{})};S.ev.push(e);BUF.push(e);r.lastAt=e.at;r.lastT=t;r.lastBy=S.view;r.lastName=e.name;if(S.view==='production'&&e.name)r.answeredBy=e.name;return e;}
+function ev(r,t,o){const e={req:r.id,at:ts(),ms:Date.now()*100+(SEQN++%100),by:S.view,name:S.view==='auto'||!ME?'':(ME.name||ME.email),t,...(o||{})};S.ev.push(e);BUF.push(e);r.lastAt=e.at;r.lastMs=e.ms;r.lastT=t;r.lastBy=S.view;r.lastName=e.name;if(S.view==='production'&&e.name)r.answeredBy=e.name;return e;}
 function sysEv(r,t,o){const pv=S.view;S.view='auto';ev(r,t,o);S.view=pv;}
 function setTurn(r){r.turn=T();}
 function firstAnswer(r){if(!r.firstAnswerAt)r.firstAnswerAt=ts();}
@@ -1627,7 +1627,7 @@ function renderNew(){
   if(ty==='date')body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Remaining</th><th class="r">Request qty</th></tr></thead><tbody>${pickRows}</tbody></table></div>`:''}
     <div class="row"><div><label class="lbl" for="nd">Date needed</label><input class="din" type="date" id="nd"></div><span class="dirlbl" id="dirlbl" style="margin-bottom:14px"></span></div>`;
   else if(ty==='check')body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Remaining</th><th class="r">Ask about qty</th></tr></thead><tbody>${pickRows}</tbody></table></div>`:''}<label class="lbl">Question</label><div class="seg" role="group"><button type="button" data-ask="confirm" aria-pressed="${!late}">Confirm ESD</button><button type="button" data-ask="status" aria-pressed="${!!late}">Status check</button></div>
-    <div class="row"><div><label class="lbl" for="nd">Date the customer needs it</label><input class="din" type="date" id="nd" value="${o.esd<t?t:o.esd}"></div></div>`;
+    <div class="row ${late?'hidden':''}" id="ndrow"><div><label class="lbl" for="nd">Date the customer needs it</label><input class="din" type="date" id="nd" value="${o.esd<t?t:o.esd}"></div></div>`;
   else if(ty==='cancel')body=o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Remaining</th><th class="r">Cancel qty</th></tr></thead><tbody>${pickRows}</tbody></table></div>`:'';
   else body=`${o.lines.length?`<div class="scroll" style="margin-top:14px"><table class="it"><thead><tr><th></th><th>Item</th><th class="r">Current qty</th><th>New item</th><th class="r">New qty</th></tr></thead><tbody>${chgRows}</tbody></table></div><datalist id="itemlist">${Object.keys(ITEMS).sort().map(k=>`<option value="${esc(k)}">`).join('')}</datalist>`:'<p class="hint up">This order has no item lines to change.</p>'}
     <div class="row"><div><label class="lbl" for="nd">Date needed (optional)</label><input class="din" type="date" id="nd"></div></div>`;
@@ -1644,7 +1644,7 @@ function renderNew(){
   const $=id=>document.getElementById(id);
   document.querySelectorAll('[data-nt]').forEach(b=>b.onclick=()=>{NR.type=b.dataset.nt;renderNew();});
   let ask=late?'status':'confirm';
-  document.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>{ask=b.dataset.ask;document.querySelectorAll('[data-ask]').forEach(z=>z.setAttribute('aria-pressed',z===b));});
+  document.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>{ask=b.dataset.ask;document.querySelectorAll('[data-ask]').forEach(z=>z.setAttribute('aria-pressed',z===b));document.getElementById('ndrow').classList.toggle('hidden',ask==='status');});
   document.querySelectorAll('.ni').forEach(c=>c.onchange=()=>{document.querySelector(`.nqty[data-ln="${c.dataset.ln}"]`).disabled=!c.checked;});
   document.querySelectorAll('.nc').forEach(c=>c.onchange=()=>{document.querySelector(`.nci[data-ln="${c.dataset.ln}"]`).disabled=!c.checked;document.querySelector(`.ncq[data-ln="${c.dataset.ln}"]`).disabled=!c.checked;});
   const dir=d=>!d?'':(o.esd<t||d<o.esd)?'earlier':d>o.esd?'later':'same';
@@ -1658,7 +1658,7 @@ function renderNew(){
       const d=$('nd').value;if(!d)return e('Pick the date needed.');if(d<t)return e('That date is in the past.');const v=dir(d);if(v==='same')return e('That’s the ESD. Use Confirm ESD instead.');
       f={type:'date',dir:v,lines:p.map(x=>({ln:x.ln,qty:x.qty})),reqDate:d};}
     else if(ty==='check'){const p=picked();if(o.lines.length&&!p.length)return e('Pick at least one item.');if(p.some(x=>!(x.qty>0)||x.qty>x.max))return e('Check the quantities.');
-      const d=$('nd').value;if(!d)return e('Enter the date the customer needs it.');if(d<t)return e('That date is in the past.');f={type:'check',ask,reqDate:d,lines:p.map(x=>({ln:x.ln,qty:x.qty}))};}
+      const d=ask==='status'?null:$('nd').value;if(ask!=='status'){if(!d)return e('Enter the date the customer needs it.');if(d<t)return e('That date is in the past.');}f={type:'check',ask,reqDate:d,lines:p.map(x=>({ln:x.ln,qty:x.qty}))};}
     else if(ty==='cancel'){const p=picked();if(o.lines.length&&!p.length)return e('Pick at least one item.');if(p.some(x=>!(x.qty>0)||x.qty>x.max))return e('Check the quantities.');f={type:'cancel',lines:p.map(x=>({ln:x.ln,qty:x.qty}))};}
     else{const ch=[];let bad='';
       document.querySelectorAll('.nc').forEach(c=>{if(!c.checked)return;const ln=+c.dataset.ln,l=lineOf(o.so,ln),it=document.querySelector(`.nci[data-ln="${ln}"]`).value.trim().toUpperCase(),qv=document.querySelector(`.ncq[data-ln="${ln}"]`).value;const nq=qv===''?null:+qv;
@@ -2627,7 +2627,7 @@ const snapshotReqs=()=>new Map(S.requests.map(q=>[q.id,JSON.stringify(q)]));
 const nowTs=CT;
 
 /* save everything that changed since `before`, in one transaction.
-   mainId/expect: the request the user acted on must still have the status they saw. */
+   mainId/expect: the request the user acted on must still have the status and last update they saw. */
 async function persist(mainId,expect,before){
   const changed=S.requests.filter(q=>before.get(q.id)!==JSON.stringify(q));
   const evs=BUF.splice(0);
@@ -2637,7 +2637,7 @@ async function persist(mainId,expect,before){
     await runTransaction(db,async tx=>{
       if(mainId){const s=await tx.get(doc(db,'requests',mainId));
         if(expect==='__new__'){if(s.exists())throw new Error('STALE');}
-        else if(!s.exists()||s.data().status!==expect)throw new Error('STALE');}
+        else if(!s.exists()||s.data().status!==expect||(s.data().lastMs||0)!==(JSON.parse(before.get(mainId)||'{}').lastMs||0))throw new Error('STALE');}
       changed.forEach(q=>tx.set(doc(db,'requests',q.id),clean(q)));
       evs.forEach(e=>tx.set(doc(collection(db,'requests',e.req,'events')),clean(e)));
     });
@@ -2664,7 +2664,7 @@ async function runEvaluate(){
   const changed=S.requests.filter(q=>before.get(q.id)!==JSON.stringify(q)),evs=BUF.splice(0);
   for(const q of changed){
     const exp=JSON.parse(before.get(q.id)).status,qe=evs.filter(e=>e.req===q.id);
-    try{await runTransaction(db,async tx=>{const s=await tx.get(doc(db,'requests',q.id));if(!s.exists()||s.data().status!==exp||(s.data().lastAt||'')!==(JSON.parse(before.get(q.id)).lastAt||''))throw new Error('STALE');tx.set(doc(db,'requests',q.id),clean(q));qe.forEach(e=>tx.set(doc(collection(db,'requests',q.id,'events')),clean(e)));});}catch(e){}
+    try{await runTransaction(db,async tx=>{const s=await tx.get(doc(db,'requests',q.id));if(!s.exists()||s.data().status!==exp||(s.data().lastMs||0)!==(JSON.parse(before.get(q.id)).lastMs||0))throw new Error('STALE');tx.set(doc(db,'requests',q.id),clean(q));qe.forEach(e=>tx.set(doc(collection(db,'requests',q.id,'events')),clean(e)));});}catch(e){}
   }
 }
 function watchEvents(){
